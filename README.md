@@ -24,6 +24,9 @@ Correct answers reveal keywords. When combined, these form a predefined sentence
 ## 🧠 Game Mechanics
 
 - Multiple quiz stations, each with a unique question
+- Two-step access process:
+  1. Enter the correct access code (related to Bitcoin terminology)
+  2. Complete the Lightning payment to unlock the question
 - Configurable access modes:
   - *Low-fee*: Multiple Choice with feedback
   - *Premium*: Instant access to the correct answer
@@ -38,6 +41,8 @@ Correct answers reveal keywords. When combined, these form a predefined sentence
 |-------------|----------------------------|------------------------------------|
 | Framework   | Next.js (Vercel)           | SSR, routing, API endpoints        |
 | Styling     | Tailwind CSS               | Responsive mobile-first UI         |
+| UI          | Radix UI                   | Accessible components              |
+| Animations  | Framer Motion              | Smooth transitions & effects       |
 | Hosting     | Vercel                     | Scalable deployment                |
 | Payments    | LNbits + LNURL-Pay         | Lightning-native payments          |
 | API         | Next.js API Routes         | Handles LNbits polling & logic     |
@@ -56,6 +61,8 @@ sequenceDiagram
     participant W as Wallet
 
     U->>A: Opens station (e.g. /q1)
+    A->>U: Prompts for access code
+    U->>A: Enters access code
     A->>U: Displays LNURL-Pay QR code (from config)
     U->>W: Pays Lightning invoice via wallet
     W->>L: Sends payment to LNbits
@@ -64,7 +71,7 @@ sequenceDiagram
     A->>U: Reveals the quiz question
 ```
 
-Each question is locked behind a Lightning payment. Once paid, the question is revealed. Answering it correctly unlocks a "solution word" for the final message.
+Each question is locked behind both an access code and a Lightning payment. Once both are completed, the question is revealed. Answering it correctly unlocks a "solution word" for the final message.
 
 ---
 
@@ -86,6 +93,8 @@ All questions and answers are fully customizable via JSON.
 - Supports educational, team-building, and onboarding use cases  
 - Runs on Bitcoin-native infrastructure (LNURL, LNbits, non-custodial)  
 - Blends movement, collaboration, and learning  
+- Modern, accessible UI with smooth animations
+- Two-factor access (knowledge + payment) for enhanced engagement
 
 ---
 
@@ -108,7 +117,9 @@ To keep things simple, use [LNbits](https://legend.lnbits.com) as your Lightning
   "lnurl": "lnurl1dp68gurn8ghj7mrv9...",
   "options": [...],
   "correct_index": 0,
-  "solution_word": "Cantillon"
+  "answer_key": "Cantillon",
+  "access_code": "magic",
+  "hint": "A hint about the access code"
 }
 ```
 

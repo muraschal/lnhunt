@@ -1,9 +1,16 @@
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import questions from '../questions.json';
+"use client"
+
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import questions from '../questions.json'
+import { QRCodeModal } from '../components/qr-code-modal'
+import { AccessModal } from '../components/access-modal'
 
 export default function Home() {
-  const [solutionWords, setSolutionWords] = useState([]);
+  const [solutionWords, setSolutionWords] = useState([])
+  const [currentStep, setCurrentStep] = useState('start')
+  const [currentQuestion, setCurrentQuestion] = useState(null)
+  const [paymentStatus, setPaymentStatus] = useState('pending')
 
   useEffect(() => {
     // Hole für jede Frage das gespeicherte Lösungswort aus localStorage
@@ -40,40 +47,120 @@ export default function Home() {
     })
     .join(' ');
 
+  const handleQuestionSelect = (question) => {
+    setCurrentQuestion(question)
+    setCurrentStep('password')
+  }
+
+  const handlePasswordSubmit = (password) => {
+    if (password.toLowerCase() === currentQuestion.password.toLowerCase()) {
+      setCurrentStep('payment')
+    }
+  }
+
+  const handlePaymentComplete = () => {
+    setCurrentStep('start')
+    setCurrentQuestion(null)
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-      <h1 className="text-4xl font-bold mb-4 text-yellow-600">⚡ lnhunt</h1>
-      <div className="mb-6 text-center max-w-xl">
-        <p className="mb-2">
-          Willkommen zu lnhunt! Entdecke Bitcoin & Lightning in einer interaktiven Quiz-Schnitzeljagd. Jede Station wird durch eine Lightning-Zahlung freigeschaltet. Sammle die Lösungswörter und finde die finalen Sätze!
-        </p>
-        <div className="mt-6 mb-4">
-          <div className="mb-4">
-            <span className="font-mono text-lg tracking-wider bg-white px-3 py-2 rounded shadow inline-block">
-              {firstSentence}
-            </span>
-          </div>
-          <div>
-            <span className="font-mono text-lg tracking-wider bg-white px-3 py-2 rounded shadow inline-block">
-              {secondSentence}
-            </span>
+    <main className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 overflow-hidden relative">
+      {/* Background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -left-40 w-96 h-96 bg-orange-500/20 rounded-full blur-3xl" />
+        <div className="absolute top-1/3 -right-40 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl" />
+        <div className="absolute -bottom-40 left-1/3 w-96 h-96 bg-orange-500/15 rounded-full blur-3xl" />
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 container mx-auto px-4 py-8 flex flex-col items-center justify-center min-h-screen">
+        <div className="w-full max-w-md">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center mb-8"
+          >
+            <h1 className="text-4xl font-bold text-white mb-2">⚡ lnhunt</h1>
+            <p className="text-gray-300">
+              Entdecke Bitcoin & Lightning in einer interaktiven Quiz-Schnitzeljagd
+            </p>
+          </motion.div>
+
+          <AnimatePresence mode="wait">
+            {currentStep === 'start' && (
+              <motion.div
+                key="start"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-6 shadow-xl"
+              >
+                <div className="mb-6">
+                  <div className="mb-4">
+                    <span className="font-mono text-lg tracking-wider text-white px-3 py-2 rounded-lg bg-white/5 inline-block">
+                      {firstSentence}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="font-mono text-lg tracking-wider text-white px-3 py-2 rounded-lg bg-white/5 inline-block">
+                      {secondSentence}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {questions.map(q => (
+                    <motion.button
+                      key={q.id}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => handleQuestionSelect(q)}
+                      className="w-full py-3 px-4 bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl text-white font-medium shadow-lg shadow-orange-500/20"
+                    >
+                      {q.id.toUpperCase()}: {q.question.slice(0, 40)}...
+                    </motion.button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {currentStep === 'password' && (
+              <motion.div
+                key="password"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+              >
+                <AccessModal
+                  questionNumber={currentQuestion.id}
+                  onPasswordSubmit={handlePasswordSubmit}
+                  accessCode={currentQuestion.access_code}
+                  hint={currentQuestion.hint}
+                />
+              </motion.div>
+            )}
+
+            {currentStep === 'payment' && (
+              <motion.div
+                key="payment"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+              >
+                <QRCodeModal
+                  onPaymentComplete={handlePaymentComplete}
+                  questionId={currentQuestion.id}
+                  satCost={10}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <div className="mt-8 text-center">
+            <p className="text-xs text-gray-400">Powered by Next.js, Tailwind CSS & LNbits</p>
           </div>
         </div>
-        <div className="text-xs text-gray-400">(Lösungswörter werden nach und nach aufgedeckt)</div>
       </div>
-      <div className="mb-8">
-        <h2 className="text-2xl font-semibold mb-2">Quiz-Stationen</h2>
-        <ul className="space-y-2">
-          {questions.map(q => (
-            <li key={q.id}>
-              <Link href={`/${q.id}`} className="text-blue-600 underline hover:text-blue-800">
-                {q.id.toUpperCase()}: {q.question.slice(0, 40)}...
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="text-sm text-gray-500">Powered by Next.js, Tailwind CSS & LNbits</div>
-    </div>
+    </main>
   );
 } 
