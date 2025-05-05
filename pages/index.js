@@ -16,10 +16,10 @@ export default function Home() {
 
   // Erste Satz im Hangman-Style bauen (Fix the money)
   const firstSentence = questions
-    .filter(q => q.answer_key === 'fix' || q.answer_key === 'the' || q.answer_key === 'money')
+    .filter(q => ['q1', 'q2', 'q3'].includes(q.id))
     .sort((a, b) => {
-      const order = { 'fix': 0, 'the': 1, 'money': 2 };
-      return order[a.answer_key] - order[b.answer_key];
+      const order = { 'q1': 0, 'q2': 1, 'q3': 2 };
+      return order[a.id] - order[b.id];
     })
     .map(q => {
       const word = solutionWords[questions.indexOf(q)];
@@ -29,7 +29,11 @@ export default function Home() {
 
   // Zweite Satz im Hangman-Style bauen (Fix the world)
   const secondSentence = questions
-    .filter(q => q.answer_key === 'world')
+    .filter(q => ['q4', 'q5', 'q6'].includes(q.id))
+    .sort((a, b) => {
+      const order = { 'q4': 0, 'q5': 1, 'q6': 2 };
+      return order[a.id] - order[b.id];
+    })
     .map(q => {
       const word = solutionWords[questions.indexOf(q)];
       return word || '_'.repeat(q.answer_key.length);
