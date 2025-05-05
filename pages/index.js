@@ -29,11 +29,7 @@ export default function Home() {
 
   // Zweite Satz im Hangman-Style bauen (Fix the world)
   const secondSentence = questions
-    .filter(q => q.answer_key === 'fix' || q.answer_key === 'the' || q.answer_key === 'world')
-    .sort((a, b) => {
-      const order = { 'fix': 0, 'the': 1, 'world': 2 };
-      return order[a.answer_key] - order[b.answer_key];
-    })
+    .filter(q => q.answer_key === 'world')
     .map(q => {
       const word = solutionWords[questions.indexOf(q)];
       return word || '_'.repeat(q.answer_key.length);
