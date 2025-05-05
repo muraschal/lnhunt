@@ -1,0 +1,93 @@
+[
+  {
+    "id": "q1",
+    "question": "Wann beginnt die achte Mining-Epoche (Halving-Ära) im Bitcoin-Netzwerk?",
+    "options": [
+      "Bei Blockhöhe 840'000",
+      "Bei Blockhöhe 2'100'000",
+      "Bei Blockhöhe 1'470'000"
+    ],
+    "correct_index": 2,
+    "solution_word": "Chancellor",
+    "hint": "Alle 210'000 Blöcke halbiert sich die Blocksubsidy. Multipliziere.",
+    "lnurlpay": "lnurlpay://q1@hwznode.rapold.io"
+  },
+  {
+    "id": "q2",
+    "question": "Wie nennt man den Effekt, bei dem Erstempfänger von neu geschaffenem Geld Vorteile gegenüber späteren Empfängern haben?",
+    "options": [
+      "Geschwindigkeitsverzerrung",
+      "Kantillon-Effekt",
+      "Seigniorage-Verschiebung"
+    ],
+    "correct_index": 1,
+    "solution_word": "on",
+    "hint": "Dieser Effekt wurde erstmals im 18. Jh. von einem französischen Ökonomen beschrieben.",
+    "lnurlpay": "lnurlpay://q2@hwznode.rapold.io"
+  },
+  {
+    "id": "q3",
+    "question": "Welcher Begriff beschreibt das ökonomische Konzept des Tauschs zwischen heutigem und zukünftigem Konsum?",
+    "options": [
+      "Abgezinsbarer Nutzen",
+      "Zeitpräferenz",
+      "Grenzneigung zum Konsum"
+    ],
+    "correct_index": 1,
+    "solution_word": "brink",
+    "hint": "HODL ist die radikalste Form davon.",
+    "lnurlpay": "lnurlpay://q3@hwznode.rapold.io"
+  },
+  {
+    "id": "q4",
+    "question": "Wofür steht SCB im Zusammenhang mit dem Lightning-Netzwerk?",
+    "options": [
+      "Secure Channel Backup",
+      "Static Channel Backup",
+      "Snapshot Channel Balance"
+    ],
+    "correct_index": 1,
+    "solution_word": "of",
+    "hint": "Unverzichtbar für die Wiederherstellung von Channels nach einem Datenverlust.",
+    "lnurlpay": "lnurlpay://q4@hwznode.rapold.io"
+  },
+  {
+    "id": "q5",
+    "question": "Was geschah 1971 unter Präsident Nixon und gilt als entscheidender Bruch im Währungssystem?",
+    "options": [
+      "Einführung flexibler Wechselkurse",
+      "Aufhebung der Goldbindung des US-Dollars",
+      "Gründung der US-Notenbank"
+    ],
+    "correct_index": 1,
+    "solution_word": "second",
+    "hint": "Danach war der Dollar nicht mehr „as good as gold“.",
+    "lnurlpay": "lnurlpay://q5@hwznode.rapold.io"
+  },
+  {
+    "id": "q6",
+    "question": "Wer gründete den Darknet-Marktplatz Silk Road und sitzt dafür lebenslänglich in Haft?",
+    "options": [
+      "Roger Ver",
+      "Ross Ulbricht",
+      "Cody Wilson"
+    ],
+    "correct_index": 1,
+    "solution_word": "bailout",
+    "hint": "Die erste große Bitcoin-Nutzung in freier Wildbahn – aber mit einem hohen Preis.",
+    "lnurlpay": "lnurlpay://q6@hwznode.rapold.io"
+  },
+  {
+    "id": "q7",
+    "question": "Welche Technik ermöglicht es, On-Chain-Bitcoin gegen Lightning-Guthaben nicht-custodial zu tauschen?",
+    "options": [
+      "Atomic Loop In",
+      "Submarine Swap",
+      "Dual-Funding HTLC"
+    ],
+    "correct_index": 1,
+    "solution_word": "for banks",
+    "hint": "Diese Technik \"taucht\" zwischen Ketten und Netzwerken – mit voller Souveränität.",
+    "lnurlpay": "lnurlpay://q7@hwznode.rapold.io"
+  }
+] 

@@ -151,6 +151,24 @@ npm run dev
 
 ---
 
+## 🐙 GitHub & 🚀 Vercel Deployment
+
+1. Initialisiere ein Git-Repository (falls noch nicht geschehen):
+   ```bash
+git init
+git add .
+git commit -m "Initial commit"
+   ```
+2. Erstelle ein neues Repository auf GitHub und pushe dein Projekt:
+   ```bash
+git remote add origin https://github.com/DEIN_USERNAME/DEIN_REPO.git
+git push -u origin main
+   ```
+3. Gehe zu [vercel.com](https://vercel.com), importiere dein GitHub-Repo und setze die Umgebungsvariablen (siehe .env.example).
+4. Deploye das Projekt – fertig!
+
+---
+
 ## 👥 License & Contribution
 
 Open for customization, whitelabel deployments, and community use.  
