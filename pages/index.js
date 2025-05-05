@@ -1,16 +1,21 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import questions from '../questions.json'
 import { QRCodeModal } from '../components/qr-code-modal'
 import { AccessModal } from '../components/access-modal'
+import { CheckCircle, Lock, HelpCircle, Zap } from "lucide-react"
+import { ProgressIndicator } from '../components/progress-indicator'
 
 export default function Home() {
   const [solutionWords, setSolutionWords] = useState([])
   const [currentStep, setCurrentStep] = useState('start')
   const [currentQuestion, setCurrentQuestion] = useState(null)
   const [paymentStatus, setPaymentStatus] = useState('pending')
+  // Debug-Log-Panel State (global, für QR-Code-Status)
+  const [debugLog, setDebugLog] = useState({ paymentStatus: '', paymentRequest: '', invoiceCreated: false, paymentHash: '', bolt11: '', lastPaymentStatus: null })
+  const debugLogRef = useRef(setDebugLog)
 
   useEffect(() => {
     // Hole für jede Frage das gespeicherte Lösungswort aus localStorage
@@ -53,14 +58,18 @@ export default function Home() {
   }
 
   const handlePasswordSubmit = (password) => {
-    if (password.toLowerCase() === currentQuestion.password.toLowerCase()) {
+    if (password.toLowerCase() === currentQuestion.access_code.toLowerCase()) {
       setCurrentStep('payment')
     }
   }
 
   const handlePaymentComplete = () => {
-    setCurrentStep('start')
-    setCurrentQuestion(null)
+    setCurrentStep('answer')
+  }
+
+  // Callback für QRCodeModal, um den Status zu setzen
+  const handleDebugLog = (log) => {
+    setDebugLog(log)
   }
 
   return (
@@ -78,12 +87,27 @@ export default function Home() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-8"
+            className="flex items-center justify-center mb-8"
           >
-            <h1 className="text-4xl font-bold text-white mb-2">⚡ lnhunt</h1>
-            <p className="text-gray-300">
-              Entdecke Bitcoin & Lightning in einer interaktiven Quiz-Schnitzeljagd
-            </p>
+            <a href="/" className="flex items-center gap-2">
+              <motion.div
+                animate={{
+                  scale: [1, 1.1, 1],
+                  rotate: [0, 5, 0, -5, 0],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Number.POSITIVE_INFINITY,
+                  repeatDelay: 3,
+                }}
+                className="bg-gradient-to-br from-orange-500 to-amber-500 p-2 rounded-xl"
+              >
+                <Zap className="w-6 h-6 text-white" />
+              </motion.div>
+              <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-amber-500">
+                LNHunt
+              </h1>
+            </a>
           </motion.div>
 
           <AnimatePresence mode="wait">
@@ -95,31 +119,40 @@ export default function Home() {
                 exit={{ opacity: 0, y: -20 }}
                 className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-6 shadow-xl"
               >
-                <div className="mb-6">
-                  <div className="mb-4">
-                    <span className="font-mono text-lg tracking-wider text-white px-3 py-2 rounded-lg bg-white/5 inline-block">
-                      {firstSentence}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="font-mono text-lg tracking-wider text-white px-3 py-2 rounded-lg bg-white/5 inline-block">
-                      {secondSentence}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  {questions.map(q => (
+                <div className="grid grid-cols-3 gap-3 mb-6">
+                  {questions.map((question) => (
                     <motion.button
-                      key={q.id}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => handleQuestionSelect(q)}
-                      className="w-full py-3 px-4 bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl text-white font-medium shadow-lg shadow-orange-500/20"
+                      key={question.id}
+                      onClick={() => handleQuestionSelect(question)}
+                      className={`aspect-square flex flex-col items-center justify-center rounded-xl backdrop-blur-md border p-2
+                        ${
+                          solutionWords[questions.indexOf(question)]
+                            ? "border-green-500/50 bg-green-500/10"
+                            : "border-white/10 bg-white/5 hover:bg-white/10"
+                        }`}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                     >
-                      {q.id.toUpperCase()}: {q.question.slice(0, 40)}...
+                      <div className="text-2xl font-bold text-white mb-1">{question.id}</div>
+                      {solutionWords[questions.indexOf(question)] ? (
+                        <CheckCircle className="w-6 h-6 text-green-500" />
+                      ) : (
+                        <Lock className="w-6 h-6 text-orange-500" />
+                      )}
                     </motion.button>
                   ))}
+                </div>
+
+                <div className="mb-6">
+                  <ProgressIndicator
+                    keywords={solutionWords.filter(Boolean)}
+                    totalKeywords={6}
+                    manualPhrase="Fix the money fix the world"
+                  />
+                </div>
+
+                <div className="text-center text-sm text-gray-400">
+                  <p>Klicke auf eine Frage, um sie freizuschalten</p>
                 </div>
               </motion.div>
             )}
@@ -151,13 +184,64 @@ export default function Home() {
                   onPaymentComplete={handlePaymentComplete}
                   questionId={currentQuestion.id}
                   satCost={10}
+                  onDebugLog={handleDebugLog}
                 />
+              </motion.div>
+            )}
+
+            {currentStep === 'answer' && currentQuestion && (
+              <motion.div
+                key="answer"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-6 shadow-xl"
+              >
+                <div className="mb-4">
+                  <h2 className="text-xl font-bold text-white mb-2">{currentQuestion.question}</h2>
+                  <div className="space-y-2">
+                    {currentQuestion.options && currentQuestion.options.map((option, idx) => (
+                      <button
+                        key={idx}
+                        className="w-full py-2 px-4 bg-white/10 rounded-lg text-white hover:bg-orange-500/80 transition"
+                        // Hier könnte später die Antwortlogik ergänzt werden
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
 
           <div className="mt-8 text-center">
             <p className="text-xs text-gray-400">Powered by Next.js, Tailwind CSS & LNbits</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Debug-Log-Panel unten links */}
+      <div style={{ position: 'fixed', left: 0, bottom: 0, zIndex: 50, maxWidth: 500 }}>
+        <div className="bg-black/80 text-green-400 text-xs font-mono p-2 rounded-tr-xl shadow-xl">
+          <div>paymentStatus: {debugLog.paymentStatus}</div>
+          <div>invoiceCreated: {debugLog.invoiceCreated ? 'true' : 'false'}</div>
+          <div>paymentHash: {debugLog.paymentHash ? debugLog.paymentHash : 'leer'}</div>
+          <div style={{ fontSize: '1rem', marginTop: 8 }}>
+            <div>paymentRequest:</div>
+            <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all', fontSize: '1rem', color: '#baffba' }}>{debugLog.paymentRequest || 'leer'}</pre>
+          </div>
+          <div style={{ fontSize: '1rem', marginTop: 8 }}>
+            <div>bolt11:</div>
+            <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all', fontSize: '1rem', color: '#baffba' }}>{debugLog.bolt11 || 'leer'}</pre>
+          </div>
+          <div style={{ fontSize: '1rem', marginTop: 8 }}>
+            <div>lastPaymentStatus:</div>
+            <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all', fontSize: '1rem', color: '#baffba' }}>{debugLog.lastPaymentStatus ? JSON.stringify(debugLog.lastPaymentStatus, null, 2) : 'leer'}</pre>
+          </div>
+          <div style={{ fontSize: '1rem', marginTop: 8 }}>
+            <div>pollingError:</div>
+            <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all', fontSize: '1rem', color: '#ff8888' }}>{debugLog.pollingError || 'kein Fehler'}</pre>
           </div>
         </div>
       </div>

@@ -22,16 +22,12 @@ export function AccessModal({
       return
     }
 
-    // Try to submit the password
-    try {
+    if (password.trim().toLowerCase() === accessCode.toLowerCase()) {
       onPasswordSubmit(password.trim())
-
-      // If we're still here, the password was incorrect
+    } else {
       setError("Falsches Passwort")
       setIsShaking(true)
       setTimeout(() => setIsShaking(false), 500)
-    } catch (err) {
-      setError("Ein Fehler ist aufgetreten")
     }
   }
 
@@ -57,6 +53,8 @@ export function AccessModal({
         <div>
           <input
             type="password"
+            name="access_code"
+            autoComplete="off"
             value={password}
             onChange={(e) => {
               setPassword(e.target.value)
