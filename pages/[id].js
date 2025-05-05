@@ -15,6 +15,8 @@ export default function QuizStation() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [refresh, setRefresh] = useState(0);
+  const [accessCode, setAccessCode] = useState('');
+  const [showAccessForm, setShowAccessForm] = useState(true);
 
   const question = questions.find(q => q.id === id);
 
@@ -22,18 +24,9 @@ export default function QuizStation() {
     if (!id) return;
     if (localStorage.getItem(`paid_${id}`)) setPaid(true);
     if (localStorage.getItem(`solved_${id}`)) setSolved(true);
-    if (!invoice) {
-      setLoading(true);
-      axios.post('/api/create-invoice', { questionId: id, amount: 100 })
-        .then(res => {
-          setInvoice(res.data.payment_request);
-          setPaymentHash(res.data.payment_hash);
-        })
-        .catch(() => setError('Fehler beim Erstellen der Invoice'))
-        .finally(() => setLoading(false));
-    }
+    if (localStorage.getItem(`access_${id}`)) setShowAccessForm(false);
     // eslint-disable-next-line
-  }, [id, refresh]);
+  }, [id]);
 
   useEffect(() => {
     if (!paymentHash || paid) return;
@@ -48,6 +41,24 @@ export default function QuizStation() {
     }, 3000);
     return () => clearInterval(interval);
   }, [paymentHash, paid, id]);
+
+  const handleAccessCodeSubmit = (e) => {
+    e.preventDefault();
+    if (accessCode.toLowerCase() === question.access_code.toLowerCase()) {
+      setShowAccessForm(false);
+      localStorage.setItem(`access_${id}`, '1');
+      setLoading(true);
+      axios.post('/api/create-invoice', { questionId: id, amount: 100 })
+        .then(res => {
+          setInvoice(res.data.payment_request);
+          setPaymentHash(res.data.payment_hash);
+        })
+        .catch(() => setError('Fehler beim Erstellen der Invoice'))
+        .finally(() => setLoading(false));
+    } else {
+      setError('Falscher Zugangscode');
+    }
+  };
 
   if (!question) return <div className="p-8">Frage nicht gefunden.</div>;
 
@@ -70,7 +81,24 @@ export default function QuizStation() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-white">
       <h1 className="text-2xl font-bold mb-4">Station {id?.toUpperCase()}</h1>
-      {!paid ? (
+      {showAccessForm ? (
+        <div className="bg-blue-100 p-6 rounded shadow text-center max-w-md w-full">
+          <p className="mb-4">Bitte gib den Zugangscode ein:</p>
+          <form onSubmit={handleAccessCodeSubmit} className="space-y-4">
+            <input
+              type="text"
+              value={accessCode}
+              onChange={(e) => setAccessCode(e.target.value)}
+              className="w-full px-3 py-2 border rounded"
+              placeholder="Zugangscode eingeben"
+            />
+            <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">
+              Bestätigen
+            </button>
+          </form>
+          {error && <div className="text-red-600 mt-2">{error}</div>}
+        </div>
+      ) : !paid ? (
         <div className="bg-yellow-100 p-6 rounded shadow text-center">
           <p className="mb-4">Um die Frage freizuschalten, zahle via Lightning:</p>
           {error && <div className="text-red-600 mb-2">{error}</div>}
@@ -112,7 +140,6 @@ export default function QuizStation() {
         <div className="bg-green-50 p-6 rounded shadow text-center">
           <div className="mb-2 font-semibold">Du hast diese Station bereits gelöst!</div>
           <div>Lösungswort: <span className="bg-yellow-200 px-2 py-1 rounded">{question.answer_key}</span></div>
-          <div>Zugangscode: <span className="bg-blue-200 px-2 py-1 rounded">{question.access_code}</span></div>
           <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded" onClick={() => router.push('/')}>Zurück zur Übersicht</button>
         </div>
       )}
