@@ -16,7 +16,7 @@ export default function Home() {
 
   // Satz im Hangman-Style bauen
   const hangmanSentence = questions
-    .map((q, idx) => solutionWords[idx] ? solutionWords[idx] : '_'.repeat(q.solution_word.length))
+    .map((q, idx) => solutionWords[idx] ? solutionWords[idx] : '_'.repeat(q.answer_key.length))
     .join(' ');
 
   return (

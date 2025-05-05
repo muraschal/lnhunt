@@ -5,7 +5,7 @@ export default function Finale() {
   const [input, setInput] = useState('');
   const [result, setResult] = useState(null);
 
-  const solution = questions.map(q => q.solution_word).join(' ');
+  const solution = questions.map(q => q.answer_key).join(' ');
 
   const checkSolution = () => {
     setResult(input.trim().toLowerCase() === solution.toLowerCase());

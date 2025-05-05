@@ -56,7 +56,7 @@ export default function QuizStation() {
     if (idx === question.correct_index) {
       setSolved(true);
       localStorage.setItem(`solved_${id}`, '1');
-      localStorage.setItem(`solution_${id}`, question.solution_word);
+      localStorage.setItem(`solution_${id}`, question.answer_key);
     } else {
       setPaid(false);
       setInvoice(null);
@@ -102,7 +102,7 @@ export default function QuizStation() {
           <button onClick={() => setShowHint(!showHint)} className="text-blue-600 underline text-sm mb-2">{showHint ? 'Hinweis ausblenden' : 'Hinweis anzeigen'}</button>
           {showHint && <div className="text-sm text-gray-600 mb-2">💡 {question.hint}</div>}
           {selected !== null && selected === question.correct_index && (
-            <div className="mt-4 text-green-700 font-bold">Richtig! Lösungswort: <span className="bg-yellow-200 px-2 py-1 rounded">{question.solution_word}</span></div>
+            <div className="mt-4 text-green-700 font-bold">Richtig! Lösungswort: <span className="bg-yellow-200 px-2 py-1 rounded">{question.answer_key}</span></div>
           )}
           {selected !== null && selected !== question.correct_index && (
             <div className="mt-4 text-red-600">Leider falsch. Du musst erneut bezahlen, um es nochmal zu versuchen!</div>
@@ -111,7 +111,8 @@ export default function QuizStation() {
       ) : (
         <div className="bg-green-50 p-6 rounded shadow text-center">
           <div className="mb-2 font-semibold">Du hast diese Station bereits gelöst!</div>
-          <div>Lösungswort: <span className="bg-yellow-200 px-2 py-1 rounded">{question.solution_word}</span></div>
+          <div>Lösungswort: <span className="bg-yellow-200 px-2 py-1 rounded">{question.answer_key}</span></div>
+          <div>Zugangscode: <span className="bg-blue-200 px-2 py-1 rounded">{question.access_code}</span></div>
           <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded" onClick={() => router.push('/')}>Zurück zur Übersicht</button>
         </div>
       )}
