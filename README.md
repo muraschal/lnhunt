@@ -18,6 +18,7 @@ Correct answers reveal keywords. When combined, these form a predefined sentence
 - Reinforcement of key concepts (e.g. time preference, money history, protocol design)
 - Physical activation and team collaboration
 - Gamified knowledge transfer with emotional anchoring
+- **Encourages exploration and real-world interaction by requiring players to find access codes at physical locations.**
 
 ---
 
@@ -27,10 +28,13 @@ Correct answers reveal keywords. When combined, these form a predefined sentence
 - Two-step access process:
   1. Enter the correct access code (related to Bitcoin terminology)
   2. Complete the Lightning payment to unlock the question
+- **Access codes are distributed in the physical world (e.g. as QR codes, stickers, or clues at specific locations). Players must find them to unlock each question.**
 - Configurable access modes:
   - *Low-fee*: Multiple Choice with feedback
   - *Premium*: Instant access to the correct answer
 - Correct answers unlock one word (or element) each
+- **Solved questions display a full-tile image badge and a checkmark.**
+- **Progress indicator and secret phrase are only shown if at least one question is solved.**
 - Goal: Collect all elements and reconstruct a final message
 
 ---
@@ -48,6 +52,7 @@ Correct answers reveal keywords. When combined, these form a predefined sentence
 | API         | Next.js API Routes         | Handles LNbits polling & logic     |
 | Data        | Local/dynamic JSON         | Quiz content & logic               |
 | State Mgmt  | LocalStorage               | Progress tracking per device       |
+| **Audio**   | MP3, HTML5 Audio           | **Success/fail sounds, Easteregg** |
 
 ---
 
@@ -72,6 +77,7 @@ sequenceDiagram
 ```
 
 Each question is locked behind both an access code and a Lightning payment. Once both are completed, the question is revealed. Answering it correctly unlocks a "solution word" for the final message.
+**Solved questions display their image as a badge on the start screen.**
 
 ---
 
@@ -84,6 +90,8 @@ Each question is locked behind both an access code and a Lightning payment. Once
 - Key historic events and personalities (e.g. 1971 Nixon shock, Silk Road)
 
 All questions and answers are fully customizable via JSON.
+**Each question can have an image ("image": "q1.png") that is shown in the question screen and as a badge.**
+**Hints are only shown in the question screen (with toggle button), not on the start page.**
 
 ---
 
@@ -95,6 +103,9 @@ All questions and answers are fully customizable via JSON.
 - Blends movement, collaboration, and learning  
 - Modern, accessible UI with smooth animations
 - Two-factor access (knowledge + payment) for enhanced engagement
+- **All static assets (images, audio) are versioned in the public folder.**
+- **Copyright notice in the footer with the current year.**
+- **Responsive, accessible UI.**
 
 ---
 
@@ -113,19 +124,25 @@ To keep things simple, use [LNbits](https://legend.lnbits.com) as your Lightning
 ```json
 {
   "id": "q1",
-  "question": "What is the Cantillon Effect?",
-  "lnurl": "lnurl1dp68gurn8ghj7mrv9...",
-  "options": [...],
-  "correct_index": 0,
-  "answer_key": "Cantillon",
+  "question": "What is the block subsidy after the next halving?",
+  "options": [
+    "1.25 BTC",
+    "1.5625 BTC",
+    "1.75 BTC"
+  ],
+  "correct_index": 1,
+  "answer_key": "fix",
   "access_code": "magic",
-  "hint": "A hint about the access code"
+  "hint": "The block subsidy halves every 210,000 blocks.",
+  "image": "q1.png"
 }
 ```
 
 5. The frontend displays this LNURL as a QR code.
 6. The backend polls LNbits to check if the payment has been received.
 7. Once confirmed, the question becomes visible to the user.
+**After all questions are solved, a prominent button 'Finish LNHunt & return sats' appears at the top.**
+**The final LNURL is shown as a QR code and direct link. The participant's name should be entered in the comment field of the wallet. After successful payment, the success URL redirects to `/thnx`.**
 
 No dynamic invoice creation. No node. No complexity. Just working.
 
@@ -137,6 +154,10 @@ No dynamic invoice creation. No node. No complexity. Just working.
 - Team-based scoring, timers, and leaderboards  
 - Badge system and proof-of-participation export (PDF/NFT)  
 - Adaptive question paths or branching logic  
+- **Audio feedback after each answer (success/fail).**
+- **Easter egg: In the info panel, the sounds can be played via buttons.**
+- **Debug panel and info panel can be toggled via button. Info panel contains technical details and Easter egg sound buttons.**
+- **After the return transaction via LNURL, users are redirected to a /thnx page ('Thank you for participating').**
 
 ---
 
@@ -184,3 +205,73 @@ git push -u origin main
 
 Open for customization, whitelabel deployments, and community use.  
 If you adapt or build on top of lnhunt, contributions and feedback are welcome!
+
+---
+
+## 🚨 2024 Updates & Features
+
+- **Completely new UI:**
+  - Question tiles now show the respective image as a full badge after solving.
+  - Progress indicator and secret phrase are only shown if at least one question is solved.
+  - The hint 'Click on a question...' is only shown if there are still open questions.
+
+- **Questions & Answers:**
+  - All questions and answers are managed via the `questions.json` file.
+  - Each question can have an `image` that is shown in the question screen and as a badge.
+  - Hints are only shown in the question screen (with toggle button), not on the start page.
+
+- **Lightning Integration:**
+  - Dynamic invoice creation via LNbits API.
+  - After all questions are solved, a prominent button 'Finish LNHunt & return sats' appears at the top.
+  - Integration of a fixed LNURL for the final return transaction (e.g. for team competitions).
+  - Note: The participant's name is entered in the comment field of the wallet.
+
+- **Audio Feedback:**
+  - Success and fail sounds after each answer (MP3, compatible with web/mobile/desktop).
+  - Easter egg: In the info panel, the sounds can be played via buttons.
+
+- **Completion & Thank You Page:**
+  - After the return transaction via LNURL, users are redirected to a /thnx page ('Thank you for participating').
+
+- **Debug & Info:**
+  - Debug panel and info panel can be toggled via button.
+  - Info panel contains technical details and Easter egg sound buttons.
+
+- **Best Practices:**
+  - Copyright notice in the footer with the current year.
+  - Responsive, accessible UI.
+  - All static assets (images, audio) are versioned in the public folder.
+
+---
+
+### Example for the new questions.json
+
+```json
+{
+  "id": "q1",
+  "question": "What is the block subsidy after the next halving?",
+  "options": [
+    "1.25 BTC",
+    "1.5625 BTC",
+    "1.75 BTC"
+  ],
+  "correct_index": 1,
+  "answer_key": "fix",
+  "access_code": "magic",
+  "hint": "The block subsidy halves every 210,000 blocks.",
+  "image": "q1.png"
+}
+```
+
+---
+
+### Notes on LNURL Return Transaction
+
+- The final LNURL is shown as a QR code and direct link as soon as all questions are solved.
+- The participant's name should be entered in the comment field of the wallet.
+- After successful payment, the success URL redirects to `/thnx`.
+
+---
+
+**Tip:**
+You can freely customize questions, images, and sounds – everything is controlled via JSON and the public folder!
