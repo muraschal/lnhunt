@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import questions from '../questions.json'
 import { QRCodeModal } from '../components/qr-code-modal'
 import { AccessModal } from '../components/access-modal'
-import { CheckCircle, Lock, HelpCircle, Zap, Wrench, Info } from "lucide-react"
+import { CheckCircle, Lock, HelpCircle, Zap, Wrench, Info, XCircle, Play } from "lucide-react"
 import { ProgressIndicator } from '../components/progress-indicator'
 
 export default function Home() {
@@ -403,6 +403,27 @@ export default function Home() {
               <li><b>Analytics:</b> Vercel Analytics & Speed Insights</li>
               <li><b>Besonderheiten:</b> 2-Faktor-Freischaltung (Code + Zahlung), Responsive UI, Debug-Panel, Info-Panel</li>
             </ul>
+            {/* Easteregg: Audio-Play-Buttons */}
+            <div className="flex gap-6 justify-center mt-6">
+              <button
+                onClick={() => { const a = new Audio('/audio/sucess.mp3'); a.play(); }}
+                className="flex items-center gap-2 px-3 py-2 rounded bg-green-700/30 hover:bg-green-600/60 text-green-300 shadow"
+                title="Success Sound abspielen"
+              >
+                <CheckCircle className="w-5 h-5" />
+                <Play className="w-4 h-4" />
+                <span className="hidden sm:inline">Success</span>
+              </button>
+              <button
+                onClick={() => { const a = new Audio('/audio/zero.mp3'); a.play(); }}
+                className="flex items-center gap-2 px-3 py-2 rounded bg-red-700/30 hover:bg-red-600/60 text-red-300 shadow"
+                title="Fail Sound abspielen"
+              >
+                <XCircle className="w-5 h-5" />
+                <Play className="w-4 h-4" />
+                <span className="hidden sm:inline">Fail</span>
+              </button>
+            </div>
           </div>
         )}
       </div>
