@@ -59,8 +59,8 @@ export default function Home() {
   // State für Hint-Visibility im Fragenscreen
   const [showHint, setShowHint] = useState(false)
   const [showFinalModal, setShowFinalModal] = useState(false)
-  // LNURL als Konstante für bessere Wartbarkeit
-  const FINAL_LNURL = "LNURL1DP68GURN8GHJ76RH0FHX7ER99EEXZUR0D3JZU6T09AKXUATJD3CZ74RJGCM8GWQ9TU707";
+  // LNURL aus den Umgebungsvariablen lesen
+  const FINAL_LNURL = process.env.NEXT_PUBLIC_LNBITS_LNURL;
   const [copiedFinalLnurl, setCopiedFinalLnurl] = useState(false);
   const [showGuidePanel, setShowGuidePanel] = useState(false)
 
@@ -328,7 +328,7 @@ export default function Home() {
                       onClick={() => setShowFinalModal(true)}
                       className="bg-orange-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-orange-700 transition text-lg"
                     >
-                      LNHunt abschließen & Sats zurücksenden
+                      LNHunt abschließen & Sats geschenkt bekommen!
                     </button>
                   </div>
                 )}
@@ -715,10 +715,10 @@ export default function Home() {
             <ol className="list-decimal list-inside space-y-2 text-left mx-auto max-w-md">
               <li>Finde den <b>physischen Code</b> in der realen Welt (z.B. QR-Code, Sticker, Hinweis).</li>
               <li>Gib den physischen Code ein, bezahle per Lightning und warte einen Moment, bis die Zahlung bestätigt wurde. Danach kannst du die Frage beantworten. Falls die Antwort falsch ist, musst du erneut bezahlen.</li>
-              <li>Nach jeder richtigen Antwort erhältst du einen <b>digitalen Code</b> (Lösungswort). Sammle alle digitalen Codes und schließe LNHunt ab, um deine Sats zurückzusenden!</li>
+              <li>Nach jeder richtigen Antwort erhältst du einen <b>digitalen Code</b> (Lösungswort). Sammle alle digitalen Codes und schließe LNHunt ab, um deine Sats-Belohnung zu erhalten!</li>
             </ol>
             <p className="mt-4 text-orange-300 text-sm">
-              💡 <b>Tipp:</b> Nach dem Lösen aller Fragen erscheint oben ein Button "LNHunt abschließen & Sats zurücksenden". Scanne den QR-Code und gib deinen Namen im Kommentar-Feld der Wallet ein!
+              💡 <b>Tipp:</b> Nach dem Lösen aller Fragen erscheint oben ein Button "LNHunt abschließen & Sats geschenkt bekommen!". Scanne den QR-Code und gib deinen Namen im Kommentar-Feld der Wallet ein!
             </p>
           </div>
         )}
@@ -734,8 +734,8 @@ export default function Home() {
               transition={{ type: 'spring', stiffness: 300, damping: 20 }}
             >
               <div className="text-center mb-4">
-                <h2 className="text-xl font-bold text-orange-500">LN Hunt abschließen & Sats zurücksenden</h2>
-                <p className="text-gray-300 text-sm mt-1">Scanne den QR-Code, um alle Sats zurückzusenden</p>
+                <h2 className="text-xl font-bold text-orange-500">Glückwunsch! Deine Belohnung</h2>
+                <p className="text-gray-300 text-sm mt-1">Scanne den QR-Code, um deine Sats zu erhalten</p>
               </div>
               <div className="relative mx-auto w-64 h-64 mb-4 flex items-center justify-center">
                 <img
@@ -765,7 +765,7 @@ export default function Home() {
                       className="inline-flex items-center px-2 py-1 bg-orange-500/90 hover:bg-orange-500 text-white text-xs rounded transition ml-1"
                       style={{ textDecoration: 'none' }}
                     >
-                      <span className="mr-1">Mit Wallet zahlen</span>
+                      <span className="mr-1">Mit Wallet öffnen</span>
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                       </svg>
@@ -775,6 +775,7 @@ export default function Home() {
                 <p className="text-xs text-gray-300 font-mono break-all">{FINAL_LNURL}</p>
               </div>
               <p className="text-xs text-orange-200 mb-2">Bitte gib deinen Namen im Kommentar-Feld der Wallet ein!</p>
+              <p className="text-sm text-white mb-4">Dies ist ein LNURL-withdraw Link. Scanne ihn mit deiner Lightning-Wallet, um deine Belohnung zu erhalten.</p>
               <button
                 onClick={() => setShowFinalModal(false)}
                 className="text-orange-400 underline text-xs mt-2"

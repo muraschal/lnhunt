@@ -142,8 +142,8 @@ To keep things simple, use [LNbits](https://legend.lnbits.com) as your Lightning
 5. The frontend displays this LNURL as a QR code.
 6. The backend polls LNbits to check if the payment has been received.
 7. Once confirmed, the question becomes visible to the user.
-**After all questions are solved, a prominent button 'Finish LNHunt & return sats' appears at the top.**
-**The final LNURL is shown as a QR code and direct link. The participant's name should be entered in the comment field of the wallet. After successful payment, the success URL redirects to `/thnx`.**
+**After all questions are solved, a prominent button 'Finish LNHunt & Sats geschenkt bekommen!' appears at the top.**
+**The final LNURL is shown as a QR code and direct link. The participant's name should be entered in the comment field of the wallet. After successful withdrawal, the success URL redirects to `/thnx`.**
 
 No dynamic invoice creation. No node. No complexity. Just working.
 
@@ -158,7 +158,7 @@ No dynamic invoice creation. No node. No complexity. Just working.
 - **Audio feedback after each answer (success/fail).**
 - **Easter egg: In the info panel, the sounds can be played via buttons.**
 - **Debug panel and info panel can be toggled via button. Info panel contains technical details and Easter egg sound buttons.**
-- **After the return transaction via LNURL, users are redirected to a /thnx page ('Thank you for participating').**
+- **After the withdrawal transaction via LNURL, users are redirected to a /thnx page ('Thank you for participating').**
 
 ---
 
@@ -179,7 +179,11 @@ npm run dev
 
 1. Push the project to GitHub  
 2. Connect it to [Vercel](https://vercel.com/)  
-3. Add environment variables (API keys, base URLs) in the Vercel dashboard  
+3. Add environment variables (API keys, base URLs) in the Vercel dashboard:
+   - `LNBITS_API_URL`: Your LNbits instance API URL
+   - `LNBITS_API_KEY`: Your LNbits API key
+   - `LNBITS_WALLET_ID`: Your LNbits wallet ID
+   - `LNBITS_LNURL`: The LNURL-withdraw link for the final reward
 4. Deploy and start playing – no backend setup required
 
 ---
@@ -223,8 +227,9 @@ If you adapt or build on top of lnhunt, contributions and feedback are welcome!
 
 - **Lightning Integration:**
   - Dynamic invoice creation via LNbits API.
-  - After all questions are solved, a prominent button 'Finish LNHunt & return sats' appears at the top.
-  - Integration of a fixed LNURL for the final return transaction (e.g. for team competitions).
+  - After all questions are solved, a prominent button 'LNHunt abschließen & Sats geschenkt bekommen!' appears at the top.
+  - Integration of a fixed LNURL-withdraw link for the final reward (players receive sats as a reward for completion).
+  - The LNURL-withdraw link is configured via the `LNBITS_LNURL` environment variable.
   - Note: The participant's name is entered in the comment field of the wallet.
 
 - **Audio Feedback:**
@@ -232,7 +237,7 @@ If you adapt or build on top of lnhunt, contributions and feedback are welcome!
   - Easter egg: In the info panel, the sounds can be played via buttons.
 
 - **Completion & Thank You Page:**
-  - After the return transaction via LNURL, users are redirected to a /thnx page ('Thank you for participating').
+  - After the withdrawal transaction via LNURL, users are redirected to a /thnx page ('Thank you for participating').
 
 - **Debug & Info:**
   - Debug panel and info panel can be toggled via button.
@@ -266,11 +271,13 @@ If you adapt or build on top of lnhunt, contributions and feedback are welcome!
 
 ---
 
-### Notes on LNURL Return Transaction
+### Notes on LNURL Withdrawal Reward
 
-- The final LNURL is shown as a QR code and direct link as soon as all questions are solved.
+- The final LNURL-withdraw is shown as a QR code and direct link as soon as all questions are solved.
+- The LNURL is configured in the `LNBITS_LNURL` environment variable.
 - The participant's name should be entered in the comment field of the wallet.
-- After successful payment, the success URL redirects to `/thnx`.
+- Players receive sats as a reward for completing all questions.
+- After successful withdrawal, the success URL redirects to `/thnx`.
 
 ---
 
