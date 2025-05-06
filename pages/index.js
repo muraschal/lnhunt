@@ -545,9 +545,12 @@ export default function Home() {
             <h3 className="text-lg font-bold mb-2 text-orange-400">Kurzanleitung</h3>
             <ol className="list-decimal list-inside space-y-2 text-left mx-auto max-w-md">
               <li>Finde den <b>physischen Code</b> in der realen Welt (z.B. QR-Code, Sticker, Hinweis).</li>
-              <li>Gib den physischen Code ein, bezahle per Lightning und beantworte die Frage.</li>
+              <li>Gib den physischen Code ein, bezahle per Lightning und warte einen Moment, bis die Zahlung bestätigt wurde. Danach kannst du die Frage beantworten. Falls die Antwort falsch ist, musst du erneut bezahlen.</li>
               <li>Nach jeder richtigen Antwort erhältst du einen <b>digitalen Code</b> (Lösungswort). Sammle alle digitalen Codes und schließe LNHunt ab, um deine Sats zurückzusenden!</li>
             </ol>
+            <p className="mt-4 text-orange-300 text-sm">
+              💡 <b>Tipp:</b> Nach dem Lösen aller Fragen erscheint oben ein Button "LNHunt abschließen & Sats zurücksenden". Scanne den QR-Code und gib deinen Namen im Kommentar-Feld der Wallet ein!
+            </p>
           </div>
         )}
       </div>
