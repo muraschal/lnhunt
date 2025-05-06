@@ -107,12 +107,6 @@ export function QRCodeModal({
             className="w-full h-full"
           />
         )}
-        {paymentStatus === "processing" && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-            <Loader2 className="w-8 h-8 text-orange-500 animate-spin mb-2" />
-            <p className="text-white font-medium">Warte auf Zahlung...</p>
-          </div>
-        )}
         {paymentStatus === "complete" && (
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
             <CheckCircle className="w-16 h-16 text-green-500 mb-4" />
@@ -143,10 +137,6 @@ export function QRCodeModal({
           <p className="text-xs text-gray-300 font-mono break-all">{paymentRequest}</p>
         </div>
       )}
-
-      <div className="mt-4 text-center">
-        <p className="text-xs text-gray-400">Powered by Lightning Network</p>
-      </div>
     </motion.div>
   )
 } 
