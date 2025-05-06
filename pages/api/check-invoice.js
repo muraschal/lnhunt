@@ -23,7 +23,7 @@ export default async function handler(req, res) {
     const response = await fetch(`${apiUrl}/payments/${paymentHash}`, {
       headers: {
         'X-Api-Key': apiKey,
-        'X-Wallet-ID': walletId
+        'X-Wallet-Id': walletId
       },
     });
     const data = await response.json();

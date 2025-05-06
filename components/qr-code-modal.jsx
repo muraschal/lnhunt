@@ -4,8 +4,9 @@ import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Loader2, CheckCircle, Copy, Check } from "lucide-react"
 
-const LNbits_API_URL = "https://hwznode.rapold.io/api/v1/payments"
-const LNbits_API_KEY = "3b5a83795ead4e40a3e956f5ef476fad"
+const LNbits_API_URL = process.env.NEXT_PUBLIC_LNBITS_API_URL || "https://hwznode.rapold.io/api/v1"
+const LNbits_API_KEY = process.env.NEXT_PUBLIC_LNBITS_API_KEY || "3b5a83795ead4e40a3e956f5ef476fad"
+const LNbits_WALLET_ID = process.env.NEXT_PUBLIC_LNBITS_WALLET_ID || "7d8c999bf9ba4fc3b0815fe6513f2780"
 
 export function QRCodeModal({
   onPaymentComplete,
@@ -24,17 +25,18 @@ export function QRCodeModal({
     setPaymentHash("")
     async function createInvoice() {
       try {
-        const res = await fetch(LNbits_API_URL, {
+        const res = await fetch(`${LNbits_API_URL}/payments`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "X-Api-Key": LNbits_API_KEY,
+            "X-Wallet-Id": LNbits_WALLET_ID,
           },
           body: JSON.stringify({
             out: false,
             amount: satCost,
             unit: "sat",
-            memo: `Frage ${questionId}`,
+            memo: `Frage ${questionId}`
           }),
         })
         const data = await res.json()
@@ -54,8 +56,11 @@ export function QRCodeModal({
     setPaymentStatus("processing")
     const poll = async () => {
       try {
-        const res = await fetch(`https://hwznode.rapold.io/api/v1/payments/${paymentHash}`, {
-          headers: { "X-Api-Key": LNbits_API_KEY },
+        const res = await fetch(`${LNbits_API_URL}/payments/${paymentHash}`, {
+          headers: {
+            "X-Api-Key": LNbits_API_KEY,
+            "X-Wallet-Id": LNbits_WALLET_ID,
+          },
         })
         const data = await res.json()
         if (data.paid === true && !cancelled) {

@@ -23,13 +23,12 @@ export default async function handler(req, res) {
         out: false,
         amount,
         unit: 'sat',
-        memo: `Frage ${questionId}`,
-        wallet_id: walletId
+        memo: `Frage ${questionId}`
       },
       { 
         headers: { 
           'X-Api-Key': apiKey,
-          'X-Wallet-ID': walletId
+          'X-Wallet-Id': walletId
         } 
       }
     );
