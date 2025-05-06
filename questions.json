@@ -8,8 +8,8 @@
       "1.75 BTC"
     ],
     "correct_index": 1,
-    "answer_key": "fix",
-    "access_code": "magic",
+    "code_digital": "fix",
+    "code_physical": "magic",
     "hint": "Alle 210'000 Blöcke halbiert sich die Blocksubsidy.",
     "image": "q1.png"
   },
@@ -22,8 +22,8 @@
       "Seigniorage-Verschiebung"
     ],
     "correct_index": 1,
-    "answer_key": "the",
-    "access_code": "internet",
+    "code_digital": "the",
+    "code_physical": "internet",
     "hint": "Dieser Effekt wurde erstmals im 18. Jh. von einem französischen Ökonomen beschrieben.",
     "image": "q2.png"
   },
@@ -36,8 +36,8 @@
       "Grenzneigung zum Konsum"
     ],
     "correct_index": 1,
-    "answer_key": "money",
-    "access_code": "money",
+    "code_digital": "money",
+    "code_physical": "money",
     "hint": "HODL ist die radikalste Form davon.",
     "image": "q3.png"
   },
@@ -50,8 +50,8 @@
       "Snapshot Channel Balance"
     ],
     "correct_index": 1,
-    "answer_key": "fix",
-    "access_code": "freedom",
+    "code_digital": "fix",
+    "code_physical": "freedom",
     "hint": "Unverzichtbar für die Wiederherstellung von Channels nach einem Datenverlust.",
     "image": "q4.png"
   },
@@ -64,8 +64,8 @@
       "Gründung der US-Notenbank"
     ],
     "correct_index": 1,
-    "answer_key": "the",
-    "access_code": "for",
+    "code_digital": "the",
+    "code_physical": "for",
     "hint": "Danach war der Dollar nicht mehr „as good as gold.",
     "image": "q5.png"
   },
@@ -78,8 +78,8 @@
       "Ordinals"
     ],
     "correct_index": 0,
-    "answer_key": "world",
-    "access_code": "all",
+    "code_digital": "world",
+    "code_physical": "all",
     "hint": "Ohne Fix für Transaction Malleability wäre Lightning unsicher.",
     "image": "q6.png"
   }

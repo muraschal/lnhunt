@@ -18,7 +18,7 @@ Correct answers reveal keywords. When combined, these form a predefined sentence
 - Reinforcement of key concepts (e.g. time preference, money history, protocol design)
 - Physical activation and team collaboration
 - Gamified knowledge transfer with emotional anchoring
-- **Encourages exploration and real-world interaction by requiring players to find access codes at physical locations.**
+- **Encourages exploration and real-world interaction by requiring players to find physical codes at physical locations.**
 
 ---
 
@@ -26,9 +26,10 @@ Correct answers reveal keywords. When combined, these form a predefined sentence
 
 - Multiple quiz stations, each with a unique question
 - Two-step access process:
-  1. Enter the correct access code (related to Bitcoin terminology)
+  1. Enter the correct physical code (found in the real world)
   2. Complete the Lightning payment to unlock the question
-- **Access codes are distributed in the physical world (e.g. as QR codes, stickers, or clues at specific locations). Players must find them to unlock each question.**
+- **Physical codes (code_physical) are distributed in the physical world (e.g. as QR codes, stickers, or clues at specific locations). Players must find them to unlock each question.**
+- **After answering correctly, you receive a digital code (code_digital) as a solution word for the final phrase.**
 - Configurable access modes:
   - *Low-fee*: Multiple Choice with feedback
   - *Premium*: Instant access to the correct answer
@@ -66,8 +67,8 @@ sequenceDiagram
     participant W as Wallet
 
     U->>A: Opens station (e.g. /q1)
-    A->>U: Prompts for access code
-    U->>A: Enters access code
+    A->>U: Prompts for physical code
+    U->>A: Enters physical code
     A->>U: Displays LNURL-Pay QR code (from config)
     U->>W: Pays Lightning invoice via wallet
     W->>L: Sends payment to LNbits
@@ -76,7 +77,7 @@ sequenceDiagram
     A->>U: Reveals the quiz question
 ```
 
-Each question is locked behind both an access code and a Lightning payment. Once both are completed, the question is revealed. Answering it correctly unlocks a "solution word" for the final message.
+Each question is locked behind both a physical code and a Lightning payment. Once both are completed, the question is revealed. Answering it correctly unlocks a "digital code" for the final message.
 **Solved questions display their image as a badge on the start screen.**
 
 ---
@@ -131,8 +132,8 @@ To keep things simple, use [LNbits](https://legend.lnbits.com) as your Lightning
     "1.75 BTC"
   ],
   "correct_index": 1,
-  "answer_key": "fix",
-  "access_code": "magic",
+  "code_digital": "fix",
+  "code_physical": "magic",
   "hint": "The block subsidy halves every 210,000 blocks.",
   "image": "q1.png"
 }
@@ -256,8 +257,8 @@ If you adapt or build on top of lnhunt, contributions and feedback are welcome!
     "1.75 BTC"
   ],
   "correct_index": 1,
-  "answer_key": "fix",
-  "access_code": "magic",
+  "code_digital": "fix",
+  "code_physical": "magic",
   "hint": "The block subsidy halves every 210,000 blocks.",
   "image": "q1.png"
 }

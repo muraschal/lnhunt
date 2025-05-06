@@ -15,7 +15,7 @@ export default function QuizStation() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [refresh, setRefresh] = useState(0);
-  const [accessCode, setAccessCode] = useState('');
+  const [codePhysical, setCodePhysical] = useState('');
   const [showAccessForm, setShowAccessForm] = useState(true);
 
   const question = questions.find(q => q.id === id);
@@ -24,7 +24,7 @@ export default function QuizStation() {
     if (!id) return;
     if (localStorage.getItem(`paid_${id}`)) setPaid(true);
     if (localStorage.getItem(`solved_${id}`)) setSolved(true);
-    if (localStorage.getItem(`access_${id}`)) setShowAccessForm(false);
+    if (localStorage.getItem(`code_physical_${id}`)) setShowAccessForm(false);
     // eslint-disable-next-line
   }, [id]);
 
@@ -42,11 +42,11 @@ export default function QuizStation() {
     return () => clearInterval(interval);
   }, [paymentHash, paid, id]);
 
-  const handleAccessCodeSubmit = (e) => {
+  const handleCodePhysicalSubmit = (e) => {
     e.preventDefault();
-    if (accessCode.toLowerCase() === question.access_code.toLowerCase()) {
+    if (codePhysical.toLowerCase() === question.code_physical.toLowerCase()) {
       setShowAccessForm(false);
-      localStorage.setItem(`access_${id}`, '1');
+      localStorage.setItem(`code_physical_${id}`, '1');
       setLoading(true);
       axios.post('/api/create-invoice', { questionId: id, amount: 100 })
         .then(res => {
@@ -56,7 +56,7 @@ export default function QuizStation() {
         .catch(() => setError('Fehler beim Erstellen der Invoice'))
         .finally(() => setLoading(false));
     } else {
-      setError('Falscher Zugangscode');
+      setError('Falscher physischer Code');
     }
   };
 
@@ -67,7 +67,7 @@ export default function QuizStation() {
     if (idx === question.correct_index) {
       setSolved(true);
       localStorage.setItem(`solved_${id}`, '1');
-      localStorage.setItem(`solution_${id}`, question.answer_key);
+      localStorage.setItem(`code_digital_${id}`, question.code_digital);
       setTimeout(() => {
         router.push('/');
       }, 2000);
@@ -86,14 +86,14 @@ export default function QuizStation() {
       <h1 className="text-2xl font-bold mb-4">Station {id?.toUpperCase()}</h1>
       {showAccessForm ? (
         <div className="bg-blue-100 p-6 rounded shadow text-center max-w-md w-full">
-          <p className="mb-4">Bitte gib den Zugangscode ein:</p>
-          <form onSubmit={handleAccessCodeSubmit} className="space-y-4">
+          <p className="mb-4">Bitte gib den physischen Code ein:</p>
+          <form onSubmit={handleCodePhysicalSubmit} className="space-y-4">
             <input
               type="text"
-              value={accessCode}
-              onChange={(e) => setAccessCode(e.target.value)}
+              value={codePhysical}
+              onChange={(e) => setCodePhysical(e.target.value)}
               className="w-full px-3 py-2 border rounded"
-              placeholder="Zugangscode eingeben"
+              placeholder="Physischen Code eingeben"
             />
             <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">
               Bestätigen
@@ -133,7 +133,7 @@ export default function QuizStation() {
           <button onClick={() => setShowHint(!showHint)} className="text-blue-600 underline text-sm mb-2">{showHint ? 'Hinweis ausblenden' : 'Hinweis anzeigen'}</button>
           {showHint && <div className="text-sm text-gray-600 mb-2">💡 {question.hint}</div>}
           {selected !== null && selected === question.correct_index && (
-            <div className="mt-4 text-green-700 font-bold">Richtig! Lösungswort: <span className="bg-yellow-200 px-2 py-1 rounded">{question.answer_key}</span></div>
+            <div className="mt-4 text-green-700 font-bold">Richtig! Digitaler Code: <span className="bg-yellow-200 px-2 py-1 rounded">{question.code_digital}</span></div>
           )}
           {selected !== null && selected !== question.correct_index && (
             <div className="mt-4 text-red-600">Leider falsch. Du musst erneut bezahlen, um es nochmal zu versuchen!</div>
@@ -142,7 +142,7 @@ export default function QuizStation() {
       ) : (
         <div className="bg-green-50 p-6 rounded shadow text-center">
           <div className="mb-2 font-semibold">Du hast diese Station bereits gelöst!</div>
-          <div>Lösungswort: <span className="bg-yellow-200 px-2 py-1 rounded">{question.answer_key}</span></div>
+          <div>Digitaler Code: <span className="bg-yellow-200 px-2 py-1 rounded">{question.code_digital}</span></div>
           <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded" onClick={() => router.push('/')}>Zurück zur Übersicht</button>
         </div>
       )}

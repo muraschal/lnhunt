@@ -5,11 +5,11 @@ import { motion, AnimatePresence } from 'framer-motion'
 import questions from '../questions.json'
 import { QRCodeModal } from '../components/qr-code-modal'
 import { AccessModal } from '../components/access-modal'
-import { CheckCircle, Lock, HelpCircle, Zap, Wrench, Info, XCircle, Play } from "lucide-react"
+import { CheckCircle, Lock, HelpCircle, Zap, Wrench, Info, XCircle, Play, Check, Copy, BookOpen } from "lucide-react"
 import { ProgressIndicator } from '../components/progress-indicator'
 
 export default function Home() {
-  const [solutionWords, setSolutionWords] = useState([])
+  const [solutionCodesDigital, setSolutionCodesDigital] = useState([])
   const [currentStep, setCurrentStep] = useState('start')
   const [currentQuestion, setCurrentQuestion] = useState(null)
   const [paymentStatus, setPaymentStatus] = useState('pending')
@@ -26,14 +26,15 @@ export default function Home() {
   // LNURL als Konstante für bessere Wartbarkeit
   const FINAL_LNURL = "LNURL1DP68GURN8GHJ76RH0FHX7ER99EEXZUR0D3JZU6T09AKXUATJD3CZ74RJGCM8GWQ9TU707";
   const [copiedFinalLnurl, setCopiedFinalLnurl] = useState(false);
+  const [showGuidePanel, setShowGuidePanel] = useState(false)
 
   useEffect(() => {
-    // Hole für jede Frage das gespeicherte Lösungswort aus localStorage
-    const words = questions.map(q => {
-      const word = (typeof window !== 'undefined') ? localStorage.getItem(`solution_${q.id}`) : null;
-      return word || null;
+    // Hole für jede Frage den gespeicherten digitalen Code aus localStorage
+    const codes = questions.map(q => {
+      const code = (typeof window !== 'undefined') ? localStorage.getItem(`code_digital_${q.id}`) : null;
+      return code || null;
     });
-    setSolutionWords(words);
+    setSolutionCodesDigital(codes);
   }, []);
 
   // Erste Satz im Hangman-Style bauen (Fix the money)
@@ -44,8 +45,8 @@ export default function Home() {
       return order[a.id] - order[b.id];
     })
     .map(q => {
-      const word = solutionWords[questions.indexOf(q)];
-      return word || '_'.repeat(q.answer_key.length);
+      const code = solutionCodesDigital[questions.indexOf(q)];
+      return code || '_'.repeat(q.code_digital.length);
     })
     .join(' ');
 
@@ -57,8 +58,8 @@ export default function Home() {
       return order[a.id] - order[b.id];
     })
     .map(q => {
-      const word = solutionWords[questions.indexOf(q)];
-      return word || '_'.repeat(q.answer_key.length);
+      const code = solutionCodesDigital[questions.indexOf(q)];
+      return code || '_'.repeat(q.code_digital.length);
     })
     .join(' ');
 
@@ -67,8 +68,8 @@ export default function Home() {
     setCurrentStep('password')
   }
 
-  const handlePasswordSubmit = (password) => {
-    if (password.toLowerCase() === currentQuestion.access_code.toLowerCase()) {
+  const handlePasswordSubmit = (codePhysical) => {
+    if (codePhysical.toLowerCase() === currentQuestion.code_physical.toLowerCase()) {
       setCurrentStep('payment')
     }
   }
@@ -88,28 +89,22 @@ export default function Home() {
     setSelectedAnswer(idx)
     if (idx === currentQuestion.correct_index) {
       setAnswerFeedback('correct')
-      // Sound abspielen
-      const audio = new Audio('/audio/sucess.mp3')
-      audio.play()
-      // Lösungswort speichern
-      localStorage.setItem(`solution_${currentQuestion.id}`, currentQuestion.answer_key)
+      // Digitalen Code speichern
+      localStorage.setItem(`code_digital_${currentQuestion.id}`, currentQuestion.code_digital)
       setTimeout(() => {
         setSelectedAnswer(null)
         setAnswerFeedback(null)
         setCurrentStep('start')
         setCurrentQuestion(null)
         // Progress neu laden
-        const words = questions.map(q => {
-          const word = (typeof window !== 'undefined') ? localStorage.getItem(`solution_${q.id}`) : null;
-          return word || null;
+        const codes = questions.map(q => {
+          const code = (typeof window !== 'undefined') ? localStorage.getItem(`code_digital_${q.id}`) : null;
+          return code || null;
         });
-        setSolutionWords(words);
+        setSolutionCodesDigital(codes);
       }, 1500)
     } else {
       setAnswerFeedback('wrong')
-      // Sound abspielen
-      const audio = new Audio('/audio/zero.mp3')
-      audio.play()
       setTimeout(() => {
         setSelectedAnswer(null)
         setAnswerFeedback(null)
@@ -122,7 +117,7 @@ export default function Home() {
     <main className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white p-8">
       <div className="max-w-4xl mx-auto">
         {/* Abschluss-Button, wenn alle Fragen gelöst */}
-        {solutionWords.filter(Boolean).length === questions.length && (
+        {solutionCodesDigital.filter(Boolean).length === questions.length && (
           <div className="mb-8 flex flex-col items-center">
             <button
               onClick={() => setShowFinalModal(true)}
@@ -136,43 +131,62 @@ export default function Home() {
             {/* Modal */}
             {showFinalModal && (
               <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-                <div className="backdrop-blur-xl bg-white/10 border border-orange-500 rounded-3xl p-6 shadow-xl max-w-sm w-full text-center">
-                  <h2 className="text-2xl font-bold mb-4 text-orange-500">LN Hunt abschließen & Sats zurücksenden</h2>
-                  <img
-                    src={`https://api.qrserver.com/v1/create-qr-code/?data=${FINAL_LNURL}&size=200x200`}
-                    alt="LNURL QR"
-                    className="mx-auto mb-4"
-                  />
-                  <a
-                    href={`lightning:${FINAL_LNURL}`}
-                    className="block bg-orange-500 text-white rounded px-4 py-2 mb-2 font-semibold shadow hover:bg-orange-600 transition"
-                  >
-                    Mit Wallet öffnen
-                  </a>
-                  {/* LNURL als Text + Copy-Button */}
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <span className="text-xs text-gray-200 font-mono break-all select-all">{FINAL_LNURL}</span>
-                    <button
-                      onClick={() => {
-                        navigator.clipboard.writeText(FINAL_LNURL);
-                        setCopiedFinalLnurl(true);
-                        setTimeout(() => setCopiedFinalLnurl(false), 1500);
-                      }}
-                      className="text-orange-300 hover:text-orange-100 text-xs underline"
-                    >
-                      {copiedFinalLnurl ? 'Kopiert!' : 'Kopieren'}
-                    </button>
+                <motion.div
+                  className="backdrop-blur-xl bg-white/10 border border-orange-500 rounded-3xl p-6 shadow-xl max-w-sm w-full"
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.9, opacity: 0 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                >
+                  <div className="text-center mb-4">
+                    <h2 className="text-xl font-bold text-orange-500">LN Hunt abschließen & Sats zurücksenden</h2>
+                    <p className="text-gray-300 text-sm mt-1">Scanne den QR-Code, um alle Sats zurückzusenden</p>
                   </div>
-                  <p className="text-xs text-orange-200 mb-2">
-                    Bitte gib deinen Namen im Kommentar-Feld der Wallet ein!
-                  </p>
+                  <div className="relative mx-auto w-64 h-64 mb-4 flex items-center justify-center">
+                    <img
+                      src={`https://api.qrserver.com/v1/create-qr-code/?data=${FINAL_LNURL}&size=180x180`}
+                      alt="LNURL QR"
+                      className="w-full h-full"
+                    />
+                  </div>
+                  <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-xl p-3 mb-4">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-xs font-medium text-gray-400">LNURL</span>
+                      <div className="flex gap-2">
+                        <motion.button
+                          onClick={() => {
+                            navigator.clipboard.writeText(FINAL_LNURL);
+                            setCopiedFinalLnurl(true);
+                            setTimeout(() => setCopiedFinalLnurl(false), 1500);
+                          }}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          className="text-orange-500 hover:text-orange-400"
+                        >
+                          {copiedFinalLnurl ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                        </motion.button>
+                        <a
+                          href={`lightning:${FINAL_LNURL}`}
+                          className="inline-flex items-center px-2 py-1 bg-orange-500/90 hover:bg-orange-500 text-white text-xs rounded transition ml-1"
+                          style={{ textDecoration: 'none' }}
+                        >
+                          <span className="mr-1">Mit Wallet zahlen</span>
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                          </svg>
+                        </a>
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-300 font-mono break-all">{FINAL_LNURL}</p>
+                  </div>
+                  <p className="text-xs text-orange-200 mb-2">Bitte gib deinen Namen im Kommentar-Feld der Wallet ein!</p>
                   <button
                     onClick={() => setShowFinalModal(false)}
                     className="text-orange-400 underline text-xs mt-2"
                   >
                     Schließen
                   </button>
-                </div>
+                </motion.div>
               </div>
             )}
           </div>
@@ -217,7 +231,7 @@ export default function Home() {
               >
                 <div className="grid grid-cols-3 gap-3 mb-6">
                   {questions.map((question) => {
-                    const solved = solutionWords[questions.indexOf(question)]
+                    const solved = solutionCodesDigital[questions.indexOf(question)]
                     return (
                       <motion.button
                         key={question.id}
@@ -258,19 +272,19 @@ export default function Home() {
                 </div>
 
                 {/* Fortschrittsanzeige und Lösungswort nur anzeigen, wenn mindestens eine Frage beantwortet wurde */}
-                {solutionWords.some(Boolean) && (
+                {solutionCodesDigital.some(Boolean) && (
                   <div className="mb-6">
                     <ProgressIndicator
-                      keywords={solutionWords.filter(Boolean)}
+                      keywords={solutionCodesDigital.filter(Boolean)}
                       totalKeywords={6}
                       manualPhrase="Fix the money fix the world"
-                      accessCodes={["magic", "internet", "money", "freedom", "for", "all"]}
+                      codesPhysical={questions.map(q => q.code_physical)}
                     />
                   </div>
                 )}
 
                 <div className="text-center text-sm text-gray-400">
-                  {solutionWords.filter(Boolean).length !== questions.length && (
+                  {solutionCodesDigital.filter(Boolean).length !== questions.length && (
                     <p>Klicke auf eine Frage, um sie freizuschalten</p>
                   )}
                 </div>
@@ -287,7 +301,7 @@ export default function Home() {
                 <AccessModal
                   questionNumber={currentQuestion.id}
                   onPasswordSubmit={handlePasswordSubmit}
-                  accessCode={currentQuestion.access_code}
+                  codePhysical={currentQuestion.code_physical}
                   hint={currentQuestion.hint}
                 />
               </motion.div>
@@ -406,7 +420,15 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Debug & Info Buttons */}
+        {/* Anleitung */}
+        <div className="mt-8 mb-4 text-center text-sm text-gray-300">
+          <b>So funktioniert's:</b> <br />
+          1. Finde den <b>physischen Code</b> in der realen Welt (z.B. QR-Code, Sticker, Hinweis).<br />
+          2. Gib den physischen Code ein, bezahle per Lightning und beantworte die Frage.<br />
+          3. Nach jeder richtigen Antwort erhältst du einen <b>digitalen Code</b> (Lösungswort). Sammle alle digitalen Codes und schließe LNHunt ab, um deine Sats zurückzusenden!
+        </div>
+
+        {/* Debug, Info & Anleitung Buttons */}
         <div className="mt-8 flex justify-center gap-4">
           <button
             onClick={() => setShowDebugPanel((v) => !v)}
@@ -424,6 +446,14 @@ export default function Home() {
             <Info className="w-5 h-5" />
             <span className="text-sm">{showInfoPanel ? 'Info ausblenden' : 'Info anzeigen'}</span>
           </button>
+          <button
+            onClick={() => setShowGuidePanel((v) => !v)}
+            className="bg-black/70 text-orange-400 p-2 rounded-full shadow-lg hover:bg-orange-500/80 hover:text-white transition flex items-center gap-2"
+            aria-label="Anleitung anzeigen"
+          >
+            <BookOpen className="w-5 h-5" />
+            <span className="text-sm">{showGuidePanel ? 'Anleitung ausblenden' : 'Anleitung anzeigen'}</span>
+          </button>
         </div>
 
         {/* Debug Panel */}
@@ -432,8 +462,8 @@ export default function Home() {
             <h3 className="text-sm font-bold mb-2">Debug Information</h3>
             <div className="mb-2">
               <div>questions.length: <span className="text-white">{questions.length}</span></div>
-              <div>solutionWords: <span className="text-white">{JSON.stringify(solutionWords)}</span></div>
-              <div>solved: <span className="text-white">{solutionWords.filter(Boolean).length}</span></div>
+              <div>solutionCodesDigital: <span className="text-white">{JSON.stringify(solutionCodesDigital)}</span></div>
+              <div>solved: <span className="text-white">{solutionCodesDigital.filter(Boolean).length}</span></div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -459,7 +489,7 @@ export default function Home() {
               <button
                 onClick={() => {
                   Object.keys(localStorage).forEach(key => {
-                    if (key.startsWith('solution_')) localStorage.removeItem(key);
+                    if (key.startsWith('code_digital_')) localStorage.removeItem(key);
                   });
                   window.location.reload();
                 }}
@@ -506,6 +536,18 @@ export default function Home() {
                 <span className="hidden sm:inline">Fail</span>
               </button>
             </div>
+          </div>
+        )}
+
+        {/* Anleitung Panel */}
+        {showGuidePanel && (
+          <div className="mt-8 p-4 bg-black/80 text-orange-200 text-sm rounded-xl shadow-xl max-w-2xl mx-auto text-center">
+            <h3 className="text-lg font-bold mb-2 text-orange-400">Kurzanleitung</h3>
+            <ol className="list-decimal list-inside space-y-2 text-left mx-auto max-w-md">
+              <li>Finde den <b>physischen Code</b> in der realen Welt (z.B. QR-Code, Sticker, Hinweis).</li>
+              <li>Gib den physischen Code ein, bezahle per Lightning und beantworte die Frage.</li>
+              <li>Nach jeder richtigen Antwort erhältst du einen <b>digitalen Code</b> (Lösungswort). Sammle alle digitalen Codes und schließe LNHunt ab, um deine Sats zurückzusenden!</li>
+            </ol>
           </div>
         )}
       </div>

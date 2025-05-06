@@ -7,25 +7,19 @@ import { Key, ArrowRight } from "lucide-react"
 export function AccessModal({
   questionNumber,
   onPasswordSubmit,
-  accessCode,
+  codePhysical,
   hint
 }) {
-  const [password, setPassword] = useState("")
+  const [input, setInput] = useState("")
   const [error, setError] = useState("")
   const [isShaking, setIsShaking] = useState(false)
 
   const handleSubmit = (e) => {
     e.preventDefault()
-
-    if (!password.trim()) {
-      setError("Bitte gib das Passwort ein")
-      return
-    }
-
-    if (password.trim().toLowerCase() === accessCode.toLowerCase()) {
-      onPasswordSubmit(password.trim())
+    if (input.trim().toLowerCase() === codePhysical.toLowerCase()) {
+      onPasswordSubmit(input)
     } else {
-      setError("Falsches Passwort")
+      setError("Falscher physischer Code. Bitte versuche es erneut.")
       setIsShaking(true)
       setTimeout(() => setIsShaking(false), 500)
     }
@@ -45,28 +39,24 @@ export function AccessModal({
         <div className="inline-block p-3 bg-white/10 rounded-full mb-4">
           <Key className="w-8 h-8 text-orange-500" />
         </div>
-        <h2 className="text-2xl font-bold text-white mb-2">Passwort eingeben</h2>
-        <p className="text-gray-300">Gib das Passwort ein, um Frage {questionNumber} freizuschalten</p>
+        <h2 className="text-2xl font-bold text-white mb-2">Frage {questionNumber} freischalten</h2>
+        <p className="text-gray-300">Gib den physischen Code ein, um Frage {questionNumber} freizuschalten</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
+          <label htmlFor="code_physical_field" className="block text-sm text-gray-300 mb-1">Physischer Code</label>
           <input
+            id="code_physical_field"
+            name="code_physical_field"
             type="text"
-            name="access_code_field"
             autoComplete="off"
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value)
-              setError("")
-            }}
-            className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-            placeholder="Passwort eingeben"
-            autoFocus
+            className="w-full px-3 py-2 rounded bg-white/20 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+            value={input}
+            onChange={e => setInput(e.target.value)}
           />
-          {error && <p className="mt-1 text-sm text-red-400">{error}</p>}
         </div>
-
+        {error && <div className="text-red-400 text-xs">{error}</div>}
         <motion.button
           type="submit"
           className="w-full py-3 px-4 bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl text-white font-medium shadow-lg shadow-orange-500/20 flex items-center justify-center gap-2"
@@ -74,7 +64,7 @@ export function AccessModal({
           whileTap={{ scale: 0.95 }}
         >
           <ArrowRight className="w-4 h-4" />
-          <span>Passwort bestätigen</span>
+          <span>Freischalten</span>
         </motion.button>
       </form>
 
