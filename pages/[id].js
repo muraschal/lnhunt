@@ -68,9 +68,18 @@ export default function QuizStation() {
       setSolved(true);
       localStorage.setItem(`solved_${id}`, '1');
       localStorage.setItem(`code_digital_${id}`, question.code_digital);
+      console.log('Redirect nach /', {
+        solved: true,
+        code_digital: question.code_digital,
+        id,
+        localStorage: {
+          solved: localStorage.getItem(`solved_${id}`),
+          code_digital: localStorage.getItem(`code_digital_${id}`)
+        }
+      });
       setTimeout(() => {
         router.push('/');
-      }, 2000);
+      }, 3000);
     } else {
       setPaid(false);
       setInvoice(null);

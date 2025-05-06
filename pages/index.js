@@ -90,7 +90,7 @@ export default function Home() {
     if (idx === currentQuestion.correct_index) {
       setAnswerFeedback('correct')
       // Zufälligen Erfolgs-Sound abspielen
-      const successSounds = ['/audio/sucess.mp3', '/audio/sucess2.mp3'];
+      const successSounds = ['/audio/success.mp3', '/audio/success2.mp3'];
       const randomSound = successSounds[Math.floor(Math.random() * successSounds.length)];
       const audio = new Audio(randomSound);
       audio.play();
@@ -540,7 +540,7 @@ export default function Home() {
             <div className="flex gap-6 justify-center mt-6">
               <button
                 onClick={() => {
-                  const successSounds = ['/audio/sucess.mp3', '/audio/sucess2.mp3'];
+                  const successSounds = ['/audio/success.mp3', '/audio/success2.mp3'];
                   const randomSound = successSounds[Math.floor(Math.random() * successSounds.length)];
                   const audio = new Audio(randomSound);
                   audio.play();
