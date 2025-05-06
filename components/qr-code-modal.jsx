@@ -11,7 +11,8 @@ const LNbits_WALLET_ID = process.env.NEXT_PUBLIC_LNBITS_WALLET_ID || "7d8c999bf9
 export function QRCodeModal({
   onPaymentComplete,
   questionId,
-  satCost = 10
+  satCost = 10,
+  onDebugLog
 }) {
   const [paymentStatus, setPaymentStatus] = useState("pending")
   const [paymentRequest, setPaymentRequest] = useState("")
@@ -42,8 +43,26 @@ export function QRCodeModal({
         const data = await res.json()
         setPaymentRequest(data.payment_request || data.bolt11)
         setPaymentHash(data.payment_hash)
+        if (onDebugLog) onDebugLog({
+          paymentStatus: 'invoice_created',
+          paymentRequest: data.payment_request || data.bolt11,
+          invoiceCreated: true,
+          paymentHash: data.payment_hash,
+          bolt11: data.bolt11 || '',
+          lastPaymentStatus: null,
+          pollingError: null
+        })
       } catch (err) {
         setPaymentStatus("error")
+        if (onDebugLog) onDebugLog({
+          paymentStatus: 'error',
+          paymentRequest: '',
+          invoiceCreated: false,
+          paymentHash: '',
+          bolt11: '',
+          lastPaymentStatus: null,
+          pollingError: err.message
+        })
       }
     }
     createInvoice()
@@ -63,6 +82,15 @@ export function QRCodeModal({
           },
         })
         const data = await res.json()
+        if (onDebugLog) onDebugLog({
+          paymentStatus: data.paid ? 'paid' : 'processing',
+          paymentRequest,
+          invoiceCreated: true,
+          paymentHash,
+          bolt11: paymentRequest,
+          lastPaymentStatus: data,
+          pollingError: null
+        })
         if (data.paid === true && !cancelled) {
           setPaymentStatus("complete")
           setTimeout(() => {
@@ -72,6 +100,15 @@ export function QRCodeModal({
           setTimeout(poll, 2000)
         }
       } catch (err) {
+        if (onDebugLog) onDebugLog({
+          paymentStatus: 'polling_error',
+          paymentRequest,
+          invoiceCreated: true,
+          paymentHash,
+          bolt11: paymentRequest,
+          lastPaymentStatus: null,
+          pollingError: err.message
+        })
         if (!cancelled) setTimeout(poll, 2000)
       }
     }

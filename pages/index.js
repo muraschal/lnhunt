@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import questions from '../questions.json'
 import { QRCodeModal } from '../components/qr-code-modal'
 import { AccessModal } from '../components/access-modal'
-import { CheckCircle, Lock, HelpCircle, Zap } from "lucide-react"
+import { CheckCircle, Lock, HelpCircle, Zap, Wrench } from "lucide-react"
 import { ProgressIndicator } from '../components/progress-indicator'
 
 export default function Home() {
@@ -16,6 +16,9 @@ export default function Home() {
   // Debug-Log-Panel State (global, für QR-Code-Status)
   const [debugLog, setDebugLog] = useState({ paymentStatus: '', paymentRequest: '', invoiceCreated: false, paymentHash: '', bolt11: '', lastPaymentStatus: null })
   const debugLogRef = useRef(setDebugLog)
+  const [showDebugPanel, setShowDebugPanel] = useState(false)
+  const [selectedAnswer, setSelectedAnswer] = useState(null)
+  const [answerFeedback, setAnswerFeedback] = useState(null) // 'correct' | 'wrong' | null
 
   useEffect(() => {
     // Hole für jede Frage das gespeicherte Lösungswort aus localStorage
@@ -70,6 +73,36 @@ export default function Home() {
   // Callback für QRCodeModal, um den Status zu setzen
   const handleDebugLog = (log) => {
     setDebugLog(log)
+  }
+
+  // Antwort-Logik für das Quiz
+  const handleAnswerClick = (idx) => {
+    if (selectedAnswer !== null) return // Doppelklick verhindern
+    setSelectedAnswer(idx)
+    if (idx === currentQuestion.correct_index) {
+      setAnswerFeedback('correct')
+      // Lösungswort speichern
+      localStorage.setItem(`solution_${currentQuestion.id}`, currentQuestion.answer_key)
+      setTimeout(() => {
+        setSelectedAnswer(null)
+        setAnswerFeedback(null)
+        setCurrentStep('start')
+        setCurrentQuestion(null)
+        // Progress neu laden
+        const words = questions.map(q => {
+          const word = (typeof window !== 'undefined') ? localStorage.getItem(`solution_${q.id}`) : null;
+          return word || null;
+        });
+        setSolutionWords(words);
+      }, 1500)
+    } else {
+      setAnswerFeedback('wrong')
+      setTimeout(() => {
+        setSelectedAnswer(null)
+        setAnswerFeedback(null)
+        setCurrentStep('payment') // zurück zur Invoice
+      }, 1500)
+    }
   }
 
   return (
@@ -201,15 +234,48 @@ export default function Home() {
                   <h2 className="text-xl font-bold text-white mb-2">{currentQuestion.question}</h2>
                   <div className="space-y-2">
                     {currentQuestion.options && currentQuestion.options.map((option, idx) => (
-                      <button
+                      <motion.button
                         key={idx}
-                        className="w-full py-2 px-4 bg-white/10 rounded-lg text-white hover:bg-orange-500/80 transition"
-                        // Hier könnte später die Antwortlogik ergänzt werden
+                        onClick={() => handleAnswerClick(idx)}
+                        className={`w-full py-2 px-4 rounded-lg text-white transition font-medium
+                          ${selectedAnswer === null ? 'bg-white/10 hover:bg-orange-500/80' :
+                            idx === currentQuestion.correct_index && answerFeedback === 'correct' ? 'bg-green-500/80' :
+                            selectedAnswer === idx && answerFeedback === 'wrong' ? 'bg-red-500/80' :
+                            'bg-white/10 opacity-50'}
+                        `}
+                        whileTap={{ scale: 0.97 }}
+                        disabled={selectedAnswer !== null}
+                        animate={selectedAnswer === idx && answerFeedback === 'correct' ? { scale: [1, 1.1, 1] } : {}}
+                        transition={{ duration: 0.3 }}
                       >
                         {option}
-                      </button>
+                      </motion.button>
                     ))}
                   </div>
+                  <AnimatePresence>
+                    {answerFeedback === 'correct' && (
+                      <motion.div
+                        key="richtig"
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        className="mt-6 text-center text-green-400 text-lg font-bold"
+                      >
+                        ✅ Richtig!
+                      </motion.div>
+                    )}
+                    {answerFeedback === 'wrong' && (
+                      <motion.div
+                        key="falsch"
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        className="mt-6 text-center text-red-400 text-lg font-bold"
+                      >
+                        ❌ Falsch! Du musst erneut bezahlen.
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               </motion.div>
             )}
@@ -221,30 +287,40 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Debug-Log-Panel unten links */}
-      <div style={{ position: 'fixed', left: 0, bottom: 0, zIndex: 50, maxWidth: 500 }}>
-        <div className="bg-black/80 text-green-400 text-xs font-mono p-2 rounded-tr-xl shadow-xl">
-          <div>paymentStatus: {debugLog.paymentStatus}</div>
-          <div>invoiceCreated: {debugLog.invoiceCreated ? 'true' : 'false'}</div>
-          <div>paymentHash: {debugLog.paymentHash ? debugLog.paymentHash : 'leer'}</div>
-          <div style={{ fontSize: '1rem', marginTop: 8 }}>
-            <div>paymentRequest:</div>
-            <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all', fontSize: '1rem', color: '#baffba' }}>{debugLog.paymentRequest || 'leer'}</pre>
-          </div>
-          <div style={{ fontSize: '1rem', marginTop: 8 }}>
-            <div>bolt11:</div>
-            <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all', fontSize: '1rem', color: '#baffba' }}>{debugLog.bolt11 || 'leer'}</pre>
-          </div>
-          <div style={{ fontSize: '1rem', marginTop: 8 }}>
-            <div>lastPaymentStatus:</div>
-            <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all', fontSize: '1rem', color: '#baffba' }}>{debugLog.lastPaymentStatus ? JSON.stringify(debugLog.lastPaymentStatus, null, 2) : 'leer'}</pre>
-          </div>
-          <div style={{ fontSize: '1rem', marginTop: 8 }}>
-            <div>pollingError:</div>
-            <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all', fontSize: '1rem', color: '#ff8888' }}>{debugLog.pollingError || 'kein Fehler'}</pre>
+      {/* Debug-Log-Panel Button und Panel */}
+      <button
+        onClick={() => setShowDebugPanel((v) => !v)}
+        className="fixed left-2 bottom-2 z-50 bg-black/70 text-green-400 p-2 rounded-full shadow-lg hover:bg-orange-500/80 hover:text-white transition"
+        style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        aria-label="Debug-Log anzeigen"
+      >
+        <Wrench className="w-5 h-5" />
+      </button>
+      {showDebugPanel && (
+        <div style={{ position: 'fixed', left: 50, bottom: 10, zIndex: 50, maxWidth: 500 }}>
+          <div className="bg-black/80 text-green-400 text-xs font-mono p-2 rounded-tr-xl shadow-xl">
+            <div className="text-xs">paymentStatus: {debugLog.paymentStatus}</div>
+            <div className="text-xs">invoiceCreated: {debugLog.invoiceCreated ? 'true' : 'false'}</div>
+            <div className="text-xs">paymentHash: {debugLog.paymentHash ? debugLog.paymentHash : 'leer'}</div>
+            <div className="mt-2">
+              <div className="text-xs">paymentRequest:</div>
+              <pre className="text-xs whitespace-pre-wrap break-all text-green-300">{debugLog.paymentRequest || 'leer'}</pre>
+            </div>
+            <div className="mt-2">
+              <div className="text-xs">bolt11:</div>
+              <pre className="text-xs whitespace-pre-wrap break-all text-green-300">{debugLog.bolt11 || 'leer'}</pre>
+            </div>
+            <div className="mt-2">
+              <div className="text-xs">lastPaymentStatus:</div>
+              <pre className="text-xs whitespace-pre-wrap break-all text-green-300">{debugLog.lastPaymentStatus ? JSON.stringify(debugLog.lastPaymentStatus, null, 2) : 'leer'}</pre>
+            </div>
+            <div className="mt-2">
+              <div className="text-xs">pollingError:</div>
+              <pre className="text-xs whitespace-pre-wrap break-all text-red-400">{debugLog.pollingError || 'kein Fehler'}</pre>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </main>
   );
 } 
