@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { Key, ArrowRight, HelpCircle } from "lucide-react"
+import { Key, ArrowRight } from "lucide-react"
 
 /**
  * Hilfsfunktion zum Vibrieren des Geräts (Kopie von index.js)
@@ -44,24 +44,68 @@ export function AccessModal({
   const [input, setInput] = useState("")
   const [error, setError] = useState("")
   const [isShaking, setIsShaking] = useState(false)
-  const [showHint, setShowHint] = useState(false)
 
   // Extrahiere die Nummer aus dem questionNumber (z.B. "q4" -> "4")
   const questionNum = questionNumber.replace('q', '')
+  
+  /**
+   * Bereinigt die Eingabe:
+   * 1. Entfernt alle HTML/Script-Tags
+   * 2. Entfernt Steuerzeichen
+   * 3. Begrenzt die Länge
+   */
+  const sanitizeInput = (input) => {
+    if (!input) return '';
+    
+    // HTML-Tags entfernen
+    let sanitized = input.replace(/<[^>]*>/g, '');
+    
+    // Steuerzeichen entfernen
+    sanitized = sanitized.replace(/[^\x20-\x7E]/g, '');
+    
+    // Länge begrenzen (50 Zeichen sollten mehr als genug sein für einen Code)
+    return sanitized.slice(0, 50);
+  };
 
   const handleSubmit = (e) => {
-    e.preventDefault()
-    if (input.trim().toLowerCase() === codePhysical.toLowerCase()) {
+    e.preventDefault();
+    
+    // Eingabe bereinigen
+    const sanitizedInput = sanitizeInput(input.trim());
+    
+    // Wenn die Eingabe nach der Bereinigung leer ist oder zu kurz
+    if (!sanitizedInput || sanitizedInput.length < 2) {
+      setError("Bitte gib einen gültigen Code ein.");
+      vibrate('error');
+      setIsShaking(true);
+      setTimeout(() => setIsShaking(false), 500);
+      return;
+    }
+    
+    // Prüfen, ob der Code korrekt ist (case-insensitive)
+    if (sanitizedInput.toLowerCase() === codePhysical.toLowerCase()) {
       // Erfolgsfall wird in der übergeordneten Komponente behandelt
-      onPasswordSubmit(input)
+      onPasswordSubmit(sanitizedInput);
     } else {
       // Fehler-Vibration
       vibrate('error');
       
-      setError("Falscher physischer Code. Bitte versuche es erneut.")
-      setIsShaking(true)
-      setTimeout(() => setIsShaking(false), 500)
+      setError("Falscher physischer Code. Bitte versuche es erneut.");
+      setIsShaking(true);
+      setTimeout(() => setIsShaking(false), 500);
     }
+  }
+  
+  // Input-Handler mit Validierung während der Eingabe
+  const handleInputChange = (e) => {
+    const rawInput = e.target.value;
+    const sanitizedInput = sanitizeInput(rawInput);
+    
+    // Setze den bereinigten Wert zurück ins Input-Feld
+    setInput(sanitizedInput);
+    
+    // Setze Fehler zurück sobald der Nutzer etwas eingibt
+    if (error) setError("");
   }
 
   return (
@@ -90,12 +134,14 @@ export function AccessModal({
             name="code_physical_field"
             type="text"
             autoComplete="off"
+            maxLength={50}
             className="w-full px-3 py-2 rounded bg-white/20 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
             value={input}
-            onChange={e => setInput(e.target.value)}
+            onChange={handleInputChange}
+            aria-describedby={error ? "code-error" : undefined}
           />
         </div>
-        {error && <div className="text-red-400 text-xs">{error}</div>}
+        {error && <div id="code-error" role="alert" className="text-red-400 text-xs">{error}</div>}
         <motion.button
           type="submit"
           className="w-full py-3 px-4 bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl text-white font-medium shadow-lg shadow-orange-500/20 flex items-center justify-center gap-2"
@@ -106,21 +152,6 @@ export function AccessModal({
           <span>Freischalten</span>
         </motion.button>
       </form>
-
-      <div className="mt-4 text-center">
-        <button
-          onClick={() => setShowHint(!showHint)}
-          className="text-blue-400 underline text-sm flex items-center gap-1 mx-auto"
-        >
-          <HelpCircle className="w-4 h-4" />
-          {showHint ? 'Hinweis ausblenden' : 'Hinweis anzeigen'}
-        </button>
-        {showHint && (
-          <p className="text-xs text-gray-400 mt-2 p-2 bg-blue-900/30 rounded">
-            💡 {hint}
-          </p>
-        )}
-      </div>
     </motion.div>
   )
 } 

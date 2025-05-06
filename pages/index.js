@@ -78,6 +78,8 @@ export default function Home() {
   const FINAL_LNURL = process.env.NEXT_PUBLIC_LNBITS_LNURL;
   const [copiedFinalLnurl, setCopiedFinalLnurl] = useState(false);
   const [showGuidePanel, setShowGuidePanel] = useState(false)
+  // Status, ob der Benutzer den LNHunt bereits abgeschlossen hat
+  const [lnhuntCompleted, setLnhuntCompleted] = useState(false)
 
   useEffect(() => {
     // Hole für jede Frage den gespeicherten digitalen Code aus localStorage
@@ -90,6 +92,10 @@ export default function Home() {
     // Zeige Anleitung automatisch an, wenn noch keine Frage gelöst wurde
     const anyQuestionSolved = codes.some(Boolean);
     setShowGuidePanel(!anyQuestionSolved);
+    
+    // Prüfe, ob der Benutzer den LNHunt bereits abgeschlossen hat
+    const completed = (typeof window !== 'undefined') ? localStorage.getItem('lnhunt_completed') === 'true' : false;
+    setLnhuntCompleted(completed);
   }, []);
 
   // Erste Satz im Hangman-Style bauen (Fix the money)
@@ -337,13 +343,13 @@ export default function Home() {
                 </div>
                 
                 {/* Abschluss-Button, wenn alle Fragen gelöst sind - jetzt zwischen Fragen und Codes */}
-                {solutionCodesDigital.filter(Boolean).length === questions.length && (
+                {solutionCodesDigital.filter(Boolean).length === questions.length && !lnhuntCompleted && (
                   <div className="mb-8 flex flex-col items-center">
                     <button
                       onClick={() => setShowFinalModal(true)}
                       className="bg-orange-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-orange-700 transition text-lg"
                     >
-                      LNHunt abschließen & Sats geschenkt bekommen!
+                      LNHunt abschliessen & Sats geschenkt bekommen!
                     </button>
                   </div>
                 )}
@@ -637,6 +643,7 @@ export default function Home() {
               <div>questions.length: <span className="text-white">{questions.length}</span></div>
               <div>solutionCodesDigital: <span className="text-white">{JSON.stringify(solutionCodesDigital)}</span></div>
               <div>solved: <span className="text-white">{solutionCodesDigital.filter(Boolean).length}</span></div>
+              <div>lnhuntCompleted: <span className="text-white">{lnhuntCompleted ? 'true' : 'false'}</span></div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -659,7 +666,7 @@ export default function Home() {
               </div>
             </div>
             {/* Cache leeren Button */}
-            <div className="mt-4 flex justify-center">
+            <div className="mt-4 flex justify-center gap-2">
               <button
                 onClick={() => {
                   Object.keys(localStorage).forEach(key => {
@@ -670,6 +677,17 @@ export default function Home() {
                 className="bg-red-700/80 hover:bg-red-800 text-white px-4 py-2 rounded shadow text-xs font-bold"
               >
                 Cache leeren
+              </button>
+              
+              <button
+                onClick={() => {
+                  localStorage.removeItem('lnhunt_completed');
+                  setLnhuntCompleted(false);
+                  devLog('LNHunt-Abschluss-Status zurückgesetzt');
+                }}
+                className="bg-yellow-700/80 hover:bg-yellow-800 text-white px-4 py-2 rounded shadow text-xs font-bold"
+              >
+                Abschluss zurücksetzen
               </button>
             </div>
           </div>
@@ -733,7 +751,7 @@ export default function Home() {
               <li>Nach jeder richtigen Antwort erhältst du einen <b>digitalen Code</b> (Lösungswort). Sammle alle digitalen Codes und schließe LNHunt ab, um deine Sats-Belohnung zu erhalten!</li>
             </ol>
             <p className="mt-4 text-orange-300 text-sm">
-              💡 <b>Tipp:</b> Nach dem Lösen aller Fragen erscheint oben ein Button "LNHunt abschließen & Sats geschenkt bekommen!". Scanne den QR-Code und gib deinen Namen im Kommentar-Feld der Wallet ein!
+              💡 <b>Tipp:</b> Nach dem Lösen aller Fragen erscheint oben ein Button "LNHunt abschliessen & Sats geschenkt bekommen!". Scanne den QR-Code und gib deinen Namen im Kommentar-Feld der Wallet ein. Nach dem Schliessen des Fensters verschwindet der Button.
             </p>
           </div>
         )}
@@ -791,7 +809,12 @@ export default function Home() {
               </div>
               <div className="text-center">
                 <button
-                  onClick={() => setShowFinalModal(false)}
+                  onClick={() => {
+                    setShowFinalModal(false);
+                    // Speichere im localStorage, dass der Benutzer abgeschlossen hat
+                    localStorage.setItem('lnhunt_completed', 'true');
+                    setLnhuntCompleted(true);
+                  }}
                   className="mt-4 px-6 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white font-medium"
                 >
                   Schliessen

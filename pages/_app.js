@@ -2,6 +2,7 @@ import '../styles/globals.css';
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { useEffect } from 'react';
+import ErrorBoundary from '../components/error-boundary';
 
 export default function MyApp({ Component, pageProps }) {
   // Service Worker registrieren für PWA-Funktionalität
@@ -22,7 +23,9 @@ export default function MyApp({ Component, pageProps }) {
 
   return (
     <>
-      <Component {...pageProps} />
+      <ErrorBoundary>
+        <Component {...pageProps} />
+      </ErrorBoundary>
       <Analytics />
       <SpeedInsights />
     </>

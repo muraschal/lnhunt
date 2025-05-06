@@ -239,7 +239,7 @@ If you adapt or build on top of lnhunt, contributions and feedback are welcome!
 
 ---
 
-## 🚨 2024 Updates & Features
+## 🚨 Updates & Features
 
 - **Completely new UI:**
   - Question tiles now show the respective image as a full badge after solving.

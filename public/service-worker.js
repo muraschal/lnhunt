@@ -11,7 +11,8 @@ const PRECACHE_ASSETS = [
   '/logos/LNHunt_android-chrome-512x512.png',
   '/audio/success.mp3',
   '/audio/success2.mp3',
-  '/audio/fail.mp3'
+  '/audio/fail.mp3',
+  '/audio/qr.mp3'
 ];
 
 // Installation Event - Cache wichtige Assets
