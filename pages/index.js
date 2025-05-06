@@ -89,6 +89,11 @@ export default function Home() {
     setSelectedAnswer(idx)
     if (idx === currentQuestion.correct_index) {
       setAnswerFeedback('correct')
+      // Zufälligen Erfolgs-Sound abspielen
+      const successSounds = ['/audio/sucess.mp3', '/audio/sucess2.mp3'];
+      const randomSound = successSounds[Math.floor(Math.random() * successSounds.length)];
+      const audio = new Audio(randomSound);
+      audio.play();
       // Digitalen Code speichern
       localStorage.setItem(`code_digital_${currentQuestion.id}`, currentQuestion.code_digital)
       setTimeout(() => {
@@ -534,7 +539,12 @@ export default function Home() {
             {/* Easteregg: Audio-Play-Buttons */}
             <div className="flex gap-6 justify-center mt-6">
               <button
-                onClick={() => { const a = new Audio('/audio/sucess.mp3'); a.play(); }}
+                onClick={() => {
+                  const successSounds = ['/audio/sucess.mp3', '/audio/sucess2.mp3'];
+                  const randomSound = successSounds[Math.floor(Math.random() * successSounds.length)];
+                  const audio = new Audio(randomSound);
+                  audio.play();
+                }}
                 className="flex items-center gap-2 px-3 py-2 rounded bg-green-700/30 hover:bg-green-600/60 text-green-300 shadow"
                 title="Success Sound abspielen"
               >
