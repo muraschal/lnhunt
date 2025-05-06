@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import questions from '../questions.json'
 import { QRCodeModal } from '../components/qr-code-modal'
 import { AccessModal } from '../components/access-modal'
-import { CheckCircle, Lock, HelpCircle, Zap, Wrench } from "lucide-react"
+import { CheckCircle, Lock, HelpCircle, Zap, Wrench, Info } from "lucide-react"
 import { ProgressIndicator } from '../components/progress-indicator'
 
 export default function Home() {
@@ -19,6 +19,7 @@ export default function Home() {
   const [showDebugPanel, setShowDebugPanel] = useState(false)
   const [selectedAnswer, setSelectedAnswer] = useState(null)
   const [answerFeedback, setAnswerFeedback] = useState(null) // 'correct' | 'wrong' | null
+  const [showInfoPanel, setShowInfoPanel] = useState(false)
 
   useEffect(() => {
     // Hole für jede Frage das gespeicherte Lösungswort aus localStorage
@@ -290,8 +291,8 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Debug Button und Panel */}
-        <div className="mt-8 flex justify-center">
+        {/* Debug & Info Buttons */}
+        <div className="mt-8 flex justify-center gap-4">
           <button
             onClick={() => setShowDebugPanel((v) => !v)}
             className="bg-black/70 text-green-400 p-2 rounded-full shadow-lg hover:bg-orange-500/80 hover:text-white transition flex items-center gap-2"
@@ -299,6 +300,14 @@ export default function Home() {
           >
             <Wrench className="w-5 h-5" />
             <span className="text-sm">{showDebugPanel ? 'Debug ausblenden' : 'Debug anzeigen'}</span>
+          </button>
+          <button
+            onClick={() => setShowInfoPanel((v) => !v)}
+            className="bg-black/70 text-blue-400 p-2 rounded-full shadow-lg hover:bg-orange-500/80 hover:text-white transition flex items-center gap-2"
+            aria-label="Info anzeigen"
+          >
+            <Info className="w-5 h-5" />
+            <span className="text-sm">{showInfoPanel ? 'Info ausblenden' : 'Info anzeigen'}</span>
           </button>
         </div>
 
@@ -325,6 +334,23 @@ export default function Home() {
                 <pre className="text-xs whitespace-pre-wrap break-all text-red-400">{debugLog.pollingError || 'kein Fehler'}</pre>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Info Panel */}
+        {showInfoPanel && (
+          <div className="mt-8 p-4 bg-black/80 text-blue-200 text-xs font-mono rounded-xl shadow-xl max-w-2xl mx-auto">
+            <h3 className="text-sm font-bold mb-2 text-blue-400">Technische Details</h3>
+            <ul className="list-disc pl-5 space-y-1">
+              <li><b>Frontend:</b> Next.js 14, React 18, Tailwind CSS, Framer Motion</li>
+              <li><b>UI-Komponenten:</b> Radix UI, Lucide Icons</li>
+              <li><b>Lightning Backend:</b> LNbits (API, Invoice-Handling, Polling)</li>
+              <li><b>Payments:</b> Lightning-native, QR-Code, Wallet-Link</li>
+              <li><b>State:</b> LocalStorage für Fortschritt und Zugang</li>
+              <li><b>Quiz-Content:</b> JSON-basiert, einfach anpassbar</li>
+              <li><b>Analytics:</b> Vercel Analytics & Speed Insights</li>
+              <li><b>Besonderheiten:</b> 2-Faktor-Freischaltung (Code + Zahlung), Responsive UI, Debug-Panel, Info-Panel</li>
+            </ul>
           </div>
         )}
       </div>
