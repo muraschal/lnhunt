@@ -68,6 +68,9 @@ export default function QuizStation() {
       setSolved(true);
       localStorage.setItem(`solved_${id}`, '1');
       localStorage.setItem(`solution_${id}`, question.answer_key);
+      setTimeout(() => {
+        router.push('/');
+      }, 2000);
     } else {
       setPaid(false);
       setInvoice(null);
