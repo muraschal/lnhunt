@@ -1,0 +1,24 @@
+{
+  "name": "LNHunt by Muraschal",
+  "short_name": "LNHunt",
+  "description": "Lightning Network Quiz-Spiel mit physischen Codes und Bitcoin-Belohnungen",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#111827",
+  "theme_color": "#f97316",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logos/LNHunt_android-chrome-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logos/LNHunt_android-chrome-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ]
+} 

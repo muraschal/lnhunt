@@ -11,6 +11,20 @@ export default function Document() {
         <link rel="apple-touch-icon" sizes="180x180" href="/logos/LNHunt_apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="192x192" href="/logos/LNHunt_android-chrome-192x192.png" />
         <link rel="icon" type="image/png" sizes="512x512" href="/logos/LNHunt_android-chrome-512x512.png" />
+        {/* PWA Support */}
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="apple-mobile-web-app-title" content="LNHunt" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="application-name" content="LNHunt" />
+        <meta name="theme-color" content="#f97316" />
+        {/* Apple Splash Screen */}
+        <link
+          rel="apple-touch-startup-image"
+          href="/logos/LNHunt_apple-splash.png"
+          media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+        />
         {/* Google Fonts - Parisienne für eleganten handschriftlichen Stil */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -29,8 +43,6 @@ export default function Document() {
         <meta name="twitter:title" content="LNHunt – Bitcoin & Lightning Quiz" />
         <meta name="twitter:description" content="Teste dein Wissen rund um Bitcoin, Lightning und mehr. Gewinne Sats und werde zum LNHunter!" />
         <meta name="twitter:image" content="/logos/LNHunt_big.png" />
-        {/* Theme Color */}
-        <meta name="theme-color" content="#171717" />
       </Head>
       <body>
         <Main />
