@@ -22,6 +22,7 @@ export default function Home() {
   const [showInfoPanel, setShowInfoPanel] = useState(false)
   // State für Hint-Visibility im Fragenscreen
   const [showHint, setShowHint] = useState(false)
+  const [showFinalModal, setShowFinalModal] = useState(false)
 
   useEffect(() => {
     // Hole für jede Frage das gespeicherte Lösungswort aus localStorage
@@ -117,6 +118,49 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white p-8">
       <div className="max-w-4xl mx-auto">
+        {/* Abschluss-Button, wenn alle Fragen gelöst */}
+        {solutionWords.filter(Boolean).length === questions.length && (
+          <div className="mb-8 flex flex-col items-center">
+            <button
+              onClick={() => setShowFinalModal(true)}
+              className="bg-orange-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-orange-700 transition text-lg"
+            >
+              LNHunt abschließen & Sats zurücksenden
+            </button>
+            <p className="text-xs text-gray-400 mt-2">
+              Bitte gib deinen Namen im Kommentar-Feld der Wallet ein!
+            </p>
+            {/* Modal */}
+            {showFinalModal && (
+              <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+                <div className="bg-white rounded-xl p-8 shadow-xl max-w-sm w-full text-center">
+                  <h2 className="text-2xl font-bold mb-4 text-orange-700">LNHunt abschließen</h2>
+                  <img
+                    src="https://api.qrserver.com/v1/create-qr-code/?data=LNURL1DP68GURN8GHJ76RH0FHX7ER99EEXZUR0D3JZU6T09AKXUATJD3CZ74RJGCM8GWQ9TU707&size=200x200"
+                    alt="LNURL QR"
+                    className="mx-auto mb-4"
+                  />
+                  <a
+                    href="lightning:LNURL1DP68GURN8GHJ76RH0FHX7ER99EEXZUR0D3JZU6T09AKXUATJD3CZ74RJGCM8GWQ9TU707"
+                    className="block bg-orange-500 text-white rounded px-4 py-2 mb-2"
+                  >
+                    Mit Wallet öffnen
+                  </a>
+                  <p className="text-xs text-gray-600 mb-2">
+                    Bitte gib deinen Namen im Kommentar-Feld der Wallet ein!
+                  </p>
+                  <button
+                    onClick={() => setShowFinalModal(false)}
+                    className="text-orange-600 underline text-xs"
+                  >
+                    Schließen
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Hauptinhalt */}
         <div className="mb-8">
           <motion.div
@@ -209,7 +253,9 @@ export default function Home() {
                 )}
 
                 <div className="text-center text-sm text-gray-400">
-                  <p>Klicke auf eine Frage, um sie freizuschalten</p>
+                  {solutionWords.filter(Boolean).length !== questions.length && (
+                    <p>Klicke auf eine Frage, um sie freizuschalten</p>
+                  )}
                 </div>
               </motion.div>
             )}
@@ -367,6 +413,11 @@ export default function Home() {
         {showDebugPanel && (
           <div className="mt-8 p-4 bg-black/80 text-green-400 text-xs font-mono rounded-xl shadow-xl">
             <h3 className="text-sm font-bold mb-2">Debug Information</h3>
+            <div className="mb-2">
+              <div>questions.length: <span className="text-white">{questions.length}</span></div>
+              <div>solutionWords: <span className="text-white">{JSON.stringify(solutionWords)}</span></div>
+              <div>solved: <span className="text-white">{solutionWords.filter(Boolean).length}</span></div>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <div className="text-xs">paymentStatus: {debugLog.paymentStatus}</div>
