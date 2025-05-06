@@ -162,14 +162,26 @@ export function QRCodeModal({
         <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-xl p-3 mb-4">
           <div className="flex justify-between items-center mb-1">
             <span className="text-xs font-medium text-gray-400">Invoice</span>
-            <motion.button
-              onClick={() => copyToClipboard(paymentRequest)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="text-orange-500 hover:text-orange-400"
-            >
-              {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-            </motion.button>
+            <div className="flex gap-2">
+              <motion.button
+                onClick={() => copyToClipboard(paymentRequest)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="text-orange-500 hover:text-orange-400"
+              >
+                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+              </motion.button>
+              <a
+                href={`lightning:${paymentRequest}`}
+                className="inline-flex items-center px-2 py-1 bg-orange-500/90 hover:bg-orange-500 text-white text-xs rounded transition ml-1"
+                style={{ textDecoration: 'none' }}
+              >
+                <span className="mr-1">Mit Wallet zahlen</span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </a>
+            </div>
           </div>
           <p className="text-xs text-gray-300 font-mono break-all">{paymentRequest}</p>
         </div>
