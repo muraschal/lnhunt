@@ -420,14 +420,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Anleitung */}
-        <div className="mt-8 mb-4 text-center text-sm text-gray-300">
-          <b>So funktioniert's:</b> <br />
-          1. Finde den <b>physischen Code</b> in der realen Welt (z.B. QR-Code, Sticker, Hinweis).<br />
-          2. Gib den physischen Code ein, bezahle per Lightning und beantworte die Frage.<br />
-          3. Nach jeder richtigen Antwort erhältst du einen <b>digitalen Code</b> (Lösungswort). Sammle alle digitalen Codes und schließe LNHunt ab, um deine Sats zurückzusenden!
-        </div>
-
         {/* Debug, Info & Anleitung Buttons */}
         <div className="mt-8 flex justify-center gap-4">
           <button
