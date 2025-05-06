@@ -160,6 +160,35 @@ No dynamic invoice creation. No node. No complexity. Just working.
 - **Debug panel and info panel can be toggled via button. Info panel contains technical details and Easter egg sound buttons.**
 - **After the withdrawal transaction via LNURL, users are redirected to a /thnx page ('Thank you for participating').**
 
+## 🔄 Technische Details zur Zahlungsüberwachung
+
+### Polling-System
+- Adaptives Polling-Intervall:
+  - Start: 8 Sekunden Initialverzögerung
+  - Schrittweise Erhöhung bis maximal 30 Sekunden
+  - Automatische Bereinigung durch Cleanup-Funktionen
+
+### Rate-Limiting
+- Zweistufiges System:
+  1. IP-basiert: 30 Anfragen pro Minute (15 im Entwicklungsmodus)
+  2. Payment-Hash-basiert: ~1/3 des IP-Limits pro Zahlung
+- Automatische Anpassung bei Überlastung:
+  - 429 Status-Code mit Retry-After Header
+  - Exponentielles Backoff bei Fehlern
+
+### Parallele Nutzung
+- Optimiert für gleichzeitige Benutzer:
+  - Unabhängige Rate-Limits pro Benutzer/Hash
+  - Zustandslose API-Endpoints
+  - Regelmäßige Cache-Bereinigung (1% pro Request)
+- Performance bleibt auch bei hoher Last stabil
+
+### Sicherheit & Fehlerbehandlung
+- Validierung aller Payment-Hashes
+- Schutz vor Race-Conditions
+- Ausführliches Error-Logging
+- Entwicklungsmodus mit Mock-Daten
+
 ---
 
 ## 🧪 Local Setup

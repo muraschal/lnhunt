@@ -31,7 +31,7 @@ export default async function handler(req, res) {
         out: false,
         amount,
         unit: 'sat',
-        memo: `Frage ${questionId}`
+        memo: `LNHunt - Frage ${questionId.replace('q', '')} freischalten`
       },
       { 
         headers: { 
