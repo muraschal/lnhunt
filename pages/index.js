@@ -220,7 +220,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             className="flex items-center justify-center mb-8"
           >
-            <a href="/" className="flex items-center gap-2">
+            <a href="/" className="flex items-center gap-2 relative">
               <motion.div
                 animate={{
                   scale: [1, 1.1, 1],
@@ -235,9 +235,35 @@ export default function Home() {
               >
                 <Zap className="w-6 h-6 text-white" />
               </motion.div>
-              <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-amber-500">
-                LNHunt
-              </h1>
+              
+              <div className="flex flex-col items-center relative">
+                <h1 className="text-3xl font-bold mb-1">
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-amber-500">
+                    LNHunt
+                  </span>
+                </h1>
+                
+                {/* Handschriftlicher "by Muraschal" Zusatz mit Parisienne Font */}
+                <motion.div 
+                  className="text-white"
+                  style={{ 
+                    fontFamily: "'Parisienne', cursive", 
+                    textShadow: "1px 1px 2px rgba(0,0,0,0.6)",
+                    fontWeight: 400,
+                    letterSpacing: "0.5px",
+                    fontSize: "1.25rem",
+                    filter: "drop-shadow(0 0 2px rgba(255, 165, 0, 0.2))",
+                    opacity: 0.92,
+                    marginTop: "-5px",
+                    transform: "rotate(-3deg)"
+                  }}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 0.92, y: 0 }}
+                  transition={{ delay: 0.5, duration: 0.5 }}
+                >
+                  by Muraschal
+                </motion.div>
+              </div>
             </a>
           </motion.div>
 
@@ -277,7 +303,9 @@ export default function Home() {
                         )}
                         {/* Overlay für ID und Icon */}
                         <div className="relative z-10 flex flex-col items-center justify-center w-full h-full">
-                          <div className="text-2xl font-bold text-white mb-1 drop-shadow-lg">{question.id}</div>
+                          <div className="text-2xl font-bold text-white mb-1 drop-shadow-lg">
+                            Nr.{question.id.replace('q', '')}
+                          </div>
                           {solved ? (
                             <CheckCircle className="w-6 h-6 text-green-500 drop-shadow-lg" />
                           ) : (

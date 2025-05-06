@@ -11,6 +11,10 @@ export default function Document() {
         <link rel="apple-touch-icon" sizes="180x180" href="/logos/LNHunt_apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="192x192" href="/logos/LNHunt_android-chrome-192x192.png" />
         <link rel="icon" type="image/png" sizes="512x512" href="/logos/LNHunt_android-chrome-512x512.png" />
+        {/* Google Fonts - Parisienne für eleganten handschriftlichen Stil */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Parisienne&display=swap" rel="stylesheet" />
         {/* Meta Description */}
         <meta name="description" content="LNHunt – Das Bitcoin & Lightning Quiz. Teste dein Wissen, knacke die Fragen und gewinne Sats!" />
         {/* Open Graph / Facebook */}
