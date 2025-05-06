@@ -344,6 +344,7 @@ export default function Home() {
                             src={`/images/${question.image}`}
                             alt="Badge"
                             className="absolute inset-0 w-full h-full object-cover rounded-xl z-0"
+                            style={{ objectPosition: 'center' }}
                           />
                         )}
                         {/* Overlay für ID und Icon */}
@@ -438,8 +439,12 @@ export default function Home() {
                       <img
                         src={`/images/${currentQuestion.image}`}
                         alt="Fragenbild"
-                        className="max-h-40 rounded-xl border border-white/20 shadow"
-                        style={{ background: '#fff' }}
+                        className="max-h-40 md:max-h-48 lg:max-h-64 xl:max-h-72 w-auto rounded-xl border border-white/20 shadow transform scale-110 md:scale-100 md:w-auto"
+                        style={{ 
+                          background: '#fff', 
+                          maxWidth: 'min(100%, 560px)',
+                          objectFit: 'contain'
+                        }}
                       />
                     </div>
                   )}
@@ -503,8 +508,12 @@ export default function Home() {
                       <img
                         src={`/images/${currentQuestion.image}`}
                         alt="Fragenbild"
-                        className="max-h-40 rounded-xl border border-white/20 shadow"
-                        style={{ background: '#fff' }}
+                        className="max-h-40 md:max-h-48 lg:max-h-64 xl:max-h-72 w-auto rounded-xl border border-white/20 shadow transform scale-110 md:scale-100 md:w-auto"
+                        style={{ 
+                          background: '#fff', 
+                          maxWidth: 'min(100%, 560px)',
+                          objectFit: 'contain'
+                        }}
                       />
                     </div>
                   )}
