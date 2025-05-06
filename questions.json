@@ -7,7 +7,7 @@
       "1.5625 BTC",
       "1.75 BTC"
     ],
-    "correct_index": 2,
+    "correct_index": 1,
     "answer_key": "fix",
     "access_code": "magic",
     "hint": "Alle 210'000 Blöcke halbiert sich die Blocksubsidy.",
