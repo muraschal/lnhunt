@@ -65,7 +65,18 @@ export default function Home() {
 
   const handleQuestionSelect = (question) => {
     setCurrentQuestion(question)
-    setCurrentStep('password')
+    
+    // Prüfen, ob die Frage bereits beantwortet wurde
+    const questionIndex = questions.indexOf(question);
+    const isAnswered = solutionCodesDigital[questionIndex] !== null;
+    
+    if (isAnswered) {
+      // Wenn die Frage bereits beantwortet wurde, zeige den "Gelöst"-Bildschirm
+      setCurrentStep('solved')
+    } else {
+      // Wenn die Frage noch nicht beantwortet wurde, normal fortfahren
+      setCurrentStep('password')
+    }
   }
 
   const handlePasswordSubmit = (codePhysical) => {
@@ -131,11 +142,14 @@ export default function Home() {
       // Fehler-Sound abspielen bei falscher Antwort
       const audio = new Audio('/audio/fail.mp3');
       audio.play();
+      
+      // Bei falscher Antwort längere Zeit zeigen, damit Benutzer die Nachricht lesen kann
       setTimeout(() => {
         setSelectedAnswer(null)
-        setAnswerFeedback(null)
+        // Wichtig: Fehlermeldung wird NICHT zurückgesetzt, damit sie im Zahlungs-Modal bleibt
+        // setAnswerFeedback(null) - nicht mehr zurücksetzen
         setCurrentStep('payment') // zurück zur Invoice
-      }, 1500)
+      }, 3000) // Längere Anzeigezeit (3 Sekunden statt 1.5 Sekunden)
     }
   }
 
@@ -345,7 +359,79 @@ export default function Home() {
                   questionId={currentQuestion.id}
                   satCost={10}
                   onDebugLog={handleDebugLog}
+                  errorMessage={answerFeedback === 'wrong' ? 'Falsche Antwort! Du musst erneut bezahlen.' : null}
                 />
+              </motion.div>
+            )}
+
+            {currentStep === 'solved' && currentQuestion && (
+              <motion.div
+                key="solved"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="backdrop-blur-xl bg-white/10 border border-green-500/30 rounded-3xl p-6 shadow-xl"
+              >
+                <div className="mb-4">
+                  {/* Banner für "Bereits gelöst" */}
+                  <div className="bg-green-500/20 border border-green-500/30 rounded-xl py-2 px-4 mb-6 text-center">
+                    <CheckCircle className="w-6 h-6 text-green-500 inline-block mr-2" />
+                    <span className="text-green-400 font-medium">Diese Frage hast du bereits richtig beantwortet</span>
+                  </div>
+                  
+                  {/* Bild über der Frage */}
+                  {currentQuestion.image && (
+                    <div className="flex justify-center mb-4">
+                      <img
+                        src={`/images/${currentQuestion.image}`}
+                        alt="Fragenbild"
+                        className="max-h-40 rounded-xl border border-white/20 shadow"
+                        style={{ background: '#fff' }}
+                      />
+                    </div>
+                  )}
+                  
+                  <h2 className="text-xl font-bold text-white mb-4">{currentQuestion.question}</h2>
+                  
+                  {/* Korrekte Antwort hervorheben */}
+                  <div className="space-y-2">
+                    {currentQuestion.options && currentQuestion.options.map((option, idx) => (
+                      <div
+                        key={idx}
+                        className={`w-full py-2 px-4 rounded-lg text-white ${
+                          idx === currentQuestion.correct_index 
+                            ? 'bg-green-500/80 border border-green-500' 
+                            : 'bg-white/10 opacity-50'
+                        }`}
+                      >
+                        {option} {idx === currentQuestion.correct_index && '✓'}
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Digitaler Code Anzeige */}
+                  <div className="mt-6 p-3 bg-yellow-500/20 border border-yellow-500/30 rounded-xl">
+                    <p className="text-sm text-yellow-300 mb-1">Dein gesammelter Code:</p>
+                    <p className="text-lg font-mono text-yellow-400 font-bold text-center">
+                      {solutionCodesDigital[questions.indexOf(currentQuestion)]}
+                    </p>
+                  </div>
+                  
+                  {/* Zurück-Button */}
+                  <div className="mt-6 text-center">
+                    <motion.button
+                      onClick={() => setCurrentStep('start')}
+                      className="px-6 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white font-medium inline-flex items-center gap-2"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
+                      </svg>
+                      Zurück zur Übersicht
+                    </motion.button>
+                  </div>
+                </div>
               </motion.div>
             )}
 

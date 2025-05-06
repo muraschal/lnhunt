@@ -21,12 +21,14 @@ const LNbits_WALLET_ID = process.env.NEXT_PUBLIC_LNBITS_WALLET_ID || "7d8c999bf9
  * @param {string} questionId - ID der Frage (für die Memo)
  * @param {number} satCost - Betrag in Satoshis
  * @param {Function} onDebugLog - Callback für Debug-Informationen
+ * @param {string} errorMessage - Optionale Fehlermeldung (z.B. bei falscher Antwort)
  */
 export function QRCodeModal({
   onPaymentComplete,
   questionId,
   satCost = 10,
-  onDebugLog
+  onDebugLog,
+  errorMessage
 }) {
   // Status-States
   const [paymentStatus, setPaymentStatus] = useState("pending") // pending, processing, complete, error
@@ -37,6 +39,9 @@ export function QRCodeModal({
   // WICHTIG: Verhindert doppelte Verarbeitung einer Zahlung
   // Insbesondere bei Race-Conditions oder schnellen Polling-Zyklen kritisch
   const [paymentDetected, setPaymentDetected] = useState(false)
+  
+  // Extrahiere die Nummer aus der questionId (z.B. "q4" -> "4")
+  const questionNum = questionId.replace('q', '')
 
   /**
    * Effect: Invoice erstellen
@@ -206,8 +211,15 @@ export function QRCodeModal({
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
     >
       <div className="text-center mb-4">
-        <h2 className="text-xl font-bold text-white">Frage {questionId} freischalten</h2>
+        <h2 className="text-xl font-bold text-white">Frage Nr.{questionNum} freischalten</h2>
         <p className="text-gray-300 text-sm mt-1">Scanne den QR-Code, um {satCost} sats zu bezahlen</p>
+        
+        {/* Fehlermeldung anzeigen, wenn vorhanden */}
+        {errorMessage && (
+          <div className="mt-2 p-2 bg-red-900/30 rounded-lg border border-red-500/20">
+            <p className="text-red-400 text-sm">❌ {errorMessage}</p>
+          </div>
+        )}
       </div>
 
       <div className="relative mx-auto w-64 h-64 mb-4 flex items-center justify-center">
