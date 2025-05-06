@@ -423,15 +423,23 @@ export default function Home() {
         {/* Debug, Info & Anleitung Buttons */}
         <div className="mt-8 flex justify-center gap-4">
           <button
-            onClick={() => setShowDebugPanel((v) => !v)}
-            className="bg-black/70 text-green-400 p-2 rounded-full shadow-lg hover:bg-orange-500/80 hover:text-white transition flex items-center gap-2"
-            aria-label="Debug-Log anzeigen"
+            onClick={() => {
+              setShowGuidePanel(true);
+              setShowInfoPanel(false);
+              setShowDebugPanel(false);
+            }}
+            className="bg-black/70 text-orange-400 p-2 rounded-full shadow-lg hover:bg-orange-500/80 hover:text-white transition flex items-center gap-2"
+            aria-label="Anleitung anzeigen"
           >
-            <Wrench className="w-5 h-5" />
-            <span className="text-sm">{showDebugPanel ? 'Debug ausblenden' : 'Debug anzeigen'}</span>
+            <BookOpen className="w-5 h-5" />
+            <span className="text-sm">{showGuidePanel ? 'Anleitung ausblenden' : 'Anleitung anzeigen'}</span>
           </button>
           <button
-            onClick={() => setShowInfoPanel((v) => !v)}
+            onClick={() => {
+              setShowInfoPanel(true);
+              setShowGuidePanel(false);
+              setShowDebugPanel(false);
+            }}
             className="bg-black/70 text-blue-400 p-2 rounded-full shadow-lg hover:bg-orange-500/80 hover:text-white transition flex items-center gap-2"
             aria-label="Info anzeigen"
           >
@@ -439,12 +447,16 @@ export default function Home() {
             <span className="text-sm">{showInfoPanel ? 'Info ausblenden' : 'Info anzeigen'}</span>
           </button>
           <button
-            onClick={() => setShowGuidePanel((v) => !v)}
-            className="bg-black/70 text-orange-400 p-2 rounded-full shadow-lg hover:bg-orange-500/80 hover:text-white transition flex items-center gap-2"
-            aria-label="Anleitung anzeigen"
+            onClick={() => {
+              setShowDebugPanel(true);
+              setShowGuidePanel(false);
+              setShowInfoPanel(false);
+            }}
+            className="bg-black/70 text-green-400 p-2 rounded-full shadow-lg hover:bg-orange-500/80 hover:text-white transition flex items-center gap-2"
+            aria-label="Debug-Log anzeigen"
           >
-            <BookOpen className="w-5 h-5" />
-            <span className="text-sm">{showGuidePanel ? 'Anleitung ausblenden' : 'Anleitung anzeigen'}</span>
+            <Wrench className="w-5 h-5" />
+            <span className="text-sm">{showDebugPanel ? 'Debug ausblenden' : 'Debug anzeigen'}</span>
           </button>
         </div>
 
