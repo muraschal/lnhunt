@@ -106,17 +106,10 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 overflow-hidden relative">
-      {/* Background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -left-40 w-96 h-96 bg-orange-500/20 rounded-full blur-3xl" />
-        <div className="absolute top-1/3 -right-40 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 left-1/3 w-96 h-96 bg-orange-500/15 rounded-full blur-3xl" />
-      </div>
-
-      {/* Content */}
-      <div className="relative z-10 container mx-auto px-4 py-8 flex flex-col items-center justify-center min-h-screen">
-        <div className="w-full max-w-md">
+    <main className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white p-8">
+      <div className="max-w-4xl mx-auto">
+        {/* Hauptinhalt */}
+        <div className="mb-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -286,38 +279,45 @@ export default function Home() {
             <p className="text-xs text-gray-400">Powered by Next.js, Tailwind CSS & LNbits</p>
           </div>
         </div>
-      </div>
 
-      {/* Debug-Log-Panel Button und Panel */}
-      <button
-        onClick={() => setShowDebugPanel((v) => !v)}
-        className="fixed left-2 bottom-2 z-50 bg-black/70 text-green-400 p-2 rounded-full shadow-lg hover:bg-orange-500/80 hover:text-white transition"
-        style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-        aria-label="Debug-Log anzeigen"
-      >
-        <Wrench className="w-5 h-5" />
-      </button>
-      {showDebugPanel && (
-        <div style={{ position: 'fixed', left: 50, bottom: 10, zIndex: 50, maxWidth: 500 }}>
-          <div className="bg-black/80 text-green-400 text-xs font-mono p-2 rounded-tr-xl shadow-xl">
-            <div className="text-xs">paymentStatus: {debugLog.paymentStatus}</div>
-            <div className="text-xs">invoiceCreated: {debugLog.invoiceCreated ? 'true' : 'false'}</div>
-            <div className="text-xs">paymentHash: {debugLog.paymentHash ? debugLog.paymentHash : 'leer'}</div>
-            <div className="mt-2">
-              <div className="text-xs">paymentRequest (bolt11):</div>
-              <pre className="text-xs whitespace-pre-wrap break-all text-green-300">{debugLog.paymentRequest || debugLog.bolt11 || 'leer'}</pre>
-            </div>
-            <div className="mt-2">
-              <div className="text-xs">lastPaymentStatus:</div>
-              <pre className="text-xs whitespace-pre-wrap break-all text-green-300">{debugLog.lastPaymentStatus ? JSON.stringify(debugLog.lastPaymentStatus, null, 2) : 'leer'}</pre>
-            </div>
-            <div className="mt-2">
-              <div className="text-xs">pollingError:</div>
-              <pre className="text-xs whitespace-pre-wrap break-all text-red-400">{debugLog.pollingError || 'kein Fehler'}</pre>
+        {/* Debug Button und Panel */}
+        <div className="mt-8 flex justify-center">
+          <button
+            onClick={() => setShowDebugPanel((v) => !v)}
+            className="bg-black/70 text-green-400 p-2 rounded-full shadow-lg hover:bg-orange-500/80 hover:text-white transition flex items-center gap-2"
+            aria-label="Debug-Log anzeigen"
+          >
+            <Wrench className="w-5 h-5" />
+            <span className="text-sm">{showDebugPanel ? 'Debug ausblenden' : 'Debug anzeigen'}</span>
+          </button>
+        </div>
+
+        {/* Debug Panel */}
+        {showDebugPanel && (
+          <div className="mt-8 p-4 bg-black/80 text-green-400 text-xs font-mono rounded-xl shadow-xl">
+            <h3 className="text-sm font-bold mb-2">Debug Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <div className="text-xs">paymentStatus: {debugLog.paymentStatus}</div>
+                <div className="text-xs">invoiceCreated: {debugLog.invoiceCreated ? 'true' : 'false'}</div>
+                <div className="text-xs">paymentHash: {debugLog.paymentHash ? debugLog.paymentHash : 'leer'}</div>
+              </div>
+              <div>
+                <div className="text-xs">paymentRequest (bolt11):</div>
+                <pre className="text-xs whitespace-pre-wrap break-all text-green-300">{debugLog.paymentRequest || debugLog.bolt11 || 'leer'}</pre>
+              </div>
+              <div className="md:col-span-2">
+                <div className="text-xs">lastPaymentStatus:</div>
+                <pre className="text-xs whitespace-pre-wrap break-all text-green-300">{debugLog.lastPaymentStatus ? JSON.stringify(debugLog.lastPaymentStatus, null, 2) : 'leer'}</pre>
+              </div>
+              <div className="md:col-span-2">
+                <div className="text-xs">pollingError:</div>
+                <pre className="text-xs whitespace-pre-wrap break-all text-red-400">{debugLog.pollingError || 'kein Fehler'}</pre>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </main>
   );
 } 
