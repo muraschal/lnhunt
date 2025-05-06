@@ -74,8 +74,25 @@ export default function Home() {
     }
   }
 
+  /**
+   * Callback für erfolgreiche Zahlungen
+   * 
+   * KRITISCHER PUNKT: Stellt die Verbindung zwischen dem Zahlungsprozess und der Navigation dar.
+   * 
+   * Die verzögerte Ausführung (setTimeout) ist entscheidend, um Race-Conditions zu vermeiden:
+   * 1. Gibt dem React-Rendering-Zyklus Zeit, alle State-Updates zu verarbeiten
+   * 2. Verhindert konkurrierende Updates zwischen dem Zahlungsstatus und der Navigation
+   * 3. Sorgt für eine zuverlässige Weiterleitung insbesondere auf Desktop-Browsern
+   * 
+   * Diese Funktion wird von der QRCodeModal-Komponente aufgerufen, wenn eine Zahlung erfolgreich war.
+   */
   const handlePaymentComplete = () => {
-    setCurrentStep('answer')
+    console.log('Payment Complete Handler aufgerufen')
+    // Kurze Verzögerung, damit React die State-Updates verarbeiten kann
+    setTimeout(() => {
+      setCurrentStep('answer')
+      console.log('Schritt auf "answer" geändert')
+    }, 500)
   }
 
   // Callback für QRCodeModal, um den Status zu setzen

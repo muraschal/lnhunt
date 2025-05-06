@@ -8,24 +8,51 @@ const LNbits_API_URL = process.env.NEXT_PUBLIC_LNBITS_API_URL || "https://hwznod
 const LNbits_API_KEY = process.env.NEXT_PUBLIC_LNBITS_API_KEY || "3b5a83795ead4e40a3e956f5ef476fad"
 const LNbits_WALLET_ID = process.env.NEXT_PUBLIC_LNBITS_WALLET_ID || "7d8c999bf9ba4fc3b0815fe6513f2780"
 
+/**
+ * QRCodeModal Komponente
+ * 
+ * Verantwortlich für:
+ * 1. Erstellung einer Lightning-Invoice
+ * 2. Anzeige des QR-Codes für die Zahlung
+ * 3. Polling des Zahlungsstatus
+ * 4. Meldung an die übergeordnete Komponente bei erfolgreicher Zahlung
+ * 
+ * @param {Function} onPaymentComplete - Callback, der bei erfolgreicher Zahlung aufgerufen wird
+ * @param {string} questionId - ID der Frage (für die Memo)
+ * @param {number} satCost - Betrag in Satoshis
+ * @param {Function} onDebugLog - Callback für Debug-Informationen
+ */
 export function QRCodeModal({
   onPaymentComplete,
   questionId,
   satCost = 10,
   onDebugLog
 }) {
-  const [paymentStatus, setPaymentStatus] = useState("pending")
-  const [paymentRequest, setPaymentRequest] = useState("")
-  const [paymentHash, setPaymentHash] = useState("")
-  const [copied, setCopied] = useState(false)
+  // Status-States
+  const [paymentStatus, setPaymentStatus] = useState("pending") // pending, processing, complete, error
+  const [paymentRequest, setPaymentRequest] = useState("") // Lightning-Invoice (BOLT11)
+  const [paymentHash, setPaymentHash] = useState("") // Eindeutige ID der Zahlung
+  const [copied, setCopied] = useState(false) // UI-State für Copy-Button
+  
+  // WICHTIG: Verhindert doppelte Verarbeitung einer Zahlung
+  // Insbesondere bei Race-Conditions oder schnellen Polling-Zyklen kritisch
+  const [paymentDetected, setPaymentDetected] = useState(false)
 
-  // Invoice erzeugen, wenn Modal geöffnet wird
+  /**
+   * Effect: Invoice erstellen
+   * Wird einmalig beim Mounten der Komponente ausgeführt
+   * Setzt alle States zurück und erstellt eine neue Invoice
+   */
   useEffect(() => {
+    // States zurücksetzen für sauberen Neuanfang
     setPaymentStatus("pending")
     setPaymentRequest("")
     setPaymentHash("")
+    setPaymentDetected(false)
+    
     async function createInvoice() {
       try {
+        // LNbits API-Aufruf zur Erstellung einer Invoice
         const res = await fetch(`${LNbits_API_URL}/payments`, {
           method: "POST",
           headers: {
@@ -41,8 +68,12 @@ export function QRCodeModal({
           }),
         })
         const data = await res.json()
+        
+        // States mit den Daten der neuen Invoice setzen
         setPaymentRequest(data.payment_request || data.bolt11)
         setPaymentHash(data.payment_hash)
+        
+        // Debug-Informationen zurückgeben, falls ein Callback übergeben wurde
         if (onDebugLog) onDebugLog({
           paymentStatus: 'invoice_created',
           paymentRequest: data.payment_request || data.bolt11,
@@ -53,6 +84,7 @@ export function QRCodeModal({
           pollingError: null
         })
       } catch (err) {
+        // Fehlerbehandlung bei Problemen mit der Invoice-Erstellung
         setPaymentStatus("error")
         if (onDebugLog) onDebugLog({
           paymentStatus: 'error',
@@ -65,19 +97,32 @@ export function QRCodeModal({
         })
       }
     }
+    
     createInvoice()
   }, [questionId, satCost])
 
-  // Polling auf Zahlungsstatus
+  /**
+   * Effect: Zahlungsstatus-Polling
+   * Prüft regelmäßig, ob die Zahlung eingegangen ist
+   * 
+   * KRITISCH: Die korrekte Behandlung des Zahlungsstatus und die
+   * Vermeidung von Race-Conditions ist entscheidend für die zuverlässige Weiterleitung
+   */
   useEffect(() => {
+    // Frühzeitige Beendigung, wenn noch kein payment_hash existiert
     if (!paymentHash) return
+    
+    // Flag zum Abbrechen des Pollings beim Unmounten der Komponente
     let cancelled = false
     setPaymentStatus("processing")
+    
     const poll = async () => {
       try {
-        // Statt direkter LNbits-API-Call jetzt über eigenen Proxy
+        // API-Aufruf zur Prüfung des Zahlungsstatus (über einen Proxy auf dem Server)
         const res = await fetch(`/api/check-payment?paymentHash=${paymentHash}`)
         const data = await res.json()
+        
+        // Debug-Informationen zurückgeben
         if (onDebugLog) onDebugLog({
           paymentStatus: data.paid ? 'paid' : 'processing',
           paymentRequest,
@@ -87,13 +132,34 @@ export function QRCodeModal({
           lastPaymentStatus: data,
           pollingError: null
         })
-        if (data.paid === true && !cancelled) {
+        
+        // KRITISCHER TEIL: Korrekte Verarbeitung des Zahlungsstatus
+        // Zahlung erkannt und noch nicht verarbeitet
+        if (data.paid === true && !paymentDetected) {
+          console.log('Zahlung erkannt, setze Status auf complete')
+          
+          // UI-Update: Status auf "complete" setzen
           setPaymentStatus("complete")
-          onPaymentComplete()
-        } else if (!cancelled) {
+          
+          // WICHTIG: Verhindern von doppelten Callbacks
+          // Dieser State stellt sicher, dass wir die Zahlung nur einmal verarbeiten
+          setPaymentDetected(true)
+          
+          // Verzögerung, um UI-Animation zu ermöglichen und React-Rendering-Zyklen zu respektieren
+          // Verhindert Race-Conditions beim State-Update und der Navigation
+          setTimeout(() => {
+            console.log('Rufe onPaymentComplete auf')
+            onPaymentComplete()
+          }, 1000)
+        } 
+        // Zahlung noch nicht erkannt und Polling nicht abgebrochen
+        // Wir setzen das Polling fort, wenn die Bedingungen erfüllt sind
+        else if (!data.paid && !cancelled) {
           setTimeout(poll, 1000)
         }
       } catch (err) {
+        // Fehlerbehandlung und Logging
+        console.error('Fehler beim Prüfen der Zahlung:', err)
         if (onDebugLog) onDebugLog({
           paymentStatus: 'polling_error',
           paymentRequest,
@@ -103,13 +169,26 @@ export function QRCodeModal({
           lastPaymentStatus: null,
           pollingError: err.message
         })
+        
+        // Bei einem Fehler: Polling fortsetzen, aber mit längerer Verzögerung
         if (!cancelled) setTimeout(poll, 2000)
       }
     }
+    
+    // Polling starten
     poll()
-    return () => { cancelled = true }
-  }, [paymentHash, onPaymentComplete, paymentRequest, onDebugLog])
+    
+    // Cleanup-Funktion: Wird beim Unmounten aufgerufen
+    // WICHTIG: Verhindert weitere API-Aufrufe, wenn die Komponente nicht mehr angezeigt wird
+    return () => { 
+      console.log('Cleanup: Polling wird beendet')
+      cancelled = true 
+    }
+  }, [paymentHash, onPaymentComplete, paymentRequest, onDebugLog, paymentDetected])
 
+  /**
+   * Kopiert den Invoice-Text in die Zwischenablage
+   */
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text).then(() => {
       setCopied(true)
@@ -117,6 +196,7 @@ export function QRCodeModal({
     })
   }
 
+  // UI-Rendering der Komponente
   return (
     <motion.div
       className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-6 shadow-xl"
@@ -138,12 +218,14 @@ export function QRCodeModal({
             className="w-full h-full"
           />
         )}
+        {/* Erfolgsanzeige: Wird angezeigt, wenn die Zahlung eingegangen ist */}
         {paymentStatus === "complete" && (
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
             <CheckCircle className="w-16 h-16 text-green-500 mb-4" />
             <p className="text-white font-medium">Zahlung erhalten!</p>
           </div>
         )}
+        {/* Fehleranzeige: Wird angezeigt, wenn ein Fehler bei der Invoice-Erstellung auftritt */}
         {paymentStatus === "error" && (
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
             <p className="text-red-400 font-bold">Fehler beim Erzeugen der Rechnung!</p>
@@ -152,6 +234,7 @@ export function QRCodeModal({
         )}
       </div>
 
+      {/* Invoice-Details und Aktionsbuttons */}
       {paymentRequest && (
         <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-xl p-3 mb-4">
           <div className="flex justify-between items-center mb-1">
