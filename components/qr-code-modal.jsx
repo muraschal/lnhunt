@@ -75,12 +75,8 @@ export function QRCodeModal({
     setPaymentStatus("processing")
     const poll = async () => {
       try {
-        const res = await fetch(`${LNbits_API_URL}/payments/${paymentHash}`, {
-          headers: {
-            "X-Api-Key": LNbits_API_KEY,
-            "X-Wallet-Id": LNbits_WALLET_ID,
-          },
-        })
+        // Statt direkter LNbits-API-Call jetzt über eigenen Proxy
+        const res = await fetch(`/api/check-payment?paymentHash=${paymentHash}`)
         const data = await res.json()
         if (onDebugLog) onDebugLog({
           paymentStatus: data.paid ? 'paid' : 'processing',
