@@ -206,6 +206,32 @@ git push -u origin main
 
 ---
 
+## 🛠️ Für Entwickler
+
+### Systemanforderungen
+- Node.js 16.x oder höher
+- NPM 7.x oder höher
+- Moderne Browser (Chrome, Firefox, Safari, Edge)
+
+### Entwicklungsmodus
+Die Anwendung besitzt einen eingebauten Entwicklungsmodus, der aktiviert wird, wenn keine LNbits-API-Schlüssel konfiguriert sind. In diesem Modus werden Lightning-Zahlungen simuliert, sodass keine echten Sats verwendet werden müssen.
+
+### Sicherheitshinweise
+- Speichern Sie niemals sensitive Daten wie API-Schlüssel im Git-Repository
+- Die `.env.local` Datei ist in `.gitignore` eingetragen und sollte NIEMALS eingecheckt werden
+- Die Anwendung implementiert Rate-Limiting für API-Anfragen zur Verhinderung von Missbrauch
+
+### Fehlerbehandlung
+Häufige Probleme:
+- **API-Fehler**: Überprüfen Sie die API-Schlüssel und URL in Ihren Umgebungsvariablen
+- **Zahlungsfehler**: Stellen Sie sicher, dass Ihre LNbits-Instanz korrekt konfiguriert ist
+- **Entwicklungsmodus**: Für Tests ohne echte Zahlungen können Sie die API-Schlüssel leer lassen
+
+### Lizenz
+Dieses Projekt steht unter der MIT-Lizenz.
+
+---
+
 ## 👥 License & Contribution
 
 Open for customization, whitelabel deployments, and community use.  
