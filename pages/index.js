@@ -149,38 +149,45 @@ export default function Home() {
                 className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-6 shadow-xl"
               >
                 <div className="grid grid-cols-3 gap-3 mb-6">
-                  {questions.map((question) => (
-                    <motion.button
-                      key={question.id}
-                      onClick={() => handleQuestionSelect(question)}
-                      className={`aspect-square flex flex-col items-center justify-center rounded-xl backdrop-blur-md border p-2 relative
-                        ${
-                          solutionWords[questions.indexOf(question)]
-                            ? "border-green-500/50 bg-green-500/10"
-                            : "border-white/10 bg-white/5 hover:bg-white/10"
-                        }`}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <div className="text-2xl font-bold text-white mb-1">{question.id}</div>
-                      {solutionWords[questions.indexOf(question)] ? (
-                        <>
-                          <CheckCircle className="w-6 h-6 text-green-500" />
-                          {/* Badge-Bild unten rechts */}
-                          {question.image && (
-                            <img
-                              src={`/images/${question.image}`}
-                              alt="Badge"
-                              className="absolute bottom-2 right-2 w-8 h-8 rounded-full border-2 border-white shadow-md bg-white"
-                              style={{ zIndex: 2 }}
-                            />
+                  {questions.map((question) => {
+                    const solved = solutionWords[questions.indexOf(question)]
+                    return (
+                      <motion.button
+                        key={question.id}
+                        onClick={() => handleQuestionSelect(question)}
+                        className={`aspect-square flex flex-col items-center justify-center rounded-xl backdrop-blur-md border p-2 relative overflow-hidden
+                          ${
+                            solved
+                              ? "border-green-500/50 bg-green-500/10"
+                              : "border-white/10 bg-white/5 hover:bg-white/10"
+                          }`}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        {/* Bild als Hintergrund, wenn gelöst */}
+                        {solved && question.image && (
+                          <img
+                            src={`/images/${question.image}`}
+                            alt="Badge"
+                            className="absolute inset-0 w-full h-full object-cover rounded-xl z-0"
+                          />
+                        )}
+                        {/* Overlay für ID und Icon */}
+                        <div className="relative z-10 flex flex-col items-center justify-center w-full h-full">
+                          <div className="text-2xl font-bold text-white mb-1 drop-shadow-lg">{question.id}</div>
+                          {solved ? (
+                            <CheckCircle className="w-6 h-6 text-green-500 drop-shadow-lg" />
+                          ) : (
+                            <Lock className="w-6 h-6 text-orange-500" />
                           )}
-                        </>
-                      ) : (
-                        <Lock className="w-6 h-6 text-orange-500" />
-                      )}
-                    </motion.button>
-                  ))}
+                        </div>
+                        {/* Overlay für solved: halbtransparentes Layer für bessere Lesbarkeit */}
+                        {solved && (
+                          <div className="absolute inset-0 bg-black/30 rounded-xl z-5" />
+                        )}
+                      </motion.button>
+                    )
+                  })}
                 </div>
 
                 {/* Fortschrittsanzeige und Lösungswort nur anzeigen, wenn mindestens eine Frage beantwortet wurde */}
