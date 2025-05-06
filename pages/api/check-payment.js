@@ -1,28 +1,36 @@
 import axios from 'axios';
 
-export default async function handler(req, res) {
-  const apiUrl = process.env.LNBITS_API_URL || 'https://hwznode.rapold.io';
-  const apiKey = process.env.LNBITS_API_KEY || '3b5a83795ead4e40a3e956f5ef476fad';
-  const { questionId } = req.query;
+const apiUrl = process.env.LNBITS_API_URL;
+const apiKey = process.env.LNBITS_API_KEY;
+const walletId = process.env.LNBITS_WALLET_ID;
 
-  if (!apiUrl || !apiKey) {
-    return res.status(500).json({ error: 'LNbits-API-URL oder API-Key fehlt' });
+export default async function handler(req, res) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' });
   }
-  if (!questionId) {
-    return res.status(400).json({ error: 'questionId fehlt' });
+
+  const { paymentHash } = req.query;
+
+  if (!apiUrl || !apiKey || !walletId) {
+    return res.status(500).json({ error: 'LNbits-Konfiguration unvollständig' });
+  }
+  if (!paymentHash) {
+    return res.status(400).json({ error: 'paymentHash fehlt' });
   }
 
   try {
-    // Hole alle Zahlungen
-    const resp = await axios.get(`${apiUrl}/api/v1/payments`, {
-      headers: { 'X-Api-Key': apiKey }
+    console.log('Checking payment with:', { apiUrl, paymentHash, walletId });
+    const response = await fetch(`${apiUrl}/payments/${paymentHash}`, {
+      headers: {
+        'X-Api-Key': apiKey,
+        'X-Wallet-ID': walletId
+      },
     });
-    // Finde Zahlung mit description === questionId und bezahlt
-    const paid = resp.data.some(
-      tx => tx.memo === `Frage ${questionId}` && tx.pending === false && tx.amount > 0
-    );
-    res.status(200).json({ paid });
+    const data = await response.json();
+    console.log('Payment status:', data);
+    res.status(200).json({ paid: data.paid });
   } catch (e) {
+    console.error('Error checking payment:', e);
     res.status(500).json({ error: 'Fehler beim Abruf von LNbits', details: e.message });
   }
 }
