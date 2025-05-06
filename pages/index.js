@@ -90,6 +90,7 @@ export default function Home() {
     if (idx === currentQuestion.correct_index) {
       setAnswerFeedback('correct')
       // Zufälligen Erfolgs-Sound abspielen
+      // Aus zwei möglichen Sounds wird einer zufällig ausgewählt
       const successSounds = ['/audio/success.mp3', '/audio/success2.mp3'];
       const randomSound = successSounds[Math.floor(Math.random() * successSounds.length)];
       const audio = new Audio(randomSound);
@@ -110,6 +111,9 @@ export default function Home() {
       }, 1500)
     } else {
       setAnswerFeedback('wrong')
+      // Fehler-Sound abspielen bei falscher Antwort
+      const audio = new Audio('/audio/fail.mp3');
+      audio.play();
       setTimeout(() => {
         setSelectedAnswer(null)
         setAnswerFeedback(null)
@@ -490,7 +494,8 @@ export default function Home() {
               <div>
                 <div className="text-xs">paymentStatus: {debugLog.paymentStatus}</div>
                 <div className="text-xs">invoiceCreated: {debugLog.invoiceCreated ? 'true' : 'false'}</div>
-                <div className="text-xs">paymentHash: {debugLog.paymentHash ? debugLog.paymentHash : 'leer'}</div>
+                <div className="text-xs">paymentHash:</div>
+                <pre className="text-xs whitespace-pre-wrap break-all text-white">{debugLog.paymentHash || 'leer'}</pre>
               </div>
               <div>
                 <div className="text-xs">paymentRequest (bolt11):</div>
@@ -540,6 +545,7 @@ export default function Home() {
             <div className="flex gap-6 justify-center mt-6">
               <button
                 onClick={() => {
+                  // Zufälligen Erfolgs-Sound abspielen (wie bei korrekten Antworten)
                   const successSounds = ['/audio/success.mp3', '/audio/success2.mp3'];
                   const randomSound = successSounds[Math.floor(Math.random() * successSounds.length)];
                   const audio = new Audio(randomSound);
@@ -553,7 +559,11 @@ export default function Home() {
                 <span className="hidden sm:inline">Success</span>
               </button>
               <button
-                onClick={() => { const a = new Audio('/audio/zero.mp3'); a.play(); }}
+                onClick={() => { 
+                  // Fehler-Sound abspielen (wie bei falschen Antworten)
+                  const a = new Audio('/audio/fail.mp3'); 
+                  a.play(); 
+                }}
                 className="flex items-center gap-2 px-3 py-2 rounded bg-red-700/30 hover:bg-red-600/60 text-red-300 shadow"
                 title="Fail Sound abspielen"
               >

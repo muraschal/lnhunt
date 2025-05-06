@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { Key, ArrowRight } from "lucide-react"
+import { Key, ArrowRight, HelpCircle } from "lucide-react"
 
 export function AccessModal({
   questionNumber,
@@ -13,6 +13,10 @@ export function AccessModal({
   const [input, setInput] = useState("")
   const [error, setError] = useState("")
   const [isShaking, setIsShaking] = useState(false)
+  const [showHint, setShowHint] = useState(false)
+
+  // Extrahiere die Nummer aus dem questionNumber (z.B. "q4" -> "4")
+  const questionNum = questionNumber.replace('q', '')
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -39,8 +43,8 @@ export function AccessModal({
         <div className="inline-block p-3 bg-white/10 rounded-full mb-4">
           <Key className="w-8 h-8 text-orange-500" />
         </div>
-        <h2 className="text-2xl font-bold text-white mb-2">Frage {questionNumber} freischalten</h2>
-        <p className="text-gray-300">Gib den physischen Code ein, um Frage {questionNumber} freizuschalten</p>
+        <h2 className="text-2xl font-bold text-white mb-2">Frage Nr.{questionNum} freischalten</h2>
+        <p className="text-gray-300">Gib den physischen Code ein, um die Frage freizuschalten</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -69,7 +73,18 @@ export function AccessModal({
       </form>
 
       <div className="mt-4 text-center">
-        <p className="text-xs text-gray-400">{hint}</p>
+        <button
+          onClick={() => setShowHint(!showHint)}
+          className="text-blue-400 underline text-sm flex items-center gap-1 mx-auto"
+        >
+          <HelpCircle className="w-4 h-4" />
+          {showHint ? 'Hinweis ausblenden' : 'Hinweis anzeigen'}
+        </button>
+        {showHint && (
+          <p className="text-xs text-gray-400 mt-2 p-2 bg-blue-900/30 rounded">
+            💡 {hint}
+          </p>
+        )}
       </div>
     </motion.div>
   )
