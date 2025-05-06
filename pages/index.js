@@ -84,6 +84,9 @@ export default function Home() {
     setSelectedAnswer(idx)
     if (idx === currentQuestion.correct_index) {
       setAnswerFeedback('correct')
+      // Sound abspielen
+      const audio = new Audio('/audio/sucess.mp3')
+      audio.play()
       // Lösungswort speichern
       localStorage.setItem(`solution_${currentQuestion.id}`, currentQuestion.answer_key)
       setTimeout(() => {
@@ -100,6 +103,9 @@ export default function Home() {
       }, 1500)
     } else {
       setAnswerFeedback('wrong')
+      // Sound abspielen
+      const audio = new Audio('/audio/zero.mp3')
+      audio.play()
       setTimeout(() => {
         setSelectedAnswer(null)
         setAnswerFeedback(null)
