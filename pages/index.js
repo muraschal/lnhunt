@@ -424,6 +424,9 @@ export default function Home() {
                 <span className="hidden sm:inline">Fail</span>
               </button>
             </div>
+            <p className="text-xs text-gray-600 mb-2">
+              Bitte gib deinen Namen im Kommentar-Feld der Wallet ein!
+            </p>
           </div>
         )}
       </div>
