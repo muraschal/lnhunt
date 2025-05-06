@@ -789,14 +789,14 @@ export default function Home() {
                 </div>
                 <p className="text-xs text-gray-300 font-mono break-all">{FINAL_LNURL}</p>
               </div>
-              <p className="text-xs text-orange-200 mb-2">Bitte gib deinen Namen im Kommentar-Feld der Wallet ein!</p>
-              <p className="text-sm text-white mb-4">Dies ist ein LNURL-withdraw Link. Scanne ihn mit deiner Lightning-Wallet, um deine Belohnung zu erhalten.</p>
-              <button
-                onClick={() => setShowFinalModal(false)}
-                className="text-orange-400 underline text-xs mt-2"
-              >
-                Schließen
-              </button>
+              <div className="text-center">
+                <button
+                  onClick={() => setShowFinalModal(false)}
+                  className="mt-4 px-6 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white font-medium"
+                >
+                  Schliessen
+                </button>
+              </div>
             </motion.div>
           </div>
         )}
