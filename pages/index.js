@@ -136,8 +136,8 @@ export default function Home() {
             {/* Modal */}
             {showFinalModal && (
               <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-                <div className="bg-white rounded-xl p-8 shadow-xl max-w-sm w-full text-center">
-                  <h2 className="text-2xl font-bold mb-4 text-orange-700">LNHunt abschließen</h2>
+                <div className="backdrop-blur-xl bg-white/10 border border-orange-500 rounded-3xl p-6 shadow-xl max-w-sm w-full text-center">
+                  <h2 className="text-2xl font-bold mb-4 text-orange-500">LN Hunt abschließen & Sats zurücksenden</h2>
                   <img
                     src={`https://api.qrserver.com/v1/create-qr-code/?data=${FINAL_LNURL}&size=200x200`}
                     alt="LNURL QR"
@@ -145,27 +145,30 @@ export default function Home() {
                   />
                   <a
                     href={`lightning:${FINAL_LNURL}`}
-                    className="block bg-orange-500 text-white rounded px-4 py-2 mb-2"
+                    className="block bg-orange-500 text-white rounded px-4 py-2 mb-2 font-semibold shadow hover:bg-orange-600 transition"
                   >
                     Mit Wallet öffnen
                   </a>
                   {/* LNURL als Text + Copy-Button */}
                   <div className="flex items-center justify-center gap-2 mb-2">
-                    <span className="text-xs text-gray-700 font-mono break-all select-all">{FINAL_LNURL}</span>
+                    <span className="text-xs text-gray-200 font-mono break-all select-all">{FINAL_LNURL}</span>
                     <button
                       onClick={() => {
                         navigator.clipboard.writeText(FINAL_LNURL);
                         setCopiedFinalLnurl(true);
                         setTimeout(() => setCopiedFinalLnurl(false), 1500);
                       }}
-                      className="text-orange-600 hover:text-orange-800 text-xs underline"
+                      className="text-orange-300 hover:text-orange-100 text-xs underline"
                     >
                       {copiedFinalLnurl ? 'Kopiert!' : 'Kopieren'}
                     </button>
                   </div>
+                  <p className="text-xs text-orange-200 mb-2">
+                    Bitte gib deinen Namen im Kommentar-Feld der Wallet ein!
+                  </p>
                   <button
                     onClick={() => setShowFinalModal(false)}
-                    className="text-orange-600 underline text-xs"
+                    className="text-orange-400 underline text-xs mt-2"
                   >
                     Schließen
                   </button>
@@ -450,6 +453,20 @@ export default function Home() {
                 <div className="text-xs">pollingError:</div>
                 <pre className="text-xs whitespace-pre-wrap break-all text-red-400">{debugLog.pollingError || 'kein Fehler'}</pre>
               </div>
+            </div>
+            {/* Cache leeren Button */}
+            <div className="mt-4 flex justify-center">
+              <button
+                onClick={() => {
+                  Object.keys(localStorage).forEach(key => {
+                    if (key.startsWith('solution_')) localStorage.removeItem(key);
+                  });
+                  window.location.reload();
+                }}
+                className="bg-red-700/80 hover:bg-red-800 text-white px-4 py-2 rounded shadow text-xs font-bold"
+              >
+                Cache leeren
+              </button>
             </div>
           </div>
         )}
