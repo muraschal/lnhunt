@@ -52,8 +52,8 @@ export function AccessModal({
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <input
-            type="password"
-            name="access_code"
+            type="text"
+            name="access_code_field"
             autoComplete="off"
             value={password}
             onChange={(e) => {
