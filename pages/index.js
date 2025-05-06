@@ -71,6 +71,10 @@ export default function Home() {
       return code || null;
     });
     setSolutionCodesDigital(codes);
+    
+    // Zeige Anleitung automatisch an, wenn noch keine Frage gelöst wurde
+    const anyQuestionSolved = codes.some(Boolean);
+    setShowGuidePanel(!anyQuestionSolved);
   }, []);
 
   // Erste Satz im Hangman-Style bauen (Fix the money)
@@ -209,82 +213,6 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white p-8">
       <div className="max-w-4xl mx-auto">
-        {/* Abschluss-Button, wenn alle Fragen gelöst */}
-        {solutionCodesDigital.filter(Boolean).length === questions.length && (
-          <div className="mb-8 flex flex-col items-center">
-            <button
-              onClick={() => setShowFinalModal(true)}
-              className="bg-orange-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-orange-700 transition text-lg"
-            >
-              LNHunt abschließen & Sats zurücksenden
-            </button>
-            <p className="text-xs text-gray-400 mt-2">
-              Bitte gib deinen Namen im Kommentar-Feld der Wallet ein!
-            </p>
-            {/* Modal */}
-            {showFinalModal && (
-              <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-                <motion.div
-                  className="backdrop-blur-xl bg-white/10 border border-orange-500 rounded-3xl p-6 shadow-xl max-w-sm w-full"
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.9, opacity: 0 }}
-                  transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                >
-                  <div className="text-center mb-4">
-                    <h2 className="text-xl font-bold text-orange-500">LN Hunt abschließen & Sats zurücksenden</h2>
-                    <p className="text-gray-300 text-sm mt-1">Scanne den QR-Code, um alle Sats zurückzusenden</p>
-                  </div>
-                  <div className="relative mx-auto w-64 h-64 mb-4 flex items-center justify-center">
-                    <img
-                      src={`https://api.qrserver.com/v1/create-qr-code/?data=${FINAL_LNURL}&size=180x180`}
-                      alt="LNURL QR"
-                      className="w-full h-full"
-                    />
-                  </div>
-                  <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-xl p-3 mb-4">
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-xs font-medium text-gray-400">LNURL</span>
-                      <div className="flex gap-2">
-                        <motion.button
-                          onClick={() => {
-                            navigator.clipboard.writeText(FINAL_LNURL);
-                            setCopiedFinalLnurl(true);
-                            setTimeout(() => setCopiedFinalLnurl(false), 1500);
-                          }}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          className="text-orange-500 hover:text-orange-400"
-                        >
-                          {copiedFinalLnurl ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                        </motion.button>
-                        <a
-                          href={`lightning:${FINAL_LNURL}`}
-                          className="inline-flex items-center px-2 py-1 bg-orange-500/90 hover:bg-orange-500 text-white text-xs rounded transition ml-1"
-                          style={{ textDecoration: 'none' }}
-                        >
-                          <span className="mr-1">Mit Wallet zahlen</span>
-                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                          </svg>
-                        </a>
-                      </div>
-                    </div>
-                    <p className="text-xs text-gray-300 font-mono break-all">{FINAL_LNURL}</p>
-                  </div>
-                  <p className="text-xs text-orange-200 mb-2">Bitte gib deinen Namen im Kommentar-Feld der Wallet ein!</p>
-                  <button
-                    onClick={() => setShowFinalModal(false)}
-                    className="text-orange-400 underline text-xs mt-2"
-                  >
-                    Schließen
-                  </button>
-                </motion.div>
-              </div>
-            )}
-          </div>
-        )}
-
         {/* Hauptinhalt */}
         <div className="mb-8">
           <motion.div
@@ -364,6 +292,18 @@ export default function Home() {
                     )
                   })}
                 </div>
+                
+                {/* Abschluss-Button, wenn alle Fragen gelöst sind - jetzt zwischen Fragen und Codes */}
+                {solutionCodesDigital.filter(Boolean).length === questions.length && (
+                  <div className="mb-8 flex flex-col items-center">
+                    <button
+                      onClick={() => setShowFinalModal(true)}
+                      className="bg-orange-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-orange-700 transition text-lg"
+                    >
+                      LNHunt abschließen & Sats zurücksenden
+                    </button>
+                  </div>
+                )}
 
                 {/* Fortschrittsanzeige und Lösungswort nur anzeigen, wenn mindestens eine Frage beantwortet wurde */}
                 {solutionCodesDigital.some(Boolean) && (
@@ -752,6 +692,68 @@ export default function Home() {
             <p className="mt-4 text-orange-300 text-sm">
               💡 <b>Tipp:</b> Nach dem Lösen aller Fragen erscheint oben ein Button "LNHunt abschließen & Sats zurücksenden". Scanne den QR-Code und gib deinen Namen im Kommentar-Feld der Wallet ein!
             </p>
+          </div>
+        )}
+
+        {/* Modal */}
+        {showFinalModal && (
+          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+            <motion.div
+              className="backdrop-blur-xl bg-white/10 border border-orange-500 rounded-3xl p-6 shadow-xl max-w-sm w-full"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            >
+              <div className="text-center mb-4">
+                <h2 className="text-xl font-bold text-orange-500">LN Hunt abschließen & Sats zurücksenden</h2>
+                <p className="text-gray-300 text-sm mt-1">Scanne den QR-Code, um alle Sats zurückzusenden</p>
+              </div>
+              <div className="relative mx-auto w-64 h-64 mb-4 flex items-center justify-center">
+                <img
+                  src={`https://api.qrserver.com/v1/create-qr-code/?data=${FINAL_LNURL}&size=180x180`}
+                  alt="LNURL QR"
+                  className="w-full h-full"
+                />
+              </div>
+              <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-xl p-3 mb-4">
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-xs font-medium text-gray-400">LNURL</span>
+                  <div className="flex gap-2">
+                    <motion.button
+                      onClick={() => {
+                        navigator.clipboard.writeText(FINAL_LNURL);
+                        setCopiedFinalLnurl(true);
+                        setTimeout(() => setCopiedFinalLnurl(false), 1500);
+                      }}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="text-orange-500 hover:text-orange-400"
+                    >
+                      {copiedFinalLnurl ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                    </motion.button>
+                    <a
+                      href={`lightning:${FINAL_LNURL}`}
+                      className="inline-flex items-center px-2 py-1 bg-orange-500/90 hover:bg-orange-500 text-white text-xs rounded transition ml-1"
+                      style={{ textDecoration: 'none' }}
+                    >
+                      <span className="mr-1">Mit Wallet zahlen</span>
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-300 font-mono break-all">{FINAL_LNURL}</p>
+              </div>
+              <p className="text-xs text-orange-200 mb-2">Bitte gib deinen Namen im Kommentar-Feld der Wallet ein!</p>
+              <button
+                onClick={() => setShowFinalModal(false)}
+                className="text-orange-400 underline text-xs mt-2"
+              >
+                Schließen
+              </button>
+            </motion.div>
           </div>
         )}
       </div>
