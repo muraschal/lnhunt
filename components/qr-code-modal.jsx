@@ -89,9 +89,7 @@ export function QRCodeModal({
         })
         if (data.paid === true && !cancelled) {
           setPaymentStatus("complete")
-          setTimeout(() => {
-            onPaymentComplete()
-          }, 1000)
+          onPaymentComplete()
         } else if (!cancelled) {
           setTimeout(poll, 1000)
         }
@@ -110,7 +108,7 @@ export function QRCodeModal({
     }
     poll()
     return () => { cancelled = true }
-  }, [paymentHash, onPaymentComplete])
+  }, [paymentHash, onPaymentComplete, paymentRequest, onDebugLog])
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text).then(() => {
