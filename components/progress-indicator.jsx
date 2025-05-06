@@ -27,31 +27,9 @@ export function ProgressIndicator({
         Collected Keywords: {keywords.length}/{totalKeywords}
       </h3> */}
 
-      <div className="flex flex-wrap gap-2 mb-4">
-        {allKeywords.map((keyword, index) => (
-          <motion.div
-            key={index}
-            className={`px-3 py-1.5 rounded-full text-sm font-medium ${
-              keyword
-                ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white"
-                : "bg-white/5 border border-white/10 text-gray-500"
-            }`}
-            initial={keyword ? { scale: 0 } : { scale: 1 }}
-            animate={keyword ? { scale: 1 } : { scale: 1 }}
-            transition={{
-              type: "spring",
-              stiffness: 300,
-              damping: 20,
-            }}
-          >
-            {keyword || "???"}
-          </motion.div>
-        ))}
-      </div>
-
-      {/* First Hangman Phrase (from keywords) */}
+      {/* Phrase from keywords */}
       {keywords.length > 0 && (
-        <div className="mb-4">
+        <div className="mb-4 keyword-phrase">
           <p className="text-sm text-gray-400 mb-2">Phrase from keywords:</p>
           <div className="flex flex-wrap gap-2">
             {keywords.map((word, index) => (
@@ -79,9 +57,9 @@ export function ProgressIndicator({
         </div>
       )}
 
-      {/* Second Hangman Phrase (manual) */}
+      {/* Secret phrase */}
       {keywords.length > 0 && manualPhrase && (
-        <div>
+        <div className="secret-phrase">
           <p className="text-sm text-gray-400 mb-2">Secret phrase:</p>
           <div className="flex flex-wrap gap-2">
             {manualHangman.map((word, index) => (
