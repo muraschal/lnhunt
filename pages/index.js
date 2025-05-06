@@ -424,9 +424,13 @@ export default function Home() {
         <div className="mt-8 flex justify-center gap-4">
           <button
             onClick={() => {
-              setShowGuidePanel(true);
-              setShowInfoPanel(false);
-              setShowDebugPanel(false);
+              if (showGuidePanel) {
+                setShowGuidePanel(false);
+              } else {
+                setShowGuidePanel(true);
+                setShowInfoPanel(false);
+                setShowDebugPanel(false);
+              }
             }}
             className="bg-black/70 text-orange-400 p-2 rounded-full shadow-lg hover:bg-orange-500/80 hover:text-white transition flex items-center gap-2"
             aria-label="Anleitung anzeigen"
@@ -436,9 +440,13 @@ export default function Home() {
           </button>
           <button
             onClick={() => {
-              setShowInfoPanel(true);
-              setShowGuidePanel(false);
-              setShowDebugPanel(false);
+              if (showInfoPanel) {
+                setShowInfoPanel(false);
+              } else {
+                setShowInfoPanel(true);
+                setShowGuidePanel(false);
+                setShowDebugPanel(false);
+              }
             }}
             className="bg-black/70 text-blue-400 p-2 rounded-full shadow-lg hover:bg-orange-500/80 hover:text-white transition flex items-center gap-2"
             aria-label="Info anzeigen"
@@ -448,9 +456,13 @@ export default function Home() {
           </button>
           <button
             onClick={() => {
-              setShowDebugPanel(true);
-              setShowGuidePanel(false);
-              setShowInfoPanel(false);
+              if (showDebugPanel) {
+                setShowDebugPanel(false);
+              } else {
+                setShowDebugPanel(true);
+                setShowGuidePanel(false);
+                setShowInfoPanel(false);
+              }
             }}
             className="bg-black/70 text-green-400 p-2 rounded-full shadow-lg hover:bg-orange-500/80 hover:text-white transition flex items-center gap-2"
             aria-label="Debug-Log anzeigen"
