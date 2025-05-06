@@ -23,6 +23,9 @@ export default function Home() {
   // State für Hint-Visibility im Fragenscreen
   const [showHint, setShowHint] = useState(false)
   const [showFinalModal, setShowFinalModal] = useState(false)
+  // LNURL als Konstante für bessere Wartbarkeit
+  const FINAL_LNURL = "LNURL1DP68GURN8GHJ76RH0FHX7ER99EEXZUR0D3JZU6T09AKXUATJD3CZ74RJGCM8GWQ9TU707";
+  const [copiedFinalLnurl, setCopiedFinalLnurl] = useState(false);
 
   useEffect(() => {
     // Hole für jede Frage das gespeicherte Lösungswort aus localStorage
@@ -136,19 +139,30 @@ export default function Home() {
                 <div className="bg-white rounded-xl p-8 shadow-xl max-w-sm w-full text-center">
                   <h2 className="text-2xl font-bold mb-4 text-orange-700">LNHunt abschließen</h2>
                   <img
-                    src="https://api.qrserver.com/v1/create-qr-code/?data=LNURL1DP68GURN8GHJ76RH0FHX7ER99EEXZUR0D3JZU6T09AKXUATJD3CZ74RJGCM8GWQ9TU707&size=200x200"
+                    src={`https://api.qrserver.com/v1/create-qr-code/?data=${FINAL_LNURL}&size=200x200`}
                     alt="LNURL QR"
                     className="mx-auto mb-4"
                   />
                   <a
-                    href="lightning:LNURL1DP68GURN8GHJ76RH0FHX7ER99EEXZUR0D3JZU6T09AKXUATJD3CZ74RJGCM8GWQ9TU707"
+                    href={`lightning:${FINAL_LNURL}`}
                     className="block bg-orange-500 text-white rounded px-4 py-2 mb-2"
                   >
                     Mit Wallet öffnen
                   </a>
-                  <p className="text-xs text-gray-600 mb-2">
-                    Bitte gib deinen Namen im Kommentar-Feld der Wallet ein!
-                  </p>
+                  {/* LNURL als Text + Copy-Button */}
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <span className="text-xs text-gray-700 font-mono break-all select-all">{FINAL_LNURL}</span>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(FINAL_LNURL);
+                        setCopiedFinalLnurl(true);
+                        setTimeout(() => setCopiedFinalLnurl(false), 1500);
+                      }}
+                      className="text-orange-600 hover:text-orange-800 text-xs underline"
+                    >
+                      {copiedFinalLnurl ? 'Kopiert!' : 'Kopieren'}
+                    </button>
+                  </div>
                   <button
                     onClick={() => setShowFinalModal(false)}
                     className="text-orange-600 underline text-xs"
