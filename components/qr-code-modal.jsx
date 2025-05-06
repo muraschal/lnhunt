@@ -440,30 +440,28 @@ export function QRCodeModal({
     }
   }, [paymentHash, onPaymentComplete, paymentRequest, onDebugLog, paymentDetected, devMode, LNbits_API_KEY, LNbits_WALLET_ID])
 
-  // Initialisiere und spiele QR-Sound, wenn der QR-Code angezeigt wird
+  // Initialisiere Audio beim Komponenten-Mount
   useEffect(() => {
-    // Spiele den Sound nur, wenn der QR-Code angezeigt wird
-    if (paymentRequest && paymentStatus === "pending") {
-      // Audio-Element erstellen, wenn es noch nicht existiert
-      if (!qrAudioRef.current) {
-        qrAudioRef.current = new Audio('/audio/qr.mp3');
-        qrAudioRef.current.volume = 0.5; // Lautstärke auf 50%
-      }
-      
-      // Audio abspielen
-      qrAudioRef.current.play().catch(err => {
-        // Fehler beim Abspielen ignorieren (oft wegen Browser-Einschränkungen)
-        devLog('QR-Audio konnte nicht abgespielt werden', err);
-      });
-    }
+    qrAudioRef.current = new Audio('/audio/qr.mp3');
+    qrAudioRef.current.volume = 0.5;
     
-    // Bereinigen bei Unmount
     return () => {
       if (qrAudioRef.current) {
         qrAudioRef.current.pause();
-        qrAudioRef.current.currentTime = 0;
+        qrAudioRef.current = null;
       }
     };
+  }, []);
+
+  // Spiele QR-Sound ab, wenn der QR-Code angezeigt wird
+  useEffect(() => {
+    if (paymentRequest && paymentStatus === "pending" && qrAudioRef.current) {
+      // Setze Audio zurück und spiele ab
+      qrAudioRef.current.currentTime = 0;
+      qrAudioRef.current.play().catch(err => {
+        devLog('QR-Audio konnte nicht abgespielt werden', err);
+      });
+    }
   }, [paymentRequest, paymentStatus]);
 
   /**
@@ -485,9 +483,6 @@ export function QRCodeModal({
       exit={{ scale: 0.9, opacity: 0 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
     >
-      {/* Verstecktes Audio-Element für Barrierefreiheit */}
-      <audio aria-hidden="true" preload="auto" src="/audio/qr.mp3" />
-      
       <div className="text-center mb-4">
         <h2 className="text-xl font-bold text-white">Frage Nr.{questionNum} freischalten</h2>
         <p className="text-gray-300 text-sm mt-1">Scanne den QR-Code, um {satCost} sats zu bezahlen</p>
