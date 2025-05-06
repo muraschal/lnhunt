@@ -20,6 +20,8 @@ export default function Home() {
   const [selectedAnswer, setSelectedAnswer] = useState(null)
   const [answerFeedback, setAnswerFeedback] = useState(null) // 'correct' | 'wrong' | null
   const [showInfoPanel, setShowInfoPanel] = useState(false)
+  // State für Hint-Visibility im Fragenscreen
+  const [showHint, setShowHint] = useState(false)
 
   useEffect(() => {
     // Hole für jede Frage das gespeicherte Lösungswort aus localStorage
@@ -151,7 +153,7 @@ export default function Home() {
                     <motion.button
                       key={question.id}
                       onClick={() => handleQuestionSelect(question)}
-                      className={`aspect-square flex flex-col items-center justify-center rounded-xl backdrop-blur-md border p-2
+                      className={`aspect-square flex flex-col items-center justify-center rounded-xl backdrop-blur-md border p-2 relative
                         ${
                           solutionWords[questions.indexOf(question)]
                             ? "border-green-500/50 bg-green-500/10"
@@ -162,7 +164,18 @@ export default function Home() {
                     >
                       <div className="text-2xl font-bold text-white mb-1">{question.id}</div>
                       {solutionWords[questions.indexOf(question)] ? (
-                        <CheckCircle className="w-6 h-6 text-green-500" />
+                        <>
+                          <CheckCircle className="w-6 h-6 text-green-500" />
+                          {/* Badge-Bild unten rechts */}
+                          {question.image && (
+                            <img
+                              src={`/images/${question.image}`}
+                              alt="Badge"
+                              className="absolute bottom-2 right-2 w-8 h-8 rounded-full border-2 border-white shadow-md bg-white"
+                              style={{ zIndex: 2 }}
+                            />
+                          )}
+                        </>
                       ) : (
                         <Lock className="w-6 h-6 text-orange-500" />
                       )}
@@ -229,6 +242,17 @@ export default function Home() {
                 className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-6 shadow-xl"
               >
                 <div className="mb-4">
+                  {/* Bild über der Frage */}
+                  {currentQuestion.image && (
+                    <div className="flex justify-center mb-4">
+                      <img
+                        src={`/images/${currentQuestion.image}`}
+                        alt="Fragenbild"
+                        className="max-h-40 rounded-xl border border-white/20 shadow"
+                        style={{ background: '#fff' }}
+                      />
+                    </div>
+                  )}
                   <h2 className="text-xl font-bold text-white mb-2">{currentQuestion.question}</h2>
                   <div className="space-y-2">
                     {currentQuestion.options && currentQuestion.options.map((option, idx) => (
@@ -249,6 +273,20 @@ export default function Home() {
                         {option}
                       </motion.button>
                     ))}
+                  </div>
+                  {/* Hinweis-Button und Anzeige */}
+                  <div className="mt-4 text-center">
+                    <button
+                      onClick={() => setShowHint((v) => !v)}
+                      className="text-blue-400 underline text-sm mb-2"
+                    >
+                      {showHint ? 'Hinweis ausblenden' : 'Hinweis anzeigen'}
+                    </button>
+                    {showHint && (
+                      <div className="text-sm text-blue-200 mt-2 p-2 bg-blue-900/30 rounded">
+                        💡 {currentQuestion.hint}
+                      </div>
+                    )}
                   </div>
                   <AnimatePresence>
                     {answerFeedback === 'correct' && (
@@ -286,8 +324,9 @@ export default function Home() {
               rel="noopener noreferrer"
               className="text-xs text-gray-400 hover:text-orange-400 underline"
             >
-              Marcel Rapold
+              © {new Date().getFullYear()} Marcel Rapold
             </a>
+            <span className="text-xs text-gray-500 ml-2">– Alle Rechte vorbehalten</span>
           </div>
         </div>
 

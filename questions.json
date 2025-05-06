@@ -1,17 +1,17 @@
 [
   {
     "id": "q1",
-    "question": "Wann beginnt die achte Mining-Epoche (Halving-Ära) im Bitcoin-Netzwerk?",
+    "question": "Wie hoch ist die Block Subsidy nach dem nächsten Halving?",
     "options": [
-      "Bei Blockhöhe 840'000",
-      "Bei Blockhöhe 2'100'000",
-      "Bei Blockhöhe 1'470'000"
+      "1.25 BTC",
+      "1.5625 BTC",
+      "1.75 BTC"
     ],
     "correct_index": 2,
     "answer_key": "fix",
     "access_code": "magic",
-    "hint": "Alle 210'000 Blöcke halbiert sich die Blocksubsidy. Multipliziere.",
-    "lnurlpay": "lnurlpay://q1@hwznode.rapold.io"
+    "hint": "Alle 210'000 Blöcke halbiert sich die Blocksubsidy.",
+    "image": "q1.png"
   },
   {
     "id": "q2",
@@ -25,7 +25,7 @@
     "answer_key": "the",
     "access_code": "internet",
     "hint": "Dieser Effekt wurde erstmals im 18. Jh. von einem französischen Ökonomen beschrieben.",
-    "lnurlpay": "lnurlpay://q2@hwznode.rapold.io"
+    "image": "q2.png"
   },
   {
     "id": "q3",
@@ -39,7 +39,7 @@
     "answer_key": "money",
     "access_code": "money",
     "hint": "HODL ist die radikalste Form davon.",
-    "lnurlpay": "lnurlpay://q3@hwznode.rapold.io"
+    "image": "q3.png"
   },
   {
     "id": "q4",
@@ -53,7 +53,7 @@
     "answer_key": "fix",
     "access_code": "freedom",
     "hint": "Unverzichtbar für die Wiederherstellung von Channels nach einem Datenverlust.",
-    "lnurlpay": "lnurlpay://q4@hwznode.rapold.io"
+    "image": "q4.png"
   },
   {
     "id": "q5",
@@ -66,21 +66,21 @@
     "correct_index": 1,
     "answer_key": "the",
     "access_code": "for",
-    "hint": "Danach war der Dollar nicht mehr „as good as gold.\"",
-    "lnurlpay": "lnurlpay://q5@hwznode.rapold.io"
+    "hint": "Danach war der Dollar nicht mehr „as good as gold.",
+    "image": "q5.png"
   },
   {
     "id": "q6",
-    "question": "Wer gründete den Darknet-Marktplatz Silk Road und sitzt dafür lebenslänglich in Haft?",
+    "question": "Welche Protokollerweiterung machte das Lightning-Netzwerk erst möglich?",
     "options": [
-      "Roger Ver",
-      "Ross Ulbricht",
-      "Cody Wilson"
+      "Segwit",
+      "Taproot",
+      "Ordinals"
     ],
-    "correct_index": 1,
+    "correct_index": 0,
     "answer_key": "world",
     "access_code": "all",
-    "hint": "Die erste große Bitcoin-Nutzung in freier Wildbahn – aber mit einem hohen Preis.",
-    "lnurlpay": "lnurlpay://q6@hwznode.rapold.io"
+    "hint": "Ohne Fix für Transaction Malleability wäre Lightning unsicher.",
+    "image": "q6.png"
   }
 ]
