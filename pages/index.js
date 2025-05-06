@@ -9,6 +9,21 @@ import { CheckCircle, Lock, HelpCircle, Zap, Wrench, Info, XCircle, Play, Check,
 import { ProgressIndicator } from '../components/progress-indicator'
 
 /**
+ * Nur im Dev-Modus loggen
+ * @param {string} message - Die Lognachricht
+ * @param {any} data - Optionale Daten für das Logging
+ */
+const devLog = (message, data) => {
+  if (process.env.NODE_ENV === 'development') {
+    if (data) {
+      console.log(message, data);
+    } else {
+      console.log(message);
+    }
+  }
+};
+
+/**
  * Hilfsfunktion zum Vibrieren des Geräts
  * Unterstützt verschiedene Vibrationsmuster für unterschiedliche Ereignisse
  * 
@@ -18,7 +33,7 @@ import { ProgressIndicator } from '../components/progress-indicator'
 function vibrate(type = 'normal') {
   // Prüfen, ob Vibration API verfügbar ist
   if (!window.navigator || !window.navigator.vibrate) {
-    console.log('Vibration nicht unterstützt');
+    devLog('Vibration nicht unterstützt');
     return false;
   }
   
@@ -149,12 +164,12 @@ export default function Home() {
     // Vibration für erfolgreiche Zahlung
     vibrate('payment');
     
-    console.log('Payment Complete Handler aufgerufen')
+    devLog('Payment Complete Handler aufgerufen');
     // Kurze Verzögerung, damit React die State-Updates verarbeiten kann
     setTimeout(() => {
-      setCurrentStep('answer')
-      console.log('Schritt auf "answer" geändert')
-    }, 500)
+      setCurrentStep('answer');
+      devLog('Schritt auf "answer" geändert');
+    }, 500);
   }
 
   // Callback für QRCodeModal, um den Status zu setzen

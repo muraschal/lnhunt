@@ -1,12 +1,45 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { motion } from "framer-motion"
 import { Loader2, CheckCircle, Copy, Check } from "lucide-react"
 
-const LNbits_API_URL = process.env.NEXT_PUBLIC_LNBITS_API_URL || "https://hwznode.rapold.io/api/v1"
-const LNbits_API_KEY = process.env.NEXT_PUBLIC_LNBITS_API_KEY || "3b5a83795ead4e40a3e956f5ef476fad"
-const LNbits_WALLET_ID = process.env.NEXT_PUBLIC_LNBITS_WALLET_ID || "7d8c999bf9ba4fc3b0815fe6513f2780"
+// Sichere Prüfung der Umgebungsvariablen
+const getLNbitsConfig = () => {
+  const url = process.env.NEXT_PUBLIC_LNBITS_API_URL;
+  const apiKey = process.env.NEXT_PUBLIC_LNBITS_API_KEY;
+  const walletId = process.env.NEXT_PUBLIC_LNBITS_WALLET_ID;
+
+  // Im Entwicklungsmodus können wir eine Warnung anzeigen
+  if (process.env.NODE_ENV === 'development') {
+    if (!url) console.warn('NEXT_PUBLIC_LNBITS_API_URL ist nicht gesetzt!');
+    if (!apiKey) console.warn('NEXT_PUBLIC_LNBITS_API_KEY ist nicht gesetzt!');
+    if (!walletId) console.warn('NEXT_PUBLIC_LNBITS_WALLET_ID ist nicht gesetzt!');
+  }
+
+  return {
+    url: url || 'https://hwznode.rapold.io/api/v1', // Fallback nur für Entwicklung
+    apiKey: apiKey || '', // Keine Fallbacks mehr für sensitive Daten
+    walletId: walletId || '',
+  };
+};
+
+const { url: LNbits_API_URL, apiKey: LNbits_API_KEY, walletId: LNbits_WALLET_ID } = getLNbitsConfig();
+
+/**
+ * Nur im Dev-Modus loggen
+ * @param {string} message - Die Lognachricht
+ * @param {any} data - Optionale Daten für das Logging
+ */
+const devLog = (message, data) => {
+  if (process.env.NODE_ENV === 'development') {
+    if (data) {
+      console.log(message, data);
+    } else {
+      console.log(message);
+    }
+  }
+};
 
 /**
  * Hilfsfunktion zum Vibrieren des Geräts (Kopie von index.js)
@@ -17,7 +50,7 @@ const LNbits_WALLET_ID = process.env.NEXT_PUBLIC_LNBITS_WALLET_ID || "7d8c999bf9
 function vibrate(type = 'normal') {
   // Prüfen, ob Vibration API verfügbar ist
   if (!window.navigator || !window.navigator.vibrate) {
-    console.log('Vibration nicht unterstützt');
+    devLog('Vibration nicht unterstützt');
     return false;
   }
   
@@ -71,8 +104,56 @@ export function QRCodeModal({
   // Insbesondere bei Race-Conditions oder schnellen Polling-Zyklen kritisch
   const [paymentDetected, setPaymentDetected] = useState(false)
   
+  // Polling Information für UI-Updates
+  const [pollingMessage, setPollingMessage] = useState("");
+  
+  // Flag für den Entwicklungsmodus
+  const [devMode] = useState(process.env.NODE_ENV === 'development');
+  
+  // Timer-ID für den Entwicklungsmodus
+  const devModeTimerRef = useRef(null);
+  
   // Extrahiere die Nummer aus der questionId (z.B. "q4" -> "4")
   const questionNum = questionId.replace('q', '')
+  
+  /**
+   * Dev-Mode: Simuliere eine erfolgreiche Zahlung nach einigen Sekunden
+   * Vermeidet unnötige API-Aufrufe im Entwicklungsmodus
+   */
+  useEffect(() => {
+    // Nur im Entwicklungsmodus und wenn die erforderlichen Konfigurationen fehlen
+    if (devMode && (!LNbits_API_KEY || !LNbits_WALLET_ID) && paymentStatus === "processing" && !paymentDetected) {
+      setPollingMessage("DEV-MODUS: Simuliere Zahlung in 8 Sekunden...");
+      devLog("DEV-MODUS: Simuliere Zahlungsprozess ohne API-Aufrufe");
+      
+      // Sicherstellen, dass alte Timer gesäubert werden
+      if (devModeTimerRef.current) {
+        clearTimeout(devModeTimerRef.current);
+      }
+      
+      // Simuliere eine erfolgreiche Zahlung nach 8 Sekunden
+      devModeTimerRef.current = setTimeout(() => {
+        devLog("DEV-MODUS: Simuliere erfolgreiche Zahlung");
+        setPollingMessage("DEV-MODUS: Zahlung erfolgreich!");
+        setPaymentStatus("complete");
+        vibrate('payment');
+        setPaymentDetected(true);
+        
+        // Rufe den Callback nach einer weiteren Sekunde auf
+        setTimeout(() => {
+          devLog("DEV-MODUS: Leite weiter zu Frage");
+          onPaymentComplete();
+        }, 1000);
+      }, 8000);
+      
+      // Cleanup, wenn die Komponente unmountet
+      return () => {
+        if (devModeTimerRef.current) {
+          clearTimeout(devModeTimerRef.current);
+        }
+      };
+    }
+  }, [devMode, LNbits_API_KEY, LNbits_WALLET_ID, paymentStatus, paymentDetected, onPaymentComplete]);
 
   /**
    * Effect: Invoice erstellen
@@ -88,6 +169,42 @@ export function QRCodeModal({
     
     async function createInvoice() {
       try {
+        // Simuliere eine Invoice im Entwicklungsmodus
+        if (devMode && (!LNbits_API_KEY || !LNbits_WALLET_ID)) {
+          devLog("DEV-MODUS: Erstelle simulierte Invoice");
+          
+          // Mock-Invoice für Entwicklung erstellen
+          const mockInvoice = {
+            payment_request: "lnbcrt10n1pj4kx5ypp5dz4qhgf42qy6658qw8w0yzct5czxtmesj29ay8tn704qg2ecrvsdzxf6hqdqjd5kxecxqyjw5qcqpjsp5x7x0yp9rp5y8afr59vwadrlrp6m5jefhvyunsd8gqv3a8c0mzfqyqrzjqwd8h8d0pjeq49w9qcxrm06xh08v45k36jlka32hsqnrhepwvupcqqqqqqqqqlgqqqqqeqqjqx2qcty00dws8wqrsykcpfakdnnzws54r2vvqnk39r4snrnysxw8j47r0mz5lz2ujlh05hjz9xapqj02zgj9nn96lwz0rsjtlnvv86sp3xjs6y",
+            payment_hash: "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+          };
+          
+          // Mock-Daten setzen
+          setPaymentRequest(mockInvoice.payment_request);
+          setPaymentHash(mockInvoice.payment_hash);
+          
+          // Status auf "processing" setzen, um den Entwicklungsmodus-Timer zu starten
+          setPaymentStatus("processing");
+          
+          // Debug-Log
+          if (onDebugLog) onDebugLog({
+            paymentStatus: 'invoice_created (DEV)',
+            paymentRequest: mockInvoice.payment_request,
+            invoiceCreated: true,
+            paymentHash: mockInvoice.payment_hash,
+            bolt11: mockInvoice.payment_request,
+            lastPaymentStatus: null,
+            pollingError: null
+          });
+          
+          return;
+        }
+
+        // Überprüfung, ob die erforderlichen Konfigurationen vorhanden sind
+        if (!LNbits_API_KEY || !LNbits_WALLET_ID) {
+          throw new Error("LNbits Konfiguration fehlt. Bitte setze die erforderlichen Umgebungsvariablen.");
+        }
+
         // LNbits API-Aufruf zur Erstellung einer Invoice
         const res = await fetch(`${LNbits_API_URL}/payments`, {
           method: "POST",
@@ -135,7 +252,7 @@ export function QRCodeModal({
     }
     
     createInvoice()
-  }, [questionId, satCost])
+  }, [questionId, satCost, devMode, LNbits_API_KEY, LNbits_WALLET_ID])
 
   /**
    * Effect: Zahlungsstatus-Polling
@@ -145,6 +262,12 @@ export function QRCodeModal({
    * Vermeidung von Race-Conditions ist entscheidend für die zuverlässige Weiterleitung
    */
   useEffect(() => {
+    // Im Entwicklungsmodus mit fehlenden API-Keys überspringen wir das Polling komplett
+    // Stattdessen erfolgt die Simulation über den Development-Mode-Effect oben
+    if (devMode && (!LNbits_API_KEY || !LNbits_WALLET_ID)) {
+      return;
+    }
+    
     // Frühzeitige Beendigung, wenn noch kein payment_hash existiert
     if (!paymentHash) return
     
@@ -152,10 +275,85 @@ export function QRCodeModal({
     let cancelled = false
     setPaymentStatus("processing")
     
+    // Polling mit längeren Intervallen für bessere Performance und Server-Schonung
+    let pollingDelay = 8000; // 8 Sekunden initiale Verzögerung (erhöht von 5s)
+    const maxDelay = 30000; // 30 Sekunden maximal
+    
+    // Timer-ID für Polling, um sicherzustellen, dass nur eine Instanz aktiv ist
+    let pollTimerId = null;
+    
+    // Erste Status-Meldung setzen (Zweitstufiger Ansatz)
+    setPollingMessage("Initialisiere Zahlungsüberwachung...");
+    
+    // Nach kurzer Zeit aktualisierten Status anzeigen
+    setTimeout(() => {
+      if (!cancelled) {
+        setPollingMessage(`Warte auf Zahlung... Überprüfung in 8 Sekunden.`);
+      }
+    }, 1500);
+    
     const poll = async () => {
+      if (cancelled) return;
+      
       try {
+        // Entwicklungsmodus: Mock für das Polling, wenn API-Keys fehlen
+        if (!LNbits_API_KEY || !LNbits_WALLET_ID) {
+          setPollingMessage("Simuliere Zahlung im Entwicklungsmodus...");
+          
+          // Simuliere eine Verzögerung bevor die Zahlung als "bezahlt" markiert wird
+          setTimeout(() => {
+            if (cancelled) return;
+            
+            // Simulierte Zahlungsbestätigung
+            if (onDebugLog) onDebugLog({
+              paymentStatus: 'paid (MOCK)',
+              paymentRequest,
+              invoiceCreated: true,
+              paymentHash,
+              bolt11: paymentRequest,
+              lastPaymentStatus: { paid: true },
+              pollingError: null
+            });
+            
+            // Setze Status auf "complete"
+            setPaymentStatus("complete");
+            vibrate('payment');
+            setPaymentDetected(true);
+            
+            // Rufe den Callback auf
+            setTimeout(() => {
+              if (cancelled) return;
+              devLog('Rufe onPaymentComplete auf (MOCK)');
+              onPaymentComplete();
+            }, 1000);
+          }, 5000); // 5 Sekunden Verzögerung für simulierte Zahlung
+          
+          return;
+        }
+        
+        setPollingMessage("Überprüfe Zahlung...");
+        
         // API-Aufruf zur Prüfung des Zahlungsstatus (über einen Proxy auf dem Server)
         const res = await fetch(`/api/check-payment?paymentHash=${paymentHash}`)
+        
+        // 429 Status (Rate Limit) erkennen und längere Pause einlegen
+        if (res.status === 429) {
+          const retryAfter = parseInt(res.headers.get('Retry-After') || '30', 10);
+          pollingDelay = retryAfter * 1000;
+          
+          setPollingMessage(`Zu viele Anfragen! Nächste Überprüfung in ${retryAfter} Sekunden.`);
+          devLog(`Rate Limit erreicht. Warte ${retryAfter} Sekunden.`);
+          
+          if (!cancelled) {
+            pollTimerId = setTimeout(poll, pollingDelay);
+          }
+          return;
+        }
+        
+        if (!res.ok) {
+          throw new Error(`API-Fehler: ${res.status}`);
+        }
+        
         const data = await res.json()
         
         // Debug-Informationen zurückgeben
@@ -172,7 +370,8 @@ export function QRCodeModal({
         // KRITISCHER TEIL: Korrekte Verarbeitung des Zahlungsstatus
         // Zahlung erkannt und noch nicht verarbeitet
         if (data.paid === true && !paymentDetected) {
-          console.log('Zahlung erkannt, setze Status auf complete')
+          devLog('Zahlung erkannt, setze Status auf complete');
+          setPollingMessage("Zahlung erfolgt!");
           
           // UI-Update: Status auf "complete" setzen
           setPaymentStatus("complete")
@@ -187,18 +386,27 @@ export function QRCodeModal({
           // Verzögerung, um UI-Animation zu ermöglichen und React-Rendering-Zyklen zu respektieren
           // Verhindert Race-Conditions beim State-Update und der Navigation
           setTimeout(() => {
-            console.log('Rufe onPaymentComplete auf')
-            onPaymentComplete()
+            devLog('Rufe onPaymentComplete auf');
+            onPaymentComplete();
           }, 1000)
         } 
         // Zahlung noch nicht erkannt und Polling nicht abgebrochen
         // Wir setzen das Polling fort, wenn die Bedingungen erfüllt sind
         else if (!data.paid && !cancelled) {
-          setTimeout(poll, 1000)
+          // Erhöhe die Wartezeit mit jeder Anfrage
+          pollingDelay = Math.min(pollingDelay * 1.5, maxDelay);
+          
+          const waitSeconds = Math.round(pollingDelay / 1000);
+          setPollingMessage(`Warte auf Zahlung... Nächste Überprüfung in ${waitSeconds} Sekunden.`);
+          devLog(`Zahlung noch nicht erkannt. Nächster Check in ${waitSeconds} Sekunden.`);
+          
+          pollTimerId = setTimeout(poll, pollingDelay);
         }
       } catch (err) {
         // Fehlerbehandlung und Logging
-        console.error('Fehler beim Prüfen der Zahlung:', err)
+        console.error('Fehler beim Prüfen der Zahlung:', err);
+        setPollingMessage(`Fehler bei der Überprüfung. Neuer Versuch in ${Math.round(pollingDelay / 1000)} Sekunden.`);
+        
         if (onDebugLog) onDebugLog({
           paymentStatus: 'polling_error',
           paymentRequest,
@@ -210,20 +418,24 @@ export function QRCodeModal({
         })
         
         // Bei einem Fehler: Polling fortsetzen, aber mit längerer Verzögerung
-        if (!cancelled) setTimeout(poll, 2000)
+        pollingDelay = Math.min(pollingDelay * 2, maxDelay);
+        if (!cancelled) pollTimerId = setTimeout(poll, pollingDelay);
       }
     }
     
-    // Polling starten
-    poll()
+    // Polling starten mit einer initialeren Verzögerung
+    pollTimerId = setTimeout(poll, 8000); // Auf 8 Sekunden erhöht (von 1 Sekunde)
     
     // Cleanup-Funktion: Wird beim Unmounten aufgerufen
     // WICHTIG: Verhindert weitere API-Aufrufe, wenn die Komponente nicht mehr angezeigt wird
     return () => { 
-      console.log('Cleanup: Polling wird beendet')
-      cancelled = true 
+      devLog('Cleanup: Polling wird beendet');
+      cancelled = true;
+      if (pollTimerId) {
+        clearTimeout(pollTimerId);
+      }
     }
-  }, [paymentHash, onPaymentComplete, paymentRequest, onDebugLog, paymentDetected])
+  }, [paymentHash, onPaymentComplete, paymentRequest, onDebugLog, paymentDetected, devMode, LNbits_API_KEY, LNbits_WALLET_ID])
 
   /**
    * Kopiert den Invoice-Text in die Zwischenablage
@@ -248,6 +460,13 @@ export function QRCodeModal({
         <h2 className="text-xl font-bold text-white">Frage Nr.{questionNum} freischalten</h2>
         <p className="text-gray-300 text-sm mt-1">Scanne den QR-Code, um {satCost} sats zu bezahlen</p>
         
+        {/* Polling-Status anzeigen */}
+        {pollingMessage && paymentStatus === "processing" && (
+          <p className="text-sm text-blue-300 mt-2 italic">
+            {pollingMessage}
+          </p>
+        )}
+        
         {/* Fehlermeldung anzeigen, wenn vorhanden */}
         {errorMessage && (
           <div className="mt-2 p-2 bg-red-900/30 rounded-lg border border-red-500/20">
@@ -259,9 +478,21 @@ export function QRCodeModal({
       <div className="relative mx-auto w-64 h-64 mb-4 flex items-center justify-center">
         {paymentRequest && (
           <img
-            src={`https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(paymentRequest)}&size=180x180`}
+            src={
+              paymentRequest.startsWith('lnbc') 
+                ? `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(paymentRequest)}&size=180x180` 
+                : '/images/error-qr.png'
+            }
             alt="Lightning QR"
             className="w-full h-full"
+            onError={(e) => {
+              // Fallback für Fehler bei der QR-Code-Generierung
+              console.error('Fehler beim Laden des QR-Codes');
+              e.target.src = '/images/error-qr.png';
+            }}
+            // Screenshot-Schutz und Copy-Schutz für Zahlungsinfos
+            onContextMenu={(e) => e.preventDefault()}
+            style={{ userSelect: 'none' }}
           />
         )}
         {/* Erfolgsanzeige: Wird angezeigt, wenn die Zahlung eingegangen ist */}
@@ -298,6 +529,8 @@ export function QRCodeModal({
                 href={`lightning:${paymentRequest}`}
                 className="inline-flex items-center px-2 py-1 bg-orange-500/90 hover:bg-orange-500 text-white text-xs rounded transition ml-1"
                 style={{ textDecoration: 'none' }}
+                // Sicherstellen, dass die URL wirklich eine Lightning-Adresse ist
+                {...(paymentRequest.startsWith('lnbc') ? {} : { onClick: (e) => e.preventDefault() })}
               >
                 <span className="mr-1">Mit Wallet zahlen</span>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
