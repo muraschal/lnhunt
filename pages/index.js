@@ -280,7 +280,7 @@ export default function Home() {
                 {solutionCodesDigital.some(Boolean) && (
                   <div className="mb-6">
                     <ProgressIndicator
-                      keywords={solutionCodesDigital.filter(Boolean)}
+                      codesDigital={solutionCodesDigital.filter(Boolean)}
                       totalKeywords={6}
                       manualPhrase="Fix the money fix the world"
                       codesPhysical={questions.map(q => q.code_physical)}
