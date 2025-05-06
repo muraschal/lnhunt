@@ -1,4 +1,10 @@
-// Next.js Konfiguration
-module.exports = {
-  reactStrictMode: true,
-}; 
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  env: {
+    NEXT_PUBLIC_LNBITS_API_URL: process.env.LNBITS_API_URL,
+    NEXT_PUBLIC_LNBITS_API_KEY: process.env.LNBITS_API_KEY,
+    NEXT_PUBLIC_LNBITS_WALLET_ID: process.env.LNBITS_WALLET_ID,
+  },
+}
+
+module.exports = nextConfig 
