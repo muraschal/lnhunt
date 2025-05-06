@@ -6,14 +6,24 @@ export function ProgressIndicator({
   keywords,
   totalKeywords,
   manualPhrase = "",
+  accessCodes = []
 }) {
   // Create empty slots for remaining keywords
   const allKeywords = [...keywords, ...Array(totalKeywords - keywords.length).fill(null)]
 
-  // Split the manual phrase into words
-  const manualPhraseWords = manualPhrase.split(" ")
+  // accessCodes für die Anzeige der Phrase from keywords
+  const phraseWords = accessCodes.length === totalKeywords ? accessCodes : manualPhrase.split(" ")
 
-  // Create a hangman-style representation of the manual phrase
+  // Phrase from keywords: Zeige die accessCodes an, aber nur, wenn das Lösungswort für die Frage schon gelöst wurde
+  const phraseFromKeywords = phraseWords.map((word, index) => {
+    if (index < keywords.length) {
+      return word
+    }
+    return "????"
+  })
+
+  // Secret phrase bleibt wie gehabt
+  const manualPhraseWords = manualPhrase.split(" ")
   const manualHangman = manualPhraseWords.map((word, index) => {
     if (index < keywords.length) {
       return word
@@ -32,27 +42,14 @@ export function ProgressIndicator({
         <div className="mb-4 keyword-phrase">
           <p className="text-sm text-gray-400 mb-2">Phrase from keywords:</p>
           <div className="flex flex-wrap gap-2">
-            {keywords.map((word, index) => (
-              <motion.span
+            {phraseFromKeywords.map((word, index) => (
+              <span
                 key={index}
-                className="px-2 py-1 bg-white/5 rounded text-white font-medium"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: index * 0.1 }}
+                className={`px-2 py-1 rounded text-white font-medium ${index < keywords.length ? 'bg-white/5' : 'bg-white/5 border border-dashed border-white/10 text-gray-500'}`}
               >
                 {word}
-              </motion.span>
+              </span>
             ))}
-            {Array(totalKeywords - keywords.length)
-              .fill(null)
-              .map((_, index) => (
-                <span
-                  key={`empty-${index}`}
-                  className="px-2 py-1 bg-white/5 rounded border border-dashed border-white/10 text-gray-500"
-                >
-                  ????
-                </span>
-              ))}
           </div>
         </div>
       )}

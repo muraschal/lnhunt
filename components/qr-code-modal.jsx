@@ -93,7 +93,7 @@ export function QRCodeModal({
             onPaymentComplete()
           }, 1000)
         } else if (!cancelled) {
-          setTimeout(poll, 2000)
+          setTimeout(poll, 1000)
         }
       } catch (err) {
         if (onDebugLog) onDebugLog({

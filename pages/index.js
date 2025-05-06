@@ -181,6 +181,7 @@ export default function Home() {
                     keywords={solutionWords.filter(Boolean)}
                     totalKeywords={6}
                     manualPhrase="Fix the money fix the world"
+                    accessCodes={["magic", "internet", "money", "freedom", "for", "all"]}
                   />
                 </div>
 
@@ -303,12 +304,8 @@ export default function Home() {
             <div className="text-xs">invoiceCreated: {debugLog.invoiceCreated ? 'true' : 'false'}</div>
             <div className="text-xs">paymentHash: {debugLog.paymentHash ? debugLog.paymentHash : 'leer'}</div>
             <div className="mt-2">
-              <div className="text-xs">paymentRequest:</div>
-              <pre className="text-xs whitespace-pre-wrap break-all text-green-300">{debugLog.paymentRequest || 'leer'}</pre>
-            </div>
-            <div className="mt-2">
-              <div className="text-xs">bolt11:</div>
-              <pre className="text-xs whitespace-pre-wrap break-all text-green-300">{debugLog.bolt11 || 'leer'}</pre>
+              <div className="text-xs">paymentRequest (bolt11):</div>
+              <pre className="text-xs whitespace-pre-wrap break-all text-green-300">{debugLog.paymentRequest || debugLog.bolt11 || 'leer'}</pre>
             </div>
             <div className="mt-2">
               <div className="text-xs">lastPaymentStatus:</div>
