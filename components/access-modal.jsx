@@ -4,6 +4,37 @@ import { useState } from "react"
 import { motion } from "framer-motion"
 import { Key, ArrowRight, HelpCircle } from "lucide-react"
 
+/**
+ * Hilfsfunktion zum Vibrieren des Geräts (Kopie von index.js)
+ * Wird hier direkt implementiert, um Abhängigkeiten zu vermeiden
+ * 
+ * @param {'success'|'error'|'payment'|'normal'} type - Art des Vibrationsmusters
+ */
+function vibrate(type = 'normal') {
+  // Prüfen, ob Vibration API verfügbar ist
+  if (!window.navigator || !window.navigator.vibrate) {
+    console.log('Vibration nicht unterstützt');
+    return false;
+  }
+  
+  // Verschiedene Vibrationsmuster je nach Typ
+  switch (type) {
+    case 'success':
+      // Kurz-kurz-lang für Erfolg (in Millisekunden)
+      window.navigator.vibrate([50, 30, 50, 30, 150]);
+      break;
+    case 'error':
+      // Lang-lang für Fehler
+      window.navigator.vibrate([150, 100, 150]);
+      break;
+    default:
+      // Einfache Vibration für allgemeine Interaktionen
+      window.navigator.vibrate(50);
+  }
+  
+  return true;
+}
+
 export function AccessModal({
   questionNumber,
   onPasswordSubmit,
@@ -21,8 +52,12 @@ export function AccessModal({
   const handleSubmit = (e) => {
     e.preventDefault()
     if (input.trim().toLowerCase() === codePhysical.toLowerCase()) {
+      // Erfolgsfall wird in der übergeordneten Komponente behandelt
       onPasswordSubmit(input)
     } else {
+      // Fehler-Vibration
+      vibrate('error');
+      
       setError("Falscher physischer Code. Bitte versuche es erneut.")
       setIsShaking(true)
       setTimeout(() => setIsShaking(false), 500)

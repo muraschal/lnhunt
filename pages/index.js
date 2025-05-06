@@ -8,6 +8,42 @@ import { AccessModal } from '../components/access-modal'
 import { CheckCircle, Lock, HelpCircle, Zap, Wrench, Info, XCircle, Play, Check, Copy, BookOpen } from "lucide-react"
 import { ProgressIndicator } from '../components/progress-indicator'
 
+/**
+ * Hilfsfunktion zum Vibrieren des Geräts
+ * Unterstützt verschiedene Vibrationsmuster für unterschiedliche Ereignisse
+ * 
+ * @param {'success'|'error'|'payment'|'normal'} type - Art des Vibrationsmusters
+ * @returns {boolean} - true wenn Vibration unterstützt wird und ausgeführt wurde
+ */
+function vibrate(type = 'normal') {
+  // Prüfen, ob Vibration API verfügbar ist
+  if (!window.navigator || !window.navigator.vibrate) {
+    console.log('Vibration nicht unterstützt');
+    return false;
+  }
+  
+  // Verschiedene Vibrationsmuster je nach Typ
+  switch (type) {
+    case 'success':
+      // Kurz-kurz-lang für Erfolg (in Millisekunden)
+      window.navigator.vibrate([50, 30, 50, 30, 150]);
+      break;
+    case 'error':
+      // Lang-lang für Fehler
+      window.navigator.vibrate([150, 100, 150]);
+      break;
+    case 'payment':
+      // Mittellang-Mittellang für erfolgreiches Payment
+      window.navigator.vibrate([100, 50, 100]);
+      break;
+    default:
+      // Einfache Vibration für allgemeine Interaktionen
+      window.navigator.vibrate(50);
+  }
+  
+  return true;
+}
+
 export default function Home() {
   const [solutionCodesDigital, setSolutionCodesDigital] = useState([])
   const [currentStep, setCurrentStep] = useState('start')
@@ -64,6 +100,9 @@ export default function Home() {
     .join(' ');
 
   const handleQuestionSelect = (question) => {
+    // Normale Vibration bei Auswahl einer Frage
+    vibrate('normal');
+    
     setCurrentQuestion(question)
     
     // Prüfen, ob die Frage bereits beantwortet wurde
@@ -81,7 +120,12 @@ export default function Home() {
 
   const handlePasswordSubmit = (codePhysical) => {
     if (codePhysical.toLowerCase() === currentQuestion.code_physical.toLowerCase()) {
+      // Erfolgsfall: Richtiger Code
+      vibrate('success');
       setCurrentStep('payment')
+    } else {
+      // Fehlerfall: Falscher Code (Vibration wird in der AccessModal-Komponente ausgelöst)
+      vibrate('error');
     }
   }
 
@@ -98,6 +142,9 @@ export default function Home() {
    * Diese Funktion wird von der QRCodeModal-Komponente aufgerufen, wenn eine Zahlung erfolgreich war.
    */
   const handlePaymentComplete = () => {
+    // Vibration für erfolgreiche Zahlung
+    vibrate('payment');
+    
     console.log('Payment Complete Handler aufgerufen')
     // Kurze Verzögerung, damit React die State-Updates verarbeiten kann
     setTimeout(() => {
@@ -116,6 +163,9 @@ export default function Home() {
     if (selectedAnswer !== null) return // Doppelklick verhindern
     setSelectedAnswer(idx)
     if (idx === currentQuestion.correct_index) {
+      // Erfolgsfall: Richtige Antwort
+      vibrate('success');
+      
       setAnswerFeedback('correct')
       // Zufälligen Erfolgs-Sound abspielen
       // Aus zwei möglichen Sounds wird einer zufällig ausgewählt
@@ -138,6 +188,9 @@ export default function Home() {
         setSolutionCodesDigital(codes);
       }, 1500)
     } else {
+      // Fehlerfall: Falsche Antwort
+      vibrate('error');
+      
       setAnswerFeedback('wrong')
       // Fehler-Sound abspielen bei falscher Antwort
       const audio = new Audio('/audio/fail.mp3');

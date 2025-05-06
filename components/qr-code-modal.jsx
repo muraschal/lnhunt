@@ -9,6 +9,37 @@ const LNbits_API_KEY = process.env.NEXT_PUBLIC_LNBITS_API_KEY || "3b5a83795ead4e
 const LNbits_WALLET_ID = process.env.NEXT_PUBLIC_LNBITS_WALLET_ID || "7d8c999bf9ba4fc3b0815fe6513f2780"
 
 /**
+ * Hilfsfunktion zum Vibrieren des Geräts (Kopie von index.js)
+ * Wird hier direkt implementiert, um Abhängigkeiten zu vermeiden
+ * 
+ * @param {'success'|'error'|'payment'|'normal'} type - Art des Vibrationsmusters
+ */
+function vibrate(type = 'normal') {
+  // Prüfen, ob Vibration API verfügbar ist
+  if (!window.navigator || !window.navigator.vibrate) {
+    console.log('Vibration nicht unterstützt');
+    return false;
+  }
+  
+  // Verschiedene Vibrationsmuster je nach Typ
+  switch (type) {
+    case 'success':
+      // Kurz-kurz-lang für Erfolg (in Millisekunden)
+      window.navigator.vibrate([50, 30, 50, 30, 150]);
+      break;
+    case 'payment':
+      // Mittellang-Mittellang für erfolgreiches Payment
+      window.navigator.vibrate([100, 50, 100]);
+      break;
+    default:
+      // Einfache Vibration für allgemeine Interaktionen
+      window.navigator.vibrate(50);
+  }
+  
+  return true;
+}
+
+/**
  * QRCodeModal Komponente
  * 
  * Verantwortlich für:
@@ -145,6 +176,9 @@ export function QRCodeModal({
           
           // UI-Update: Status auf "complete" setzen
           setPaymentStatus("complete")
+          
+          // Vibration für erfolgreiche Zahlung
+          vibrate('payment');
           
           // WICHTIG: Verhindern von doppelten Callbacks
           // Dieser State stellt sicher, dass wir die Zahlung nur einmal verarbeiten
