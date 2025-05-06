@@ -169,14 +169,17 @@ export default function Home() {
                   ))}
                 </div>
 
-                <div className="mb-6">
-                  <ProgressIndicator
-                    keywords={solutionWords.filter(Boolean)}
-                    totalKeywords={6}
-                    manualPhrase="Fix the money fix the world"
-                    accessCodes={["magic", "internet", "money", "freedom", "for", "all"]}
-                  />
-                </div>
+                {/* Fortschrittsanzeige und Lösungswort nur anzeigen, wenn mindestens eine Frage beantwortet wurde */}
+                {solutionWords.some(Boolean) && (
+                  <div className="mb-6">
+                    <ProgressIndicator
+                      keywords={solutionWords.filter(Boolean)}
+                      totalKeywords={6}
+                      manualPhrase="Fix the money fix the world"
+                      accessCodes={["magic", "internet", "money", "freedom", "for", "all"]}
+                    />
+                  </div>
+                )}
 
                 <div className="text-center text-sm text-gray-400">
                   <p>Klicke auf eine Frage, um sie freizuschalten</p>
@@ -276,7 +279,14 @@ export default function Home() {
           </AnimatePresence>
 
           <div className="mt-8 text-center">
-            <p className="text-xs text-gray-400">Powered by Next.js, Tailwind CSS & LNbits</p>
+            <a
+              href="https://www.linkedin.com/in/marcelrapold/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-gray-400 hover:text-orange-400 underline"
+            >
+              Marcel Rapold
+            </a>
           </div>
         </div>
 
