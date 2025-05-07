@@ -4,38 +4,21 @@ export default function Document() {
   return (
     <Html lang="de">
       <Head>
-        {/* Ultra-radikale Service Worker Deaktivierung (höchste Priorität) */}
+        {/* Einfache Service Worker Deaktivierung */}
         <script dangerouslySetInnerHTML={{
           __html: `
-            // Service Worker safe deactivation
-            (function() {
-              console.log("Service Worker safe deactivation");
-              
-              if ('serviceWorker' in navigator) {
-                // Existierende Worker deregistrieren
-                navigator.serviceWorker.getRegistrations()
-                  .then(function(registrations) {
-                    if (registrations && registrations.length) {
-                      for (let registration of registrations) {
-                        registration.unregister().catch(function() {});
-                      }
-                      console.log('Service Worker deregistriert');
-                    }
-                  })
-                  .catch(function() {
-                    console.log('Service Worker deregistrierung fehlgeschlagen (expected)');
-                  });
-                
-                // Caches löschen, falls vorhanden
-                if (window.caches) {
-                  caches.keys().then(function(keys) {
-                    keys.forEach(function(key) {
-                      caches.delete(key).catch(function() {});
+            if ('serviceWorker' in navigator) {
+              window.addEventListener('load', function() {
+                navigator.serviceWorker.ready.then(registration => {
+                  registration.unregister();
+                  if (caches) {
+                    caches.keys().then(function(names) {
+                      for (let name of names) caches.delete(name);
                     });
-                  }).catch(function() {});
-                }
-              }
-            })();
+                  }
+                }).catch(err => console.log('SW cleanup error:', err));
+              });
+            }
           `
         }} />
         
@@ -58,7 +41,17 @@ export default function Document() {
         {process.env.NODE_ENV === 'production' ? (
           <meta
             httpEquiv="Content-Security-Policy"
-            content="default-src 'self' https://*.vercel.live https://*.vercel.app https://fonts.googleapis.com https://fonts.gstatic.com https://hwznode.rapold.io *.vercel.com *.vercel-dns.com *.vercel-scripts.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.vercel.live *.vercel.com *.vercel-dns.com *.vercel-scripts.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https://api.qrserver.com; frame-src 'self' https://*.vercel.live https://*.vercel.app *.vercel-scripts.com *.vercel.com; connect-src 'self' https://hwznode.rapold.io *.vercel.com *.vercel-dns.com *.vercel-scripts.com https://*.vercel.live https://fonts.googleapis.com https://fonts.gstatic.com;"
+            content={`
+              default-src 'self';
+              script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://*.vercel.live https://vercel.com https://*.vercel.com https://*.vercel-dns.com https://*.vercel-scripts.com https://*.vercel.app;
+              script-src-elem 'self' 'unsafe-inline' https://vercel.live https://*.vercel.live https://vercel.com https://*.vercel.com https://*.vercel-dns.com https://*.vercel-scripts.com https://*.vercel.app;
+              style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+              font-src 'self' https://fonts.gstatic.com data:;
+              img-src 'self' data: https://api.qrserver.com;
+              connect-src 'self' https://hwznode.rapold.io https://vercel.live https://*.vercel.live https://vercel.com https://*.vercel.com https://*.vercel-dns.com https://*.vercel-scripts.com https://*.vercel.app https://fonts.googleapis.com https://fonts.gstatic.com wss://*.vercel.app;
+              frame-src 'self' https://vercel.live https://*.vercel.live https://vercel.com https://*.vercel.com https://*.vercel-dns.com https://*.vercel-scripts.com;
+              media-src 'self';
+            `.replace(/\s{2,}/g, ' ').trim()}
           />
         ) : null}
         

@@ -1,25 +1,13 @@
-// Minimaler Service Worker, der nichts tut
-self.addEventListener('install', function(event) {
-  console.log('Service Worker installiert, tut aber nichts');
+// Deaktivierter Service Worker
+self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
-self.addEventListener('activate', function(event) {
-  console.log('Service Worker aktiviert, tut aber nichts');
-  // Alte Caches löschen
-  event.waitUntil(
-    caches.keys().then(function(cacheNames) {
-      return Promise.all(
-        cacheNames.map(function(cacheName) {
-          return caches.delete(cacheName);
-        })
-      );
-    })
-  );
+self.addEventListener('activate', (event) => {
+  // Alles löschen
+  event.waitUntil(caches.keys().then(keys => {
+    return Promise.all(keys.map(key => caches.delete(key)));
+  }));
 });
 
-// Fetch-Listener, der nichts cached, sondern alles an das Netzwerk weiterleitet
-self.addEventListener('fetch', function(event) {
-  // Einfach das Netzwerk verwenden, nichts cachen
-  event.respondWith(fetch(event.request));
-}); 
+// Keine Fetch-Handler - lässt den Browser alles normal laden 

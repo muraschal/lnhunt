@@ -20,19 +20,6 @@ const nextConfig = {
         source: '/(.*)',
         headers: [
           {
-            key: 'Content-Security-Policy',
-            value: `
-              default-src 'self' https://*.vercel.live https://vercel.live https://*.vercel.app https://fonts.googleapis.com https://fonts.gstatic.com https://hwznode.rapold.io *.vercel.com *.vercel-dns.com *.vercel-scripts.com;
-              script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.vercel.live https://vercel.live *.vercel.com *.vercel-dns.com *.vercel-scripts.com;
-              style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-              font-src 'self' https://fonts.gstatic.com data:;
-              img-src 'self' data: https://api.qrserver.com;
-              connect-src 'self' https://hwznode.rapold.io *.vercel.com *.vercel-dns.com *.vercel-scripts.com https://*.vercel.live https://vercel.live https://fonts.googleapis.com https://fonts.gstatic.com wss://*.vercel.app;
-              frame-src 'self' https://*.vercel.live https://vercel.live *.vercel.com *.vercel-scripts.com;
-              media-src 'self';
-            `.replace(/\s{2,}/g, ' ').trim()
-          },
-          {
             key: 'X-Content-Type-Options',
             value: 'nosniff',
           },
