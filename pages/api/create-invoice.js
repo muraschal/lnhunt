@@ -43,7 +43,7 @@ export default async function handler(req, res) {
   try {
     console.log('[API] Invoice request', { apiUrl, amount, questionId, walletId });
     const resp = await axios.post(
-      `${apiUrl}/api/v1/payments`,
+      `${apiUrl}/payments`,
       {
         out: false,
         amount,
