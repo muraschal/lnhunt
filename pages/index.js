@@ -99,9 +99,8 @@ export default function Home() {
       localStorage.setItem('has_seen_guide', 'true');
     }
     
-    // Prüfe, ob der Benutzer den LNHunt bereits abgeschlossen hat
-    const completed = (typeof window !== 'undefined') ? localStorage.getItem('lnhunt_completed') === 'true' : false;
-    setLnhuntCompleted(completed);
+    // Status immer auf "nicht abgeschlossen" setzen, um Button stets verfügbar zu halten
+    setLnhuntCompleted(false);
   }, []);
 
   // Erste Satz im Hangman-Style bauen (Fix the money)
@@ -367,7 +366,7 @@ export default function Home() {
                     
                     {/* Sats claimen Button - wird immer angezeigt, aber in unterschiedlichen Zuständen */}
                     <div className="mt-8 flex justify-center">
-                      <div className={`relative ${solutionCodesDigital.filter(Boolean).length === questions.length && !lnhuntCompleted ? '' : 'pointer-events-none'}`}>
+                      <div className={`relative ${solutionCodesDigital.filter(Boolean).length === questions.length ? '' : 'pointer-events-none'}`}>
                         {/* Fortschrittsanzeige über dem Button */}
                         <div className="absolute -top-6 left-0 right-0 text-center text-sm text-orange-300">
                           {solutionCodesDigital.filter(Boolean).length < questions.length ? 
@@ -378,11 +377,11 @@ export default function Home() {
                         
                         {/* Button mit bedingtem Glasmorphismus-Effekt */}
                         <button
-                          onClick={() => solutionCodesDigital.filter(Boolean).length === questions.length && !lnhuntCompleted && setShowFinalModal(true)}
+                          onClick={() => solutionCodesDigital.filter(Boolean).length === questions.length && setShowFinalModal(true)}
                           className={`
                             bg-gradient-to-r from-orange-500 to-amber-500 text-white 
                             px-8 py-3 rounded-xl font-bold shadow-lg transition-all duration-500
-                            ${solutionCodesDigital.filter(Boolean).length === questions.length && !lnhuntCompleted ? 
+                            ${solutionCodesDigital.filter(Boolean).length === questions.length ? 
                               'hover:scale-105 active:scale-95' : 
                               'opacity-60'
                             }
@@ -723,17 +722,6 @@ export default function Home() {
               >
                 Cache leeren
               </button>
-              
-              <button
-                onClick={() => {
-                  localStorage.removeItem('lnhunt_completed');
-                  setLnhuntCompleted(false);
-                  devLog('LNHunt-Abschluss-Status zurückgesetzt');
-                }}
-                className="bg-yellow-700/80 hover:bg-yellow-800 text-white px-4 py-2 rounded shadow text-xs font-bold"
-              >
-                Abschluss zurücksetzen
-              </button>
             </div>
           </div>
         )}
@@ -857,9 +845,6 @@ export default function Home() {
                 <button
                   onClick={() => {
                     setShowFinalModal(false);
-                    // Speichere im localStorage, dass der Benutzer abgeschlossen hat
-                    localStorage.setItem('lnhunt_completed', 'true');
-                    setLnhuntCompleted(true);
                   }}
                   className="mt-4 px-6 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white font-medium"
                 >
