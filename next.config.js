@@ -4,7 +4,8 @@ const nextConfig = {
     NEXT_PUBLIC_LNBITS_API_URL: process.env.LNBITS_API_URL,
     NEXT_PUBLIC_LNBITS_API_KEY: process.env.LNBITS_API_KEY,
     NEXT_PUBLIC_LNBITS_WALLET_ID: process.env.LNBITS_WALLET_ID,
-    NEXT_PUBLIC_LNBITS_LNURL: process.env.LNBITS_LNURL || "LNURL1DP68GURN8GHJ76RH0FHX7ER99EEXZUR0D3JZU6T09AMKJARGV3EXZAE0V9CXJTMKXYHKCMN4WFKZ76J5VEV8JMM5XE3X2NRT0FXHZ62SFEF9JMMF45RXZ3",
+    NEXT_PUBLIC_LNBITS_LNURL: process.env.LNBITS_LNURL,
+    NEXT_PUBLIC_LNBITS_LNURL_WITHDRAW: process.env.LNBITS_LNURL_WITHDRAW,
   },
   // Experimentelle Features aus Next.js 14.2.28 entfernt, da nicht mehr unterstützt
   experimental: {
@@ -19,20 +20,29 @@ const nextConfig = {
         source: '/(.*)',
         headers: [
           {
-            key: 'X-DNS-Prefetch-Control',
-            value: 'on',
+            key: 'Content-Security-Policy',
+            value: `
+              default-src 'self' https://vercel.live https://fonts.googleapis.com https://fonts.gstatic.com https://hwznode.rapold.io *.vercel.com *.vercel-dns.com *.vercel-scripts.com;
+              script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live *.vercel.com *.vercel-dns.com *.vercel-scripts.com;
+              style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+              font-src 'self' https://fonts.gstatic.com data:;
+              img-src 'self' data: https://api.qrserver.com;
+              connect-src 'self' https://hwznode.rapold.io *.vercel.com *.vercel-dns.com *.vercel-scripts.com https://vercel.live https://fonts.googleapis.com https://fonts.gstatic.com wss://*.vercel.app;
+              frame-src 'self';
+              media-src 'self';
+            `.replace(/\s{2,}/g, ' ').trim()
           },
           {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block',
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
           },
           {
             key: 'X-Frame-Options',
             value: 'DENY',
           },
           {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
           },
           {
             key: 'Referrer-Policy',
@@ -42,28 +52,11 @@ const nextConfig = {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=()',
           },
-          // Angepasste Content Security Policy, die Vercel-Skripte erlaubt
-          {
-            key: 'Content-Security-Policy',
-            value: `
-              default-src 'self';
-              script-src 'self' 'unsafe-inline' 'unsafe-eval' *.vercel.com *.vercel-dns.com vercel.live *.vercel.app *.vercel-scripts.com;
-              style-src 'self' 'unsafe-inline' fonts.googleapis.com;
-              img-src 'self' data: api.qrserver.com;
-              font-src 'self' fonts.gstatic.com;
-              connect-src 'self' *.vercel.com *.vercel-dns.com *.vercel-scripts.com;
-              frame-src 'none';
-              media-src 'self';
-              object-src 'none';
-              base-uri 'self';
-              form-action 'self';
-              frame-ancestors 'none';
-            `.replace(/\s+/g, ' ').trim()
-          },
         ],
       },
     ];
   },
+  reactStrictMode: true,
 }
 
 module.exports = nextConfig 
