@@ -319,14 +319,21 @@ export default function Home() {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                       >
-                        {/* Bild als Hintergrund, wenn gelöst */}
-                        {solved && question.image && (
-                          <img
-                            src={`/images/${question.id === 'q2' ? 'q2.png' : question.image}`}
-                            alt="Badge"
-                            className="absolute inset-0 w-full h-full object-cover rounded-xl z-0"
-                            style={{ objectPosition: 'center' }}
-                          />
+                        {/* Bild/Video als Hintergrund */}
+                        {question.image && (
+                          <div className="absolute inset-0 w-full h-full z-0">
+                            <img
+                              src={`/images/${question.image}`}
+                              alt="Badge"
+                              className={`w-full h-full object-cover rounded-xl transition-all duration-300
+                                ${solved ? 'opacity-80' : 'opacity-10'}`}
+                              style={{ objectPosition: 'center' }}
+                            />
+                            {/* Glassmorphism Overlay für ungelöste Fragen */}
+                            {!solved && (
+                              <div className="absolute inset-0 backdrop-blur-sm bg-black/40 rounded-xl z-5"></div>
+                            )}
+                          </div>
                         )}
                         {/* Overlay für ID und Icon */}
                         <div className="relative z-10 flex flex-col items-center justify-center w-full h-full">
@@ -341,7 +348,7 @@ export default function Home() {
                         </div>
                         {/* Overlay für solved: halbtransparentes Layer für bessere Lesbarkeit */}
                         {solved && (
-                          <div className="absolute inset-0 bg-black/30 rounded-xl z-5" />
+                          <div className="absolute inset-0 bg-black/30 rounded-xl z-5"></div>
                         )}
                       </motion.button>
                     )
@@ -431,32 +438,18 @@ export default function Home() {
                   {/* Bild oder Video über der Frage */}
                   {currentQuestion.image && (
                     <div className="flex justify-center mb-6" style={{ width: "100%" }}>
-                      {currentQuestion.id === 'q2' ? (
-                        <video
-                          src="/images/q2.mp4"
-                          className="w-full rounded-xl border border-white/20 shadow"
-                          style={{ 
-                            background: '#fff', 
-                            maxWidth: "100%"
-                          }}
-                          autoPlay
-                          loop
-                          muted
-                          playsInline
-                        />
-                      ) : (
-                        <img
-                          src={`/images/${currentQuestion.image}`}
-                          alt="Fragenbild"
-                          className="w-full rounded-xl border border-white/20 shadow"
-                          style={{ 
-                            background: '#fff', 
-                            maxWidth: "100%",
-                            height: 'auto',
-                            objectFit: 'contain'
-                          }}
-                        />
-                      )}
+                      <video
+                        src={`/images/${currentQuestion.id}.mp4`}
+                        className="w-full rounded-xl border border-white/20 shadow"
+                        style={{ 
+                          background: '#fff', 
+                          maxWidth: "100%"
+                        }}
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                      />
                     </div>
                   )}
                   
@@ -516,32 +509,18 @@ export default function Home() {
                   {/* Bild oder Video über der Frage */}
                   {currentQuestion.image && (
                     <div className="flex justify-center mb-6" style={{ width: "100%" }}>
-                      {currentQuestion.id === 'q2' ? (
-                        <video
-                          src="/images/q2.mp4"
-                          className="w-full rounded-xl border border-white/20 shadow"
-                          style={{ 
-                            background: '#fff', 
-                            maxWidth: "100%"
-                          }}
-                          autoPlay
-                          loop
-                          muted
-                          playsInline
-                        />
-                      ) : (
-                        <img
-                          src={`/images/${currentQuestion.image}`}
-                          alt="Fragenbild"
-                          className="w-full rounded-xl border border-white/20 shadow"
-                          style={{ 
-                            background: '#fff', 
-                            maxWidth: "100%",
-                            height: 'auto',
-                            objectFit: 'contain'
-                          }}
-                        />
-                      )}
+                      <video
+                        src={`/images/${currentQuestion.id}.mp4`}
+                        className="w-full rounded-xl border border-white/20 shadow"
+                        style={{ 
+                          background: '#fff', 
+                          maxWidth: "100%"
+                        }}
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                      />
                     </div>
                   )}
                   <h2 className="text-xl font-bold text-white mb-2">{currentQuestion.question}</h2>
