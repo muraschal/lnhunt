@@ -11,17 +11,31 @@ export default function MyApp({ Component, pageProps }) {
       typeof window !== 'undefined' && 
       window.location.hostname.includes('vercel.app');
     
-    if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production' && !isVercelPreview) {
-      window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/service-worker.js').then(
-          function(registration) {
-            console.log('Service Worker erfolgreich registriert mit Scope: ', registration.scope);
-          },
-          function(err) {
-            console.log('Service Worker Registrierung fehlgeschlagen: ', err);
+    if ('serviceWorker' in navigator) {
+      if (process.env.NODE_ENV === 'production' && !isVercelPreview) {
+        // Echte Produktion: Service Worker registrieren
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/service-worker.js').then(
+            function(registration) {
+              console.log('Service Worker erfolgreich registriert mit Scope: ', registration.scope);
+            },
+            function(err) {
+              console.log('Service Worker Registrierung fehlgeschlagen: ', err);
+            }
+          );
+        });
+      } else if (isVercelPreview) {
+        // Für Vercel Preview: Vorhandenen Service Worker deregistrieren
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for(let registration of registrations) {
+            registration.unregister().then(function(success) {
+              console.log('Service Worker für Preview deregistriert:', success);
+              // Nach erfolgreicher Deregistrierung Seite neu laden
+              if (success) window.location.reload();
+            });
           }
-        );
-      });
+        });
+      }
     }
   }, []);
 

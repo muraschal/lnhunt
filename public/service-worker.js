@@ -15,6 +15,15 @@ const PRECACHE_ASSETS = [
   '/audio/qr.mp3'
 ];
 
+// Domains, die wir nicht cachen oder behandeln wollen
+const SKIP_DOMAINS = [
+  'fonts.googleapis.com',
+  'fonts.gstatic.com',
+  'vercel.live',
+  'hwznode.rapold.io',
+  'api.qrserver.com'
+];
+
 // Installation Event - Cache wichtige Assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -46,6 +55,14 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   // Nur GET Requests bearbeiten
   if (event.request.method !== 'GET') return;
+  
+  // Bestimmte URLs überspringen
+  const url = new URL(event.request.url);
+  
+  // Überprüfen, ob die Domain in der Skip-Liste ist
+  if (SKIP_DOMAINS.some(domain => url.hostname.includes(domain))) {
+    return;
+  }
   
   // API-Calls und partielle Anfragen nicht cachen
   if (event.request.url.includes('/api/')) {
