@@ -23,7 +23,7 @@ export default function Document() {
         {process.env.NODE_ENV === 'production' ? (
           <meta
             httpEquiv="Content-Security-Policy"
-            content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://api.qrserver.com; connect-src 'self' https://hwznode.rapold.io *.vercel.com *.vercel-dns.com *.vercel-scripts.com vercel.live;"
+            content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live *.vercel.com *.vercel-dns.com *.vercel-scripts.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https://api.qrserver.com; connect-src 'self' https://hwznode.rapold.io *.vercel.com *.vercel-dns.com *.vercel-scripts.com https://vercel.live https://fonts.googleapis.com https://fonts.gstatic.com;"
           />
         ) : null}
         {/* Apple Splash Screen */}

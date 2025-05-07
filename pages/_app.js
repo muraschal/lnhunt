@@ -5,9 +5,13 @@ import { useEffect } from 'react';
 import ErrorBoundary from '../components/error-boundary';
 
 export default function MyApp({ Component, pageProps }) {
-  // Service Worker registrieren für PWA-Funktionalität
+  // Service Worker nur in der echten Produktion registrieren, nicht in Vercel Previews
   useEffect(() => {
-    if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
+    const isVercelPreview = 
+      typeof window !== 'undefined' && 
+      window.location.hostname.includes('vercel.app');
+    
+    if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production' && !isVercelPreview) {
       window.addEventListener('load', function() {
         navigator.serviceWorker.register('/service-worker.js').then(
           function(registration) {
