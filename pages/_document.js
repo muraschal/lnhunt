@@ -4,6 +4,48 @@ export default function Document() {
   return (
     <Html lang="de">
       <Head>
+        {/* Ultra-radikale Service Worker Deaktivierung (höchste Priorität) */}
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            // SOFORT und mit höchster Priorität ausführen
+            (function() {
+              console.log("Ultra-radikale Service Worker Deaktivierung");
+              
+              // Service Worker API komplett deaktivieren
+              if (navigator) {
+                // Die Service Worker API überschreiben
+                navigator.serviceWorker = {
+                  // Pseudo-Methoden, die nichts tun
+                  register: function() { 
+                    console.log("Service Worker Registrierung verhindert");
+                    return Promise.reject(new Error("Service Worker API deaktiviert"));
+                  },
+                  getRegistration: function() {
+                    return Promise.resolve(null);
+                  },
+                  getRegistrations: function() {
+                    return Promise.resolve([]);
+                  },
+                  // Pseudo-Properties
+                  controller: null,
+                  ready: Promise.reject(new Error("Service Worker API deaktiviert"))
+                };
+              }
+              
+              // Cache API deaktivieren
+              if (window.caches) {
+                window.caches = {
+                  open: function() { return Promise.resolve(null); },
+                  match: function() { return Promise.resolve(null); },
+                  has: function() { return Promise.resolve(false); },
+                  delete: function() { return Promise.resolve(false); },
+                  keys: function() { return Promise.resolve([]); }
+                };
+              }
+            })();
+          `
+        }} />
+        
         {/* Favicon & App Icons */}
         <link rel="icon" type="image/png" sizes="32x32" href="/logos/LNHunt_favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/logos/LNHunt_favicon-16x16.png" />
