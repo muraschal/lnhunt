@@ -7,40 +7,33 @@ export default function Document() {
         {/* Ultra-radikale Service Worker Deaktivierung (höchste Priorität) */}
         <script dangerouslySetInnerHTML={{
           __html: `
-            // SOFORT und mit höchster Priorität ausführen
+            // Service Worker safe deactivation
             (function() {
-              console.log("Ultra-radikale Service Worker Deaktivierung");
+              console.log("Service Worker safe deactivation");
               
-              // Service Worker API komplett deaktivieren
-              if (navigator) {
-                // Die Service Worker API überschreiben
-                navigator.serviceWorker = {
-                  // Pseudo-Methoden, die nichts tun
-                  register: function() { 
-                    console.log("Service Worker Registrierung verhindert");
-                    return Promise.reject(new Error("Service Worker API deaktiviert"));
-                  },
-                  getRegistration: function() {
-                    return Promise.resolve(null);
-                  },
-                  getRegistrations: function() {
-                    return Promise.resolve([]);
-                  },
-                  // Pseudo-Properties
-                  controller: null,
-                  ready: Promise.reject(new Error("Service Worker API deaktiviert"))
-                };
-              }
-              
-              // Cache API deaktivieren
-              if (window.caches) {
-                window.caches = {
-                  open: function() { return Promise.resolve(null); },
-                  match: function() { return Promise.resolve(null); },
-                  has: function() { return Promise.resolve(false); },
-                  delete: function() { return Promise.resolve(false); },
-                  keys: function() { return Promise.resolve([]); }
-                };
+              if ('serviceWorker' in navigator) {
+                // Existierende Worker deregistrieren
+                navigator.serviceWorker.getRegistrations()
+                  .then(function(registrations) {
+                    if (registrations && registrations.length) {
+                      for (let registration of registrations) {
+                        registration.unregister().catch(function() {});
+                      }
+                      console.log('Service Worker deregistriert');
+                    }
+                  })
+                  .catch(function() {
+                    console.log('Service Worker deregistrierung fehlgeschlagen (expected)');
+                  });
+                
+                // Caches löschen, falls vorhanden
+                if (window.caches) {
+                  caches.keys().then(function(keys) {
+                    keys.forEach(function(key) {
+                      caches.delete(key).catch(function() {});
+                    });
+                  }).catch(function() {});
+                }
               }
             })();
           `
@@ -65,41 +58,9 @@ export default function Document() {
         {process.env.NODE_ENV === 'production' ? (
           <meta
             httpEquiv="Content-Security-Policy"
-            content="default-src 'self' https://vercel.live https://fonts.googleapis.com https://fonts.gstatic.com https://hwznode.rapold.io *.vercel.com *.vercel-dns.com *.vercel-scripts.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live *.vercel.com *.vercel-dns.com *.vercel-scripts.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https://api.qrserver.com; connect-src 'self' https://hwznode.rapold.io *.vercel.com *.vercel-dns.com *.vercel-scripts.com https://vercel.live https://fonts.googleapis.com https://fonts.gstatic.com;"
+            content="default-src 'self' https://vercel.live https://fonts.googleapis.com https://fonts.gstatic.com https://hwznode.rapold.io *.vercel.com *.vercel-dns.com *.vercel-scripts.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live *.vercel.com *.vercel-dns.com *.vercel-scripts.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https://api.qrserver.com; frame-src 'self' https://vercel.live; connect-src 'self' https://hwznode.rapold.io *.vercel.com *.vercel-dns.com *.vercel-scripts.com https://vercel.live https://fonts.googleapis.com https://fonts.gstatic.com;"
           />
         ) : null}
-        
-        {/* Sofortige Service Worker Deaktivierung */}
-        <script dangerouslySetInnerHTML={{
-          __html: `
-            // Sofort ausführen, um Service Worker zu deaktivieren
-            (function() {
-              if ('serviceWorker' in navigator) {
-                console.log('Radikale Service Worker Deaktivierung');
-                // Service Worker verhindern
-                navigator.serviceWorker.register = function() {
-                  return Promise.reject(new Error('Service Worker deaktiviert'));
-                };
-                // Existierende Worker entfernen
-                navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                  registrations.forEach(function(registration) {
-                    registration.unregister();
-                    console.log('Service Worker deaktiviert');
-                  });
-                  
-                  // Cache löschen
-                  if (window.caches) {
-                    caches.keys().then(function(names) {
-                      for (let name of names) {
-                        caches.delete(name);
-                      }
-                    });
-                  }
-                });
-              }
-            })();
-          `
-        }} />
         
         {/* Apple Splash Screen */}
         <link

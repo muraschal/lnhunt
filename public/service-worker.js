@@ -1,21 +1,25 @@
-// Leerer Service Worker, der sich sofort selbst deregistriert
+// Minimaler Service Worker, der nichts tut
 self.addEventListener('install', function(event) {
-  console.log('Leerer Service Worker wird installiert');
+  console.log('Service Worker installiert, tut aber nichts');
   self.skipWaiting();
-  
-  // Sofort selbst deregistrieren
-  self.registration.unregister()
-    .then(function() {
-      console.log('Service Worker hat sich selbst deregistriert');
-      return self.clients.matchAll();
-    })
-    .then(function(clients) {
-      clients.forEach(function(client) {
-        if (client.navigate && client.url) {
-          client.navigate(client.url);
-        }
-      });
-    });
 });
 
-// Keine weiteren Event-Handler, tut absolut nichts 
+self.addEventListener('activate', function(event) {
+  console.log('Service Worker aktiviert, tut aber nichts');
+  // Alte Caches löschen
+  event.waitUntil(
+    caches.keys().then(function(cacheNames) {
+      return Promise.all(
+        cacheNames.map(function(cacheName) {
+          return caches.delete(cacheName);
+        })
+      );
+    })
+  );
+});
+
+// Fetch-Listener, der nichts cached, sondern alles an das Netzwerk weiterleitet
+self.addEventListener('fetch', function(event) {
+  // Einfach das Netzwerk verwenden, nichts cachen
+  event.respondWith(fetch(event.request));
+}); 
