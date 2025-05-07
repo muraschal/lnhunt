@@ -47,11 +47,11 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: `
               default-src 'self';
-              script-src 'self' 'unsafe-inline' 'unsafe-eval' *.vercel.com *.vercel-dns.com vercel.live *.vercel.app;
-              style-src 'self' 'unsafe-inline';
+              script-src 'self' 'unsafe-inline' 'unsafe-eval' *.vercel.com *.vercel-dns.com vercel.live *.vercel.app *.vercel-scripts.com;
+              style-src 'self' 'unsafe-inline' fonts.googleapis.com;
               img-src 'self' data: api.qrserver.com;
-              font-src 'self';
-              connect-src 'self' *.vercel.com *.vercel-dns.com;
+              font-src 'self' fonts.gstatic.com;
+              connect-src 'self' *.vercel.com *.vercel-dns.com *.vercel-scripts.com;
               frame-src 'none';
               media-src 'self';
               object-src 'none';
