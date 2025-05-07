@@ -23,22 +23,36 @@ export default function Document() {
         {process.env.NODE_ENV === 'production' ? (
           <meta
             httpEquiv="Content-Security-Policy"
-            content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live *.vercel.com *.vercel-dns.com *.vercel-scripts.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https://api.qrserver.com; connect-src 'self' https://hwznode.rapold.io *.vercel.com *.vercel-dns.com *.vercel-scripts.com https://vercel.live https://fonts.googleapis.com https://fonts.gstatic.com;"
+            content="default-src 'self' https://vercel.live https://fonts.googleapis.com https://fonts.gstatic.com https://hwznode.rapold.io *.vercel.com *.vercel-dns.com *.vercel-scripts.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live *.vercel.com *.vercel-dns.com *.vercel-scripts.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https://api.qrserver.com; connect-src 'self' https://hwznode.rapold.io *.vercel.com *.vercel-dns.com *.vercel-scripts.com https://vercel.live https://fonts.googleapis.com https://fonts.gstatic.com;"
           />
         ) : null}
         
-        {/* Notfall-Skript zur Deaktivierung des Service Workers in Preview-Umgebungen */}
+        {/* Sofortige Service Worker Deaktivierung */}
         <script dangerouslySetInnerHTML={{
           __html: `
-            // Sofort ausführen, um Service Worker zu deaktivieren, wenn wir auf Vercel Preview sind
+            // Sofort ausführen, um Service Worker zu deaktivieren
             (function() {
-              if (window.location.hostname.includes('vercel.app') && 'serviceWorker' in navigator) {
-                console.log('Notfall-Deaktivierung des Service Workers aktiviert');
+              if ('serviceWorker' in navigator) {
+                console.log('Radikale Service Worker Deaktivierung');
+                // Service Worker verhindern
+                navigator.serviceWorker.register = function() {
+                  return Promise.reject(new Error('Service Worker deaktiviert'));
+                };
+                // Existierende Worker entfernen
                 navigator.serviceWorker.getRegistrations().then(function(registrations) {
                   registrations.forEach(function(registration) {
                     registration.unregister();
-                    console.log('Service Worker deaktiviert durch Notfall-Skript');
+                    console.log('Service Worker deaktiviert');
                   });
+                  
+                  // Cache löschen
+                  if (window.caches) {
+                    caches.keys().then(function(names) {
+                      for (let name of names) {
+                        caches.delete(name);
+                      }
+                    });
+                  }
                 });
               }
             })();
