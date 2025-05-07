@@ -338,3 +338,10 @@ If you adapt or build on top of lnhunt, contributions and feedback are welcome!
 
 **Tip:**
 You can freely customize questions, images, and sounds – everything is controlled via JSON and the public folder!
+
+## CI/CD-Workflow
+
+Dieses Projekt verwendet einen automatisierten CI/CD-Workflow mit GitHub und Vercel. Details zur Pipeline findest du in [DEPLOYMENT.md](./DEPLOYMENT.md).
+
+- **Produktion:** https://lnhunt.rapold.io
+- **Feature-Previews:** https://pr-[nummer].lnhunt.rapold.io
