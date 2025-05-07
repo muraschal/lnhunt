@@ -89,9 +89,15 @@ export default function Home() {
     });
     setSolutionCodesDigital(codes);
     
-    // Zeige Anleitung automatisch an, wenn noch keine Frage gelöst wurde
+    // Zeige Anleitung automatisch an, wenn noch keine Frage gelöst wurde UND der Benutzer sie noch nie gesehen hat
     const anyQuestionSolved = codes.some(Boolean);
-    setShowGuidePanel(!anyQuestionSolved);
+    const hasSeenGuide = localStorage.getItem('has_seen_guide') === 'true';
+    setShowGuidePanel(!anyQuestionSolved && !hasSeenGuide);
+    
+    // Falls die Anleitung angezeigt wird, markiere sie als gesehen
+    if (!anyQuestionSolved && !hasSeenGuide) {
+      localStorage.setItem('has_seen_guide', 'true');
+    }
     
     // Prüfe, ob der Benutzer den LNHunt bereits abgeschlossen hat
     const completed = (typeof window !== 'undefined') ? localStorage.getItem('lnhunt_completed') === 'true' : false;
@@ -778,13 +784,12 @@ export default function Home() {
           <div className="mt-8 p-4 bg-black/80 text-orange-200 text-sm rounded-xl shadow-xl max-w-2xl mx-auto text-center">
             <h3 className="text-lg font-bold mb-2 text-orange-400">Kurzanleitung</h3>
             <ol className="list-decimal list-inside space-y-2 text-left mx-auto max-w-md">
-              <li>Finde den <b>physischen Code</b> in der realen Welt (z.B. QR-Code, Sticker, Hinweis).</li>
-              <li>Gib den physischen Code ein, bezahle per Lightning und warte einen Moment, bis die Zahlung bestätigt wurde. Danach kannst du die Frage beantworten. Falls die Antwort falsch ist, musst du erneut bezahlen.</li>
-              <li>Nach jeder richtigen Antwort erhältst du einen <b>digitalen Code</b> (Lösungswort). Sammle alle digitalen Codes und schließe LNHunt ab, um deine Sats-Belohnung zu erhalten!</li>
+              <li>Finde den <b>physischen Code</b> in der realen Welt (QR-Code, Sticker oder Hinweis).</li>
+              <li>Gib den <b>physischen Code</b> ein, bezahle per Lightning und beantworte die Frage. Bei falscher Antwort musst du erneut bezahlen.</li>
+              <li>Nach jeder richtigen Antwort erhältst du einen <b>digitalen Code</b>. Sammle alle <b>digitalen Codes</b>.</li>
+              <li>Nach dem Lösen aller Fragen erscheint oben ein Button "LNHunt abschliessen".</li>
+              <li>Scanne den QR-Code oder kopiere die LNURL, um deine Sats zu erhalten.</li>
             </ol>
-            <p className="mt-4 text-orange-300 text-sm">
-              💡 <b>Tipp:</b> Nach dem Lösen aller Fragen erscheint oben ein Button "LNHunt abschliessen & Sats geschenkt bekommen!". Scanne den QR-Code und gib deinen Namen im Kommentar-Feld der Wallet ein. Nach dem Schliessen des Fensters verschwindet der Button.
-            </p>
           </div>
         )}
 
