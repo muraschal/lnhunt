@@ -47,21 +47,36 @@ self.addEventListener('fetch', (event) => {
   // Nur GET Requests bearbeiten
   if (event.request.method !== 'GET') return;
   
-  // API-Calls nicht cachen
+  // API-Calls und partielle Anfragen nicht cachen
   if (event.request.url.includes('/api/')) {
+    return;
+  }
+  
+  // Range-Requests (für Audio/Video) nicht cachen
+  if (event.request.headers.get('range')) {
     return;
   }
 
   event.respondWith(
     fetch(event.request)
       .then((response) => {
+        // Nur vollständige 200er Antworten cachen
+        // Vermeide 206 Partial Content, die den Cache-Fehler verursachen
+        if (!response || response.status !== 200) {
+          return response;
+        }
+        
         // Kopie des Responses erstellen
         const responseClone = response.clone();
         
-        // Response im Cache speichern
+        // Response im Cache speichern (in einem Try-Catch-Block für zusätzliche Sicherheit)
         caches.open(CACHE_NAME)
           .then((cache) => {
-            cache.put(event.request, responseClone);
+            try {
+              cache.put(event.request, responseClone);
+            } catch (error) {
+              console.log('Cache-Fehler vermieden:', error);
+            }
           });
           
         return response;
@@ -75,9 +90,12 @@ self.addEventListener('fetch', (event) => {
             }
             
             // Wenn kein Cache für diese URL existiert, Offline-Seite zurückgeben
-            if (event.request.headers.get('accept').includes('text/html')) {
+            if (event.request.headers.get('accept') && 
+                event.request.headers.get('accept').includes('text/html')) {
               return caches.match('/');
             }
+            
+            return null;
           });
       })
   );

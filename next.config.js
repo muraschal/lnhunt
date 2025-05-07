@@ -42,6 +42,24 @@ const nextConfig = {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=()',
           },
+          // Angepasste Content Security Policy, die Vercel-Skripte erlaubt
+          {
+            key: 'Content-Security-Policy',
+            value: `
+              default-src 'self';
+              script-src 'self' 'unsafe-inline' 'unsafe-eval' *.vercel.com *.vercel-dns.com vercel.live *.vercel.app;
+              style-src 'self' 'unsafe-inline';
+              img-src 'self' data: api.qrserver.com;
+              font-src 'self';
+              connect-src 'self' *.vercel.com *.vercel-dns.com;
+              frame-src 'none';
+              media-src 'self';
+              object-src 'none';
+              base-uri 'self';
+              form-action 'self';
+              frame-ancestors 'none';
+            `.replace(/\s+/g, ' ').trim()
+          },
         ],
       },
     ];
