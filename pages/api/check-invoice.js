@@ -20,12 +20,17 @@ export default async function handler(req, res) {
 
   try {
     console.log('Checking invoice with:', { apiUrl, paymentHash, walletId });
-    const response = await fetch(`${apiUrl}/payments/${paymentHash}`, {
+    const response = await fetch(`${apiUrl}/api/v1/payments/${paymentHash}`, {
       headers: {
         'X-Api-Key': apiKey,
         'X-Wallet-Id': walletId
-      },
+      }
     });
+
+    if (!response.ok) {
+      return res.status(500).json({ error: 'Fehler beim Abruf des Invoice-Status', details: 'Response not ok' });
+    }
+
     const data = await response.json();
     console.log('Invoice status:', data);
     res.status(200).json({ paid: data.paid });

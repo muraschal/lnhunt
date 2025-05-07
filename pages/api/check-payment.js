@@ -203,7 +203,7 @@ export default async function handler(req, res) {
 
   try {
     devLog('Checking payment with:', { apiUrl, paymentHash, walletId });
-    const response = await fetch(`${apiUrl}/payments/${paymentHash}`, {
+    const response = await fetch(`${apiUrl}/api/v1/payments/${paymentHash}`, {
       headers: {
         'X-Api-Key': apiKey,
         'X-Wallet-Id': walletId
