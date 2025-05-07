@@ -47,7 +47,7 @@ export default function Document() {
         <link rel="icon" type="image/png" sizes="192x192" href="/logos/LNHunt_android-chrome-192x192.png" />
         <link rel="icon" type="image/png" sizes="512x512" href="/logos/LNHunt_android-chrome-512x512.png" />
         {/* PWA Support */}
-        <link rel="manifest" href="/manifest.json" />
+        <link rel="manifest" href="manifest.json" crossOrigin="use-credentials" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black" />
         <meta name="apple-mobile-web-app-title" content="LNHunt" />
