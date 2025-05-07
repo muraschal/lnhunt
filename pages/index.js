@@ -75,7 +75,7 @@ export default function Home() {
   const [showHint, setShowHint] = useState(false)
   const [showFinalModal, setShowFinalModal] = useState(false)
   // LNURL aus den Umgebungsvariablen lesen
-  const FINAL_LNURL = process.env.NEXT_PUBLIC_LNBITS_LNURL;
+  const FINAL_LNURL = process.env.NEXT_PUBLIC_LNBITS_LNURL_WITHDRAW || process.env.NEXT_PUBLIC_LNBITS_LNURL;
   const [copiedFinalLnurl, setCopiedFinalLnurl] = useState(false);
   const [showGuidePanel, setShowGuidePanel] = useState(false)
   // Status, ob der Benutzer den LNHunt bereits abgeschlossen hat
@@ -316,7 +316,7 @@ export default function Home() {
                         {/* Bild als Hintergrund, wenn gelöst */}
                         {solved && question.image && (
                           <img
-                            src={`/images/${question.image}`}
+                            src={`/images/${question.id === 'q2' ? 'q2.png' : question.image}`}
                             alt="Badge"
                             className="absolute inset-0 w-full h-full object-cover rounded-xl z-0"
                             style={{ objectPosition: 'center' }}
@@ -349,7 +349,7 @@ export default function Home() {
                       onClick={() => setShowFinalModal(true)}
                       className="bg-orange-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-orange-700 transition text-lg"
                     >
-                      LNHunt abschliessen & Sats geschenkt bekommen!
+                      LNHunt abschliessen
                     </button>
                   </div>
                 )}
@@ -422,19 +422,35 @@ export default function Home() {
                     <span className="text-green-400 font-medium">Diese Frage hast du bereits richtig beantwortet</span>
                   </div>
                   
-                  {/* Bild über der Frage */}
+                  {/* Bild oder Video über der Frage */}
                   {currentQuestion.image && (
-                    <div className="flex justify-center mb-4">
-                      <img
-                        src={`/images/${currentQuestion.image}`}
-                        alt="Fragenbild"
-                        className="max-h-40 md:max-h-48 lg:max-h-64 xl:max-h-72 w-auto rounded-xl border border-white/20 shadow transform scale-110 md:scale-100 md:w-auto"
-                        style={{ 
-                          background: '#fff', 
-                          maxWidth: 'min(100%, 560px)',
-                          objectFit: 'contain'
-                        }}
-                      />
+                    <div className="flex justify-center mb-6" style={{ width: "100%" }}>
+                      {currentQuestion.id === 'q2' ? (
+                        <video
+                          src="/images/q2.mp4"
+                          className="w-full rounded-xl border border-white/20 shadow"
+                          style={{ 
+                            background: '#fff', 
+                            maxWidth: "100%"
+                          }}
+                          autoPlay
+                          loop
+                          muted
+                          playsInline
+                        />
+                      ) : (
+                        <img
+                          src={`/images/${currentQuestion.image}`}
+                          alt="Fragenbild"
+                          className="w-full rounded-xl border border-white/20 shadow"
+                          style={{ 
+                            background: '#fff', 
+                            maxWidth: "100%",
+                            height: 'auto',
+                            objectFit: 'contain'
+                          }}
+                        />
+                      )}
                     </div>
                   )}
                   
@@ -491,19 +507,35 @@ export default function Home() {
                 className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-6 shadow-xl"
               >
                 <div className="mb-4">
-                  {/* Bild über der Frage */}
+                  {/* Bild oder Video über der Frage */}
                   {currentQuestion.image && (
-                    <div className="flex justify-center mb-4">
-                      <img
-                        src={`/images/${currentQuestion.image}`}
-                        alt="Fragenbild"
-                        className="max-h-40 md:max-h-48 lg:max-h-64 xl:max-h-72 w-auto rounded-xl border border-white/20 shadow transform scale-110 md:scale-100 md:w-auto"
-                        style={{ 
-                          background: '#fff', 
-                          maxWidth: 'min(100%, 560px)',
-                          objectFit: 'contain'
-                        }}
-                      />
+                    <div className="flex justify-center mb-6" style={{ width: "100%" }}>
+                      {currentQuestion.id === 'q2' ? (
+                        <video
+                          src="/images/q2.mp4"
+                          className="w-full rounded-xl border border-white/20 shadow"
+                          style={{ 
+                            background: '#fff', 
+                            maxWidth: "100%"
+                          }}
+                          autoPlay
+                          loop
+                          muted
+                          playsInline
+                        />
+                      ) : (
+                        <img
+                          src={`/images/${currentQuestion.image}`}
+                          alt="Fragenbild"
+                          className="w-full rounded-xl border border-white/20 shadow"
+                          style={{ 
+                            background: '#fff', 
+                            maxWidth: "100%",
+                            height: 'auto',
+                            objectFit: 'contain'
+                          }}
+                        />
+                      )}
                     </div>
                   )}
                   <h2 className="text-xl font-bold text-white mb-2">{currentQuestion.question}</h2>
@@ -807,6 +839,7 @@ export default function Home() {
                 </div>
                 <p className="text-xs text-gray-300 font-mono break-all">{FINAL_LNURL}</p>
               </div>
+              
               <div className="text-center">
                 <button
                   onClick={() => {
@@ -814,6 +847,9 @@ export default function Home() {
                     // Speichere im localStorage, dass der Benutzer abgeschlossen hat
                     localStorage.setItem('lnhunt_completed', 'true');
                     setLnhuntCompleted(true);
+                    
+                    // Nach erfolgreicher Zahlung zur Dankesseite navigieren
+                    window.location.href = '/thnx';
                   }}
                   className="mt-4 px-6 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white font-medium"
                 >
