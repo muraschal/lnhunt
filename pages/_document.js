@@ -58,7 +58,7 @@ export default function Document() {
         {process.env.NODE_ENV === 'production' ? (
           <meta
             httpEquiv="Content-Security-Policy"
-            content="default-src 'self' https://vercel.live https://fonts.googleapis.com https://fonts.gstatic.com https://hwznode.rapold.io *.vercel.com *.vercel-dns.com *.vercel-scripts.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live *.vercel.com *.vercel-dns.com *.vercel-scripts.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https://api.qrserver.com; frame-src 'self' https://vercel.live; connect-src 'self' https://hwznode.rapold.io *.vercel.com *.vercel-dns.com *.vercel-scripts.com https://vercel.live https://fonts.googleapis.com https://fonts.gstatic.com;"
+            content="default-src 'self' https://*.vercel.live https://*.vercel.app https://fonts.googleapis.com https://fonts.gstatic.com https://hwznode.rapold.io *.vercel.com *.vercel-dns.com *.vercel-scripts.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.vercel.live *.vercel.com *.vercel-dns.com *.vercel-scripts.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https://api.qrserver.com; frame-src 'self' https://*.vercel.live https://*.vercel.app *.vercel-scripts.com *.vercel.com; connect-src 'self' https://hwznode.rapold.io *.vercel.com *.vercel-dns.com *.vercel-scripts.com https://*.vercel.live https://fonts.googleapis.com https://fonts.gstatic.com;"
           />
         ) : null}
         

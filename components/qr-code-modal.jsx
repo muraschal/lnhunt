@@ -576,14 +576,14 @@ export function QRCodeModal({
             src={
               paymentRequest.startsWith('lnbc') 
                 ? `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(paymentRequest)}&size=180x180` 
-                : '/images/error-qr.png'
+                : `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 180 180"><rect width="180" height="180" fill="black" /><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Arial" font-size="12">QR Code nicht verfügbar</text></svg>`
             }
             alt="Lightning QR"
             className="w-full h-full"
             onError={(e) => {
-              // Fallback für Fehler bei der QR-Code-Generierung
-              console.error('Fehler beim Laden des QR-Codes');
-              e.target.src = '/images/error-qr.png';
+              // Fallback für Fehler bei der QR-Code-Generierung mit einem Inline-SVG
+              console.error('Fehler beim Laden des QR-Codes, verwende Inline-SVG');
+              e.target.src = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 180 180"><rect width="180" height="180" fill="black" /><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Arial" font-size="12">QR Code nicht verfügbar</text></svg>`;
             }}
             // Screenshot-Schutz und Copy-Schutz für Zahlungsinfos
             onContextMenu={(e) => e.preventDefault()}

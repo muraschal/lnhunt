@@ -22,13 +22,13 @@ const nextConfig = {
           {
             key: 'Content-Security-Policy',
             value: `
-              default-src 'self' https://vercel.live https://fonts.googleapis.com https://fonts.gstatic.com https://hwznode.rapold.io *.vercel.com *.vercel-dns.com *.vercel-scripts.com;
-              script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live *.vercel.com *.vercel-dns.com *.vercel-scripts.com;
+              default-src 'self' https://*.vercel.live https://*.vercel.app https://fonts.googleapis.com https://fonts.gstatic.com https://hwznode.rapold.io *.vercel.com *.vercel-dns.com *.vercel-scripts.com;
+              script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.vercel.live *.vercel.com *.vercel-dns.com *.vercel-scripts.com;
               style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
               font-src 'self' https://fonts.gstatic.com data:;
               img-src 'self' data: https://api.qrserver.com;
-              connect-src 'self' https://hwznode.rapold.io *.vercel.com *.vercel-dns.com *.vercel-scripts.com https://vercel.live https://fonts.googleapis.com https://fonts.gstatic.com wss://*.vercel.app;
-              frame-src 'self';
+              connect-src 'self' https://hwznode.rapold.io *.vercel.com *.vercel-dns.com *.vercel-scripts.com https://*.vercel.live https://fonts.googleapis.com https://fonts.gstatic.com wss://*.vercel.app;
+              frame-src 'self' https://*.vercel.live *.vercel.com *.vercel-scripts.com;
               media-src 'self';
             `.replace(/\s{2,}/g, ' ').trim()
           },
@@ -54,6 +54,42 @@ const nextConfig = {
           },
         ],
       },
+      {
+        // Spezifische Headers für manifest.json
+        source: '/manifest.json',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/manifest+json',
+          },
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: '*',
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=3600',
+          }
+        ],
+      },
+      {
+        // Headers für MP4-Videos
+        source: '/images/:path*.mp4',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'video/mp4',
+          },
+          {
+            key: 'Accept-Ranges',
+            value: 'bytes',
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400',
+          }
+        ],
+      }
     ];
   },
   reactStrictMode: true,
