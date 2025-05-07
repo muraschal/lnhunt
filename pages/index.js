@@ -89,15 +89,9 @@ export default function Home() {
     });
     setSolutionCodesDigital(codes);
     
-    // Zeige Anleitung automatisch an, wenn noch keine Frage gelöst wurde UND der Benutzer sie noch nie gesehen hat
+    // Zeige Anleitung automatisch an, wenn noch keine Frage gelöst wurde
     const anyQuestionSolved = codes.some(Boolean);
-    const hasSeenGuide = localStorage.getItem('has_seen_guide') === 'true';
-    setShowGuidePanel(!anyQuestionSolved && !hasSeenGuide);
-    
-    // Falls die Anleitung angezeigt wird, markiere sie als gesehen
-    if (!anyQuestionSolved && !hasSeenGuide) {
-      localStorage.setItem('has_seen_guide', 'true');
-    }
+    setShowGuidePanel(!anyQuestionSolved);
     
     // Prüfe, ob der Benutzer den LNHunt bereits abgeschlossen hat
     const completed = (typeof window !== 'undefined') ? localStorage.getItem('lnhunt_completed') === 'true' : false;
@@ -319,21 +313,14 @@ export default function Home() {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                       >
-                        {/* Bild/Video als Hintergrund */}
-                        {question.image && (
-                          <div className="absolute inset-0 w-full h-full z-0">
-                            <img
-                              src={`/images/${question.image}`}
-                              alt="Badge"
-                              className={`w-full h-full object-cover rounded-xl transition-all duration-300
-                                ${solved ? 'opacity-80' : 'opacity-10'}`}
-                              style={{ objectPosition: 'center' }}
-                            />
-                            {/* Glassmorphism Overlay für ungelöste Fragen */}
-                            {!solved && (
-                              <div className="absolute inset-0 backdrop-blur-sm bg-black/40 rounded-xl z-5"></div>
-                            )}
-                          </div>
+                        {/* Bild als Hintergrund, wenn gelöst */}
+                        {solved && question.image && (
+                          <img
+                            src={`/images/${question.image}`}
+                            alt="Badge"
+                            className="absolute inset-0 w-full h-full object-cover rounded-xl z-0"
+                            style={{ objectPosition: 'center' }}
+                          />
                         )}
                         {/* Overlay für ID und Icon */}
                         <div className="relative z-10 flex flex-col items-center justify-center w-full h-full">
@@ -348,25 +335,13 @@ export default function Home() {
                         </div>
                         {/* Overlay für solved: halbtransparentes Layer für bessere Lesbarkeit */}
                         {solved && (
-                          <div className="absolute inset-0 bg-black/30 rounded-xl z-5"></div>
+                          <div className="absolute inset-0 bg-black/30 rounded-xl z-5" />
                         )}
                       </motion.button>
                     )
                   })}
                 </div>
                 
-                {/* Abschluss-Button, wenn alle Fragen gelöst sind - jetzt zwischen Fragen und Codes */}
-                {solutionCodesDigital.filter(Boolean).length === questions.length && !lnhuntCompleted && (
-                  <div className="mb-8 flex flex-col items-center">
-                    <button
-                      onClick={() => setShowFinalModal(true)}
-                      className="bg-orange-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-orange-700 transition text-lg"
-                    >
-                      LNHunt abschliessen
-                    </button>
-                  </div>
-                )}
-
                 {/* Fortschrittsanzeige und Lösungswort nur anzeigen, wenn mindestens eine Frage beantwortet wurde */}
                 {solutionCodesDigital.some(Boolean) && (
                   <div className="mb-6">
@@ -376,6 +351,41 @@ export default function Home() {
                       manualPhrase="Fix the money fix the world"
                       codesPhysical={questions.map(q => q.code_physical)}
                     />
+                    
+                    {/* Sats claimen Button - wird immer angezeigt, aber in unterschiedlichen Zuständen */}
+                    <div className="mt-8 flex justify-center">
+                      <div className={`relative ${solutionCodesDigital.filter(Boolean).length === questions.length && !lnhuntCompleted ? '' : 'pointer-events-none'}`}>
+                        {/* Fortschrittsanzeige über dem Button */}
+                        <div className="absolute -top-6 left-0 right-0 text-center text-sm text-orange-300">
+                          {solutionCodesDigital.filter(Boolean).length < questions.length ? 
+                            `${solutionCodesDigital.filter(Boolean).length}/${questions.length} Fragen gelöst` :
+                            '🎉 Alle Fragen gelöst!'
+                          }
+                        </div>
+                        
+                        {/* Button mit bedingtem Glasmorphismus-Effekt */}
+                        <button
+                          onClick={() => solutionCodesDigital.filter(Boolean).length === questions.length && !lnhuntCompleted && setShowFinalModal(true)}
+                          className={`
+                            bg-gradient-to-r from-orange-500 to-amber-500 text-white 
+                            px-8 py-3 rounded-xl font-bold shadow-lg transition-all duration-500
+                            ${solutionCodesDigital.filter(Boolean).length === questions.length && !lnhuntCompleted ? 
+                              'hover:scale-105 active:scale-95' : 
+                              'opacity-60'
+                            }
+                          `}
+                        >
+                          LNHunt abschliessen
+                        </button>
+                        
+                        {/* Glasmorphismus-Overlay bei nicht vollständig gelösten Fragen */}
+                        {solutionCodesDigital.filter(Boolean).length !== questions.length && (
+                          <div className="absolute inset-0 backdrop-blur-md bg-black/30 rounded-xl z-10 flex items-center justify-center">
+                            <Lock className="w-6 h-6 text-white/70" />
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 )}
 
@@ -435,20 +445,18 @@ export default function Home() {
                     <span className="text-green-400 font-medium">Diese Frage hast du bereits richtig beantwortet</span>
                   </div>
                   
-                  {/* Bild oder Video über der Frage */}
+                  {/* Bild über der Frage */}
                   {currentQuestion.image && (
-                    <div className="flex justify-center mb-6" style={{ width: "100%" }}>
-                      <video
-                        src={`/images/${currentQuestion.id}.mp4`}
-                        className="w-full rounded-xl border border-white/20 shadow"
+                    <div className="flex justify-center mb-4">
+                      <img
+                        src={`/images/${currentQuestion.image}`}
+                        alt="Fragenbild"
+                        className="max-h-40 md:max-h-48 lg:max-h-64 xl:max-h-72 w-auto rounded-xl border border-white/20 shadow transform scale-110 md:scale-100 md:w-auto"
                         style={{ 
                           background: '#fff', 
-                          maxWidth: "100%"
+                          maxWidth: 'min(100%, 560px)',
+                          objectFit: 'contain'
                         }}
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
                       />
                     </div>
                   )}
@@ -506,20 +514,18 @@ export default function Home() {
                 className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-6 shadow-xl"
               >
                 <div className="mb-4">
-                  {/* Bild oder Video über der Frage */}
+                  {/* Bild über der Frage */}
                   {currentQuestion.image && (
-                    <div className="flex justify-center mb-6" style={{ width: "100%" }}>
-                      <video
-                        src={`/images/${currentQuestion.id}.mp4`}
-                        className="w-full rounded-xl border border-white/20 shadow"
+                    <div className="flex justify-center mb-4">
+                      <img
+                        src={`/images/${currentQuestion.image}`}
+                        alt="Fragenbild"
+                        className="max-h-40 md:max-h-48 lg:max-h-64 xl:max-h-72 w-auto rounded-xl border border-white/20 shadow transform scale-110 md:scale-100 md:w-auto"
                         style={{ 
                           background: '#fff', 
-                          maxWidth: "100%"
+                          maxWidth: 'min(100%, 560px)',
+                          objectFit: 'contain'
                         }}
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
                       />
                     </div>
                   )}
@@ -763,12 +769,13 @@ export default function Home() {
           <div className="mt-8 p-4 bg-black/80 text-orange-200 text-sm rounded-xl shadow-xl max-w-2xl mx-auto text-center">
             <h3 className="text-lg font-bold mb-2 text-orange-400">Kurzanleitung</h3>
             <ol className="list-decimal list-inside space-y-2 text-left mx-auto max-w-md">
-              <li>Finde den <b>physischen Code</b> in der realen Welt (QR-Code, Sticker oder Hinweis).</li>
-              <li>Gib den <b>physischen Code</b> ein, bezahle per Lightning und beantworte die Frage. Bei falscher Antwort musst du erneut bezahlen.</li>
-              <li>Nach jeder richtigen Antwort erhältst du einen <b>digitalen Code</b>. Sammle alle <b>digitalen Codes</b>.</li>
-              <li>Nach dem Lösen aller Fragen erscheint oben ein Button "LNHunt abschliessen".</li>
-              <li>Scanne den QR-Code oder kopiere die LNURL, um deine Sats zu erhalten.</li>
+              <li>Finde den <b>physischen Code</b> in der realen Welt (z.B. QR-Code, Sticker, Hinweis).</li>
+              <li>Gib den physischen Code ein, bezahle per Lightning und warte einen Moment, bis die Zahlung bestätigt wurde. Danach kannst du die Frage beantworten. Falls die Antwort falsch ist, musst du erneut bezahlen.</li>
+              <li>Nach jeder richtigen Antwort erhältst du einen <b>digitalen Code</b> (Lösungswort). Sammle alle digitalen Codes und schließe LNHunt ab, um deine Sats-Belohnung zu erhalten!</li>
             </ol>
+            <p className="mt-4 text-orange-300 text-sm">
+              💡 <b>Tipp:</b> Nach dem Lösen aller Fragen erscheint oben ein Button "LNHunt abschliessen & Sats geschenkt bekommen!". Scanne den QR-Code und gib deinen Namen im Kommentar-Feld der Wallet ein. Nach dem Schliessen des Fensters verschwindet der Button.
+            </p>
           </div>
         )}
 
@@ -823,7 +830,6 @@ export default function Home() {
                 </div>
                 <p className="text-xs text-gray-300 font-mono break-all">{FINAL_LNURL}</p>
               </div>
-              
               <div className="text-center">
                 <button
                   onClick={() => {
@@ -831,9 +837,6 @@ export default function Home() {
                     // Speichere im localStorage, dass der Benutzer abgeschlossen hat
                     localStorage.setItem('lnhunt_completed', 'true');
                     setLnhuntCompleted(true);
-                    
-                    // Nach erfolgreicher Zahlung zur Dankesseite navigieren
-                    window.location.href = '/thnx';
                   }}
                   className="mt-4 px-6 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white font-medium"
                 >
