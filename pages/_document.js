@@ -26,6 +26,25 @@ export default function Document() {
             content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live *.vercel.com *.vercel-dns.com *.vercel-scripts.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https://api.qrserver.com; connect-src 'self' https://hwznode.rapold.io *.vercel.com *.vercel-dns.com *.vercel-scripts.com https://vercel.live https://fonts.googleapis.com https://fonts.gstatic.com;"
           />
         ) : null}
+        
+        {/* Notfall-Skript zur Deaktivierung des Service Workers in Preview-Umgebungen */}
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            // Sofort ausführen, um Service Worker zu deaktivieren, wenn wir auf Vercel Preview sind
+            (function() {
+              if (window.location.hostname.includes('vercel.app') && 'serviceWorker' in navigator) {
+                console.log('Notfall-Deaktivierung des Service Workers aktiviert');
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  registrations.forEach(function(registration) {
+                    registration.unregister();
+                    console.log('Service Worker deaktiviert durch Notfall-Skript');
+                  });
+                });
+              }
+            })();
+          `
+        }} />
+        
         {/* Apple Splash Screen */}
         <link
           rel="apple-touch-startup-image"

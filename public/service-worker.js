@@ -26,6 +26,29 @@ const SKIP_DOMAINS = [
 
 // Installation Event - Cache wichtige Assets
 self.addEventListener('install', (event) => {
+  // Prüfen, ob wir auf einer Vercel Preview-Domain sind
+  if (self.location.hostname.includes('vercel.app')) {
+    console.log('Vercel Preview-Environment erkannt - Service Worker wird deaktiviert');
+    self.registration.unregister()
+      .then(() => {
+        console.log('Service Worker erfolgreich deregistriert');
+        // Wenn möglich, Client-Seiten neu laden
+        return self.clients.matchAll();
+      })
+      .then(clients => {
+        clients.forEach(client => {
+          if (client.url && 'navigate' in client) {
+            client.navigate(client.url);
+          }
+        });
+      })
+      .catch(err => console.error('Fehler bei Service Worker Deregistrierung:', err));
+    
+    // Installation abbrechen
+    return;
+  }
+  
+  // Normale Installation fortsetzen
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {

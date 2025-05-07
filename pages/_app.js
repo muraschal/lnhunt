@@ -9,10 +9,31 @@ export default function MyApp({ Component, pageProps }) {
   useEffect(() => {
     const isVercelPreview = 
       typeof window !== 'undefined' && 
-      window.location.hostname.includes('vercel.app');
+      (window.location.hostname.includes('vercel.app') || 
+       window.location.hostname.includes('localhost') || 
+       window.location.hostname.includes('127.0.0.1'));
     
     if ('serviceWorker' in navigator) {
-      if (process.env.NODE_ENV === 'production' && !isVercelPreview) {
+      if (isVercelPreview) {
+        // Für Vercel Preview: Alle vorhandenen Service Worker sofort deregistrieren
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for(let registration of registrations) {
+            registration.unregister().then(function(success) {
+              console.log('Service Worker deregistriert:', success);
+              if (success && window.caches) {
+                // Auch den Cache leeren
+                window.caches.keys().then(function(cacheNames) {
+                  cacheNames.forEach(function(cacheName) {
+                    window.caches.delete(cacheName);
+                  });
+                  // Nach erfolgreichem Löschen Seite neu laden
+                  window.location.reload();
+                });
+              }
+            });
+          }
+        });
+      } else if (process.env.NODE_ENV === 'production') {
         // Echte Produktion: Service Worker registrieren
         window.addEventListener('load', function() {
           navigator.serviceWorker.register('/service-worker.js').then(
@@ -23,17 +44,6 @@ export default function MyApp({ Component, pageProps }) {
               console.log('Service Worker Registrierung fehlgeschlagen: ', err);
             }
           );
-        });
-      } else if (isVercelPreview) {
-        // Für Vercel Preview: Vorhandenen Service Worker deregistrieren
-        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-          for(let registration of registrations) {
-            registration.unregister().then(function(success) {
-              console.log('Service Worker für Preview deregistriert:', success);
-              // Nach erfolgreicher Deregistrierung Seite neu laden
-              if (success) window.location.reload();
-            });
-          }
         });
       }
     }
