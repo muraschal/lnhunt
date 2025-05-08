@@ -10,7 +10,7 @@ const QuestionCard = ({ question }) => {
       className="bg-white border-2 border-gray-300 rounded-xl p-4 mb-12 page-break-after"
       style={{
         pageBreakAfter: 'always',
-        minHeight: '950px', // Etwas reduzierte Mindestseitenhöhe
+        minHeight: '900px', // Weiter reduzierte Mindestseitenhöhe
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between'
@@ -18,9 +18,9 @@ const QuestionCard = ({ question }) => {
     >
       <div>
         {/* Header mit LNHunt und Muraschal-Schriftzug */}
-        <div className="text-center mb-5">
+        <div className="text-center mb-4">
           {/* LNHunt-Schriftzug */}
-          <h1 className="text-5xl font-bold mb-1" style={{ color: '#F97316' }}>
+          <h1 className="text-4xl font-bold mb-1" style={{ color: '#F97316' }}>
             LNHunt
           </h1>
           
@@ -31,9 +31,9 @@ const QuestionCard = ({ question }) => {
               textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
               fontWeight: 400,
               letterSpacing: "0.5px",
-              fontSize: "1.75rem",
+              fontSize: "1.5rem",
               color: "#000000",
-              marginBottom: "8px"
+              marginBottom: "6px"
             }}
           >
             by Muraschal
@@ -41,19 +41,19 @@ const QuestionCard = ({ question }) => {
         </div>
         
         {/* Frage-Titel mit integrierter Nummer */}
-        <h2 className="text-2xl font-bold mb-5 text-center border-b-2 border-gray-200 pb-3">
+        <h2 className="text-xl font-bold mb-4 text-center border-b-2 border-gray-200 pb-2">
           Frage Nr.{question.id.replace('q', '')} - {question.question}
         </h2>
         
         {/* Bild - jetzt mit Vollbreite aber etwas kleiner */}
-        <div className="mb-6 flex justify-center">
+        <div className="mb-5 flex justify-center">
           <div className="p-2 border border-gray-300 rounded-lg shadow-md bg-white w-full">
             <img 
               src={`/images/${question.id}.png`} 
               alt={`Bild für Frage ${question.id}`}
               style={{ 
                 width: '100%',
-                height: '380px', // Kleinere Höhe für besseres Layout im PDF
+                height: '350px', // Noch etwas kleinere Höhe
                 objectFit: 'contain',
                 borderRadius: '0.25rem'
               }}
@@ -63,19 +63,19 @@ const QuestionCard = ({ question }) => {
         </div>
         
         {/* Antwortoptionen - ohne Markierung der richtigen Antwort */}
-        <div className="mt-4 mb-4">
-          <h3 className="text-xl font-bold mb-3 border-l-4 border-orange-500 pl-3">Antwortoptionen:</h3>
-          <div className="space-y-2">
+        <div className="mt-3 mb-3">
+          <h3 className="text-lg font-bold mb-2 border-l-4 border-orange-500 pl-3">Antwortoptionen:</h3>
+          <div className="space-y-1.5">
             {question.options && question.options.map((option, idx) => (
               <div 
                 key={idx}
-                className="border border-gray-300 rounded-lg p-3 bg-white text-black"
+                className="border border-gray-300 rounded-lg p-2.5 bg-white text-black"
               >
                 <div className="flex items-center">
-                  <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center mr-3 font-bold text-lg">
+                  <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center mr-2.5 font-bold text-base">
                     {idx + 1}
                   </div>
-                  <span className="text-xl">{option}</span>
+                  <span className="text-base">{option}</span>
                 </div>
               </div>
             ))}
@@ -85,14 +85,14 @@ const QuestionCard = ({ question }) => {
       
       {/* Code Physical */}
       <div className="mt-auto">
-        <div className="font-bold text-lg uppercase text-gray-600 mb-2 text-center">
+        <div className="font-bold text-base uppercase text-gray-600 mb-1.5 text-center">
           Code Physical
         </div>
-        <div className="text-6xl font-bold text-center p-5 border-4 border-gray-800 rounded-lg bg-gray-100 shadow-inner">
+        <div className="text-5xl font-bold text-center p-4 border-4 border-gray-800 rounded-lg bg-gray-100 shadow-inner">
           <span className="text-orange-500" style={{ letterSpacing: '0.1em' }}>{question.code_physical}</span>
         </div>
         
-        <div className="text-center mt-3 text-gray-500 text-sm">
+        <div className="text-center mt-2 text-gray-500 text-xs">
           LNHunt © {new Date().getFullYear()} by Marcel Rapold
         </div>
       </div>
