@@ -140,6 +140,11 @@ export default function PrintQuestions() {
               print-color-adjust: exact !important;
               color-adjust: exact !important;
             }
+            
+            /* Explizit die UI-Elemente zum Drucken ausblenden */
+            #print-ui {
+              display: none !important;
+            }
           }
           
           @font-face {
@@ -153,7 +158,8 @@ export default function PrintQuestions() {
       </Head>
       
       <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-6 no-print">
+        {/* UI-Elemente mit einer ID, die im Print-CSS explizit ausgeblendet wird */}
+        <div id="print-ui" className="flex justify-between items-center mb-6 no-print">
           <h1 className="text-3xl font-bold">LNHunt - Fragen zum Drucken</h1>
           <div className="flex gap-3">
             <button 
@@ -171,7 +177,8 @@ export default function PrintQuestions() {
           ))}
         </div>
         
-        <div className="my-8 p-4 bg-gray-100 rounded-lg no-print">
+        {/* Auch die Druckanleitung mit einer ID versehen */}
+        <div id="print-ui" className="my-8 p-4 bg-gray-100 rounded-lg no-print">
           <h3 className="font-bold mb-2">Anleitung zum Drucken:</h3>
           <ol className="list-decimal list-inside">
             <li>Klicke auf "Drucken" oder nutze die Browser-Druckfunktion (Strg+P / Cmd+P)</li>
