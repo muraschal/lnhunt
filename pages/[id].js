@@ -91,68 +91,76 @@ export default function QuizStation() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-white">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-white">
       <h1 className="text-2xl font-bold mb-4">Station {id?.toUpperCase()}</h1>
       {showAccessForm ? (
-        <div className="bg-blue-100 p-6 rounded shadow text-center max-w-md w-full">
-          <p className="mb-4">Bitte gib den physischen Code ein:</p>
-          <form onSubmit={handleCodePhysicalSubmit} className="space-y-4">
-            <input
-              type="text"
-              value={codePhysical}
-              onChange={(e) => setCodePhysical(e.target.value)}
-              className="w-full px-3 py-2 border rounded"
-              placeholder="Physischen Code eingeben"
-            />
-            <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">
-              Bestätigen
-            </button>
-          </form>
-          {error && <div className="text-red-600 mt-2">{error}</div>}
+        <div className="flex items-center justify-center w-full h-full">
+          <div className="bg-blue-100 p-6 rounded shadow text-center max-w-md w-full flex flex-col items-center justify-center">
+            <p className="mb-4">Bitte gib den physischen Code ein:</p>
+            <form onSubmit={handleCodePhysicalSubmit} className="space-y-4 w-full flex flex-col items-center justify-center">
+              <input
+                type="text"
+                value={codePhysical}
+                onChange={(e) => setCodePhysical(e.target.value)}
+                className="w-full px-3 py-2 border rounded"
+                placeholder="Physischen Code eingeben"
+              />
+              <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">
+                Bestätigen
+              </button>
+            </form>
+            {error && <div className="text-red-600 mt-2">{error}</div>}
+          </div>
         </div>
       ) : !paid ? (
-        <div className="bg-yellow-100 p-6 rounded shadow text-center">
-          <p className="mb-4">Um die Frage freizuschalten, zahle via Lightning:</p>
-          {error && <div className="text-red-600 mb-2">{error}</div>}
-          {loading && <div className="mb-2">Invoice wird erstellt ...</div>}
-          {invoice && (
-            <div className="mb-2">
-              <img src={`https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(invoice)}&size=180x180`} alt="Invoice QR" />
-              <div className="text-xs break-all mt-2">{invoice}</div>
-            </div>
-          )}
-          <div className="mt-4 text-gray-600 animate-pulse">Warte auf Zahlung ...</div>
+        <div className="flex items-center justify-center w-full h-full">
+          <div className="bg-yellow-100 p-6 rounded shadow text-center flex flex-col items-center justify-center">
+            <p className="mb-4">Um die Frage freizuschalten, zahle via Lightning:</p>
+            {error && <div className="text-red-600 mb-2">{error}</div>}
+            {loading && <div className="mb-2">Invoice wird erstellt ...</div>}
+            {invoice && (
+              <div className="mb-2">
+                <img src={`https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(invoice)}&size=180x180`} alt="Invoice QR" />
+                <div className="text-xs break-all mt-2">{invoice}</div>
+              </div>
+            )}
+            <div className="mt-4 text-gray-600 animate-pulse">Warte auf Zahlung ...</div>
+          </div>
         </div>
       ) : !solved ? (
-        <div className="bg-gray-100 p-6 rounded shadow max-w-md w-full">
-          <div className="mb-4 font-semibold">{question.question}</div>
-          <ul className="mb-4 space-y-2">
-            {question.options.map((opt, idx) => (
-              <li key={idx}>
-                <button
-                  className={`w-full px-3 py-2 rounded border ${selected === idx ? (idx === question.correct_index ? 'bg-green-200 border-green-500' : 'bg-red-200 border-red-500') : 'bg-white border-gray-300'} hover:bg-gray-50`}
-                  onClick={() => handleAnswer(idx)}
-                  disabled={selected !== null}
-                >
-                  {opt}
-                </button>
-              </li>
-            ))}
-          </ul>
-          <button onClick={() => setShowHint(!showHint)} className="text-blue-600 underline text-sm mb-2">{showHint ? 'Hinweis ausblenden' : 'Hinweis anzeigen'}</button>
-          {showHint && <div className="text-sm text-gray-600 mb-2">💡 {question.hint}</div>}
-          {selected !== null && selected === question.correct_index && (
-            <div className="mt-4 text-green-700 font-bold">Richtig! Digitaler Code: <span className="bg-yellow-200 px-2 py-1 rounded">{question.code_digital}</span></div>
-          )}
-          {selected !== null && selected !== question.correct_index && (
-            <div className="mt-4 text-red-600">Leider falsch. Du musst erneut bezahlen, um es nochmal zu versuchen!</div>
-          )}
+        <div className="flex items-center justify-center w-full h-full">
+          <div className="bg-gray-100 p-6 rounded shadow max-w-md w-full flex flex-col items-center justify-center">
+            <div className="mb-4 font-semibold">{question.question}</div>
+            <ul className="mb-4 space-y-2 w-full">
+              {question.options.map((opt, idx) => (
+                <li key={idx} className="w-full">
+                  <button
+                    className={`w-full px-3 py-2 rounded border ${selected === idx ? (idx === question.correct_index ? 'bg-green-200 border-green-500' : 'bg-red-200 border-red-500') : 'bg-white border-gray-300'} hover:bg-gray-50`}
+                    onClick={() => handleAnswer(idx)}
+                    disabled={selected !== null}
+                  >
+                    {opt}
+                  </button>
+                </li>
+              ))}
+            </ul>
+            <button onClick={() => setShowHint(!showHint)} className="text-blue-600 underline text-sm mb-2">{showHint ? 'Hinweis ausblenden' : 'Hinweis anzeigen'}</button>
+            {showHint && <div className="text-sm text-gray-600 mb-2">💡 {question.hint}</div>}
+            {selected !== null && selected === question.correct_index && (
+              <div className="mt-4 text-green-700 font-bold">Richtig! Digitaler Code: <span className="bg-yellow-200 px-2 py-1 rounded">{question.code_digital}</span></div>
+            )}
+            {selected !== null && selected !== question.correct_index && (
+              <div className="mt-4 text-red-600">Leider falsch. Du musst erneut bezahlen, um es nochmal zu versuchen!</div>
+            )}
+          </div>
         </div>
       ) : (
-        <div className="bg-green-50 p-6 rounded shadow text-center">
-          <div className="mb-2 font-semibold">Du hast diese Station bereits gelöst!</div>
-          <div>Digitaler Code: <span className="bg-yellow-200 px-2 py-1 rounded">{question.code_digital}</span></div>
-          <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded" onClick={() => router.push('/')}>Zurück zur Übersicht</button>
+        <div className="flex items-center justify-center w-full h-full">
+          <div className="bg-green-50 p-6 rounded shadow text-center flex flex-col items-center justify-center">
+            <div className="mb-2 font-semibold">Du hast diese Station bereits gelöst!</div>
+            <div>Digitaler Code: <span className="bg-yellow-200 px-2 py-1 rounded">{question.code_digital}</span></div>
+            <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded" onClick={() => router.push('/')}>Zurück zur Übersicht</button>
+          </div>
         </div>
       )}
     </div>
