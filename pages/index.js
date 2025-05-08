@@ -24,6 +24,17 @@ const isDevOrPreviewEnvironment = () => {
 };
 
 /**
+ * Funktion zum Überprüfen, ob die aktuelle Umgebung Produktion ist (lnhunt.rapold.io)
+ * @returns {boolean} - true, wenn die Umgebung die Produktionsumgebung ist
+ */
+const isProductionEnvironment = () => {
+  if (typeof window === 'undefined') return false;
+  
+  const hostname = window.location.hostname;
+  return hostname === 'lnhunt.rapold.io';
+};
+
+/**
  * Nur im Dev-Modus loggen
  * @param {string} message - Die Lognachricht
  * @param {any} data - Optionale Daten für das Logging
@@ -790,36 +801,38 @@ export default function Home() {
         </div>
 
         {/* Dev-Mode Toggle mit Slider */}
-        <div className="mt-4 flex justify-center">
-          <div className="bg-black/70 p-2 pl-3 pr-4 rounded-xl shadow-lg flex items-center gap-3">
-            <span className={`text-sm ${devModeEnabled ? 'text-orange-400 font-medium' : 'text-gray-400'}`}>
-              <Code className="w-4 h-4 inline-block mr-1" />
-              Dev-Mode
-            </span>
-            
-            {/* Custom Toggle Slider */}
-            <button 
-              onClick={toggleDevMode}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                devModeEnabled 
-                  ? 'bg-gradient-to-r from-orange-500 to-amber-500 focus:ring-orange-500' 
-                  : 'bg-gray-600 focus:ring-gray-500'
-              }`}
-              role="switch"
-              aria-checked={devModeEnabled}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-lg transition-transform ${
-                  devModeEnabled ? 'translate-x-6' : 'translate-x-1'
+        {!isProductionEnvironment() && (
+          <div className="mt-4 flex justify-center">
+            <div className="bg-black/70 p-2 pl-3 pr-4 rounded-xl shadow-lg flex items-center gap-3">
+              <span className={`text-sm ${devModeEnabled ? 'text-orange-400 font-medium' : 'text-gray-400'}`}>
+                <Code className="w-4 h-4 inline-block mr-1" />
+                Dev-Mode
+              </span>
+              
+              {/* Custom Toggle Slider */}
+              <button 
+                onClick={toggleDevMode}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                  devModeEnabled 
+                    ? 'bg-gradient-to-r from-orange-500 to-amber-500 focus:ring-orange-500' 
+                    : 'bg-gray-600 focus:ring-gray-500'
                 }`}
-              />
-            </button>
-            
-            <span className={`text-xs ${devModeEnabled ? 'text-orange-300' : 'text-gray-500'}`}>
-              {devModeEnabled ? 'Aktiv' : 'Inaktiv'}
-            </span>
+                role="switch"
+                aria-checked={devModeEnabled}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-lg transition-transform ${
+                    devModeEnabled ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+              
+              <span className={`text-xs ${devModeEnabled ? 'text-orange-300' : 'text-gray-500'}`}>
+                {devModeEnabled ? 'Aktiv' : 'Inaktiv'}
+              </span>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Debug Panel */}
         {showDebugPanel && (
