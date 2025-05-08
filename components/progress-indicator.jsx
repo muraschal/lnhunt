@@ -51,9 +51,9 @@ export function ProgressIndicator({
 
       {/* Physische Codes Anzeige - nur anzeigen, wenn mindestens ein Code gesammelt wurde */}
       {codesDigital.length > 0 && (
-        <div className="mb-4 keyword-phrase">
-          <p className="text-sm text-gray-400 mb-2">Physische Codes:</p>
-          <div className="flex flex-wrap gap-2">
+        <div className="mb-4 keyword-phrase text-center">
+          <p className="text-sm font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-amber-500 mb-2">Physische Codes:</p>
+          <div className="flex flex-wrap gap-2 justify-center">
             {phraseFromCodes.map((word, index) => (
               <span
                 key={index}
@@ -68,9 +68,9 @@ export function ProgressIndicator({
 
       {/* Digitale Codes Anzeige - nur anzeigen, wenn mindestens ein Code gesammelt wurde */}
       {codesDigital.length > 0 && manualPhrase && (
-        <div className="secret-phrase">
-          <p className="text-sm text-gray-400 mb-2">Digitale Codes:</p>
-          <div className="flex flex-wrap gap-2">
+        <div className="secret-phrase text-center">
+          <p className="text-sm font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-amber-500 mb-2">Digitale Codes:</p>
+          <div className="flex flex-wrap gap-2 justify-center">
             {manualHangman.map((word, index) => (
               <motion.span
                 key={index}

@@ -418,7 +418,7 @@ export default function Home() {
                             }
                           `}
                         >
-                          LNHunt abschliessen
+                          {lnhuntCompleted ? 'LNHunt abgeschlossen' : 'LNHunt abschliessen'}
                         </button>
                         
                         {/* Glasmorphismus-Overlay bei nicht vollständig gelösten Fragen */}
@@ -490,7 +490,7 @@ export default function Home() {
                   
                   {/* Video für die Frage - im solved Zustand */}
                   {currentQuestion.id && (
-                    <div className="w-full mb-4">
+                    <div className="w-full mb-4 flex justify-center">
                       <video
                         src={`/images/${currentQuestion.id}.mp4`}
                         className="w-full rounded-xl border border-white/20 shadow"
@@ -502,7 +502,9 @@ export default function Home() {
                         poster={`/images/${currentQuestion.id}.png`}
                         style={{ 
                           maxWidth: '100%',
-                          background: '#000'
+                          maxHeight: '60vh',
+                          background: '#000',
+                          width: '720px'
                         }}
                       />
                     </div>
@@ -563,7 +565,7 @@ export default function Home() {
                 <div className="mb-4">
                   {/* Video für die Frage - im answer Zustand */}
                   {currentQuestion.id && (
-                    <div className="w-full mb-4">
+                    <div className="w-full mb-4 flex justify-center">
                       <video
                         src={`/images/${currentQuestion.id}.mp4`}
                         className="w-full rounded-xl border border-white/20 shadow"
@@ -575,7 +577,9 @@ export default function Home() {
                         poster={`/images/${currentQuestion.id}.png`}
                         style={{ 
                           maxWidth: '100%',
-                          background: '#000'
+                          maxHeight: '60vh',
+                          background: '#000',
+                          width: '720px'
                         }}
                       />
                     </div>
@@ -811,7 +815,7 @@ export default function Home() {
             <h3 className="text-lg font-bold mb-2 text-orange-400">Kurzanleitung</h3>
             <ol className="list-decimal list-inside space-y-2 text-left mx-auto max-w-md">
               <li>Finde den <span className="font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-amber-500">physischen Code</span> in der realen Welt (z.B. QR-Code, Sticker, Hinweis).</li>
-              <li>Gib den physischen Code ein, bezahle per Lightning und warte einen Moment, bis die Zahlung bestätigt wurde.</li>
+              <li>Gib den <span className="font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-amber-500">physischen Code</span> ein, bezahle per Lightning und warte einen Moment, bis die Zahlung bestätigt wurde.</li>
               <li>Beantworte die Frage richtig und sammle den <span className="font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-amber-500">digitalen Code</span>. Bei falscher Antwort musst du erneut bezahlen.</li>
               <li>Nach dem Lösen aller Fragen kannst du über den "LNHunt abschliessen" Button deine <b>Sats-Belohnung</b> abholen!</li>
             </ol>
@@ -836,28 +840,39 @@ export default function Home() {
                 <p className="text-gray-300 text-sm mt-1">Scanne den QR-Code, um deine Sats zu erhalten</p>
               </div>
               <div className="relative mx-auto w-64 h-64 mb-4 flex items-center justify-center">
-                <img
-                  src={`https://api.qrserver.com/v1/create-qr-code/?data=${FINAL_LNURL}&size=180x180`}
-                  alt="LNURL QR"
-                  className="w-full h-full"
-                />
+                {/* QR-Code mit bedingtem Glassmorphismus-Effekt nach Beanspruchung */}
+                <div className="relative">
+                  <img
+                    src={`https://api.qrserver.com/v1/create-qr-code/?data=${FINAL_LNURL}&size=180x180`}
+                    alt="LNURL QR"
+                    className="w-full h-full p-2 bg-white rounded-xl"
+                  />
+                  {/* Glassmorphismus-Overlay beim Claimed-Status */}
+                  {claimStatus === 'claimed' && (
+                    <div className="absolute inset-0 backdrop-blur-md bg-black/40 rounded-xl z-10 flex items-center justify-center">
+                      <CheckCircle className="w-16 h-16 text-green-500" />
+                    </div>
+                  )}
+                </div>
               </div>
               <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-xl p-3 mb-4">
                 <div className="flex justify-between items-center mb-1">
                   <span className="text-xs font-medium text-gray-400">LNURL</span>
                   <div className="flex gap-2">
-                    <motion.button
-                      onClick={() => {
-                        navigator.clipboard.writeText(FINAL_LNURL);
-                        setCopiedFinalLnurl(true);
-                        setTimeout(() => setCopiedFinalLnurl(false), 1500);
-                      }}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="text-orange-500 hover:text-orange-400"
-                    >
-                      {copiedFinalLnurl ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                    </motion.button>
+                    {claimStatus !== 'claimed' && (
+                      <motion.button
+                        onClick={() => {
+                          navigator.clipboard.writeText(FINAL_LNURL);
+                          setCopiedFinalLnurl(true);
+                          setTimeout(() => setCopiedFinalLnurl(false), 1500);
+                        }}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="text-orange-500 hover:text-orange-400"
+                      >
+                        {copiedFinalLnurl ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                      </motion.button>
+                    )}
                     {claimStatus === 'idle' && (
                       <a
                         href={`lightning:${FINAL_LNURL}`}
@@ -897,7 +912,7 @@ export default function Home() {
                     )}
                   </div>
                 </div>
-                <p className="text-xs text-gray-300 font-mono break-all">{FINAL_LNURL}</p>
+                <p className={`text-xs ${claimStatus === 'claimed' ? 'text-gray-500' : 'text-gray-300'} font-mono break-all`}>{FINAL_LNURL}</p>
                 
                 {/* Status-Nachricht basierend auf dem Claim-Status */}
                 {claimStatus === 'claimed' && (
@@ -910,6 +925,10 @@ export default function Home() {
                 <button
                   onClick={() => {
                     setShowFinalModal(false);
+                    // Setze lnhuntCompleted auf true, wenn Claim durchgeführt wurde
+                    if (claimStatus === 'claimed') {
+                      setLnhuntCompleted(true);
+                    }
                   }}
                   className="mt-4 px-6 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white font-medium"
                 >
