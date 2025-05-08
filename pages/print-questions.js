@@ -10,10 +10,11 @@ const QuestionCard = ({ question }) => {
       className="bg-white border-2 border-gray-300 rounded-xl p-4 mb-12 page-break-after"
       style={{
         pageBreakAfter: 'always',
-        minHeight: '900px', // Weiter reduzierte Mindestseitenhöhe
+        minHeight: '870px', // Reduzierte Mindestseitenhöhe
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        marginTop: '0.5cm' // Zusätzlicher Abstand oben
       }}
     >
       <div>
@@ -143,7 +144,7 @@ export default function PrintQuestions() {
             
             @page {
               size: A4;
-              margin: 0.5cm;
+              margin: 1cm;
             }
             
             /* Stellen sicher, dass Hintergrundfarben gedruckt werden */
