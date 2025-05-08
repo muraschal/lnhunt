@@ -17,8 +17,13 @@ const QuestionCard = ({ question }) => {
       }}
     >
       <div>
-        {/* Header mit Muraschal-Schriftzug */}
+        {/* Header mit LNHunt und Muraschal-Schriftzug */}
         <div className="text-center mb-6">
+          {/* LNHunt-Schriftzug */}
+          <h1 className="text-5xl font-bold mb-1" style={{ color: '#F97316' }}>
+            LNHunt
+          </h1>
+          
           {/* "by Muraschal" in Schwarz für den Druck */}
           <div 
             style={{ 
