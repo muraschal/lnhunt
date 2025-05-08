@@ -4,6 +4,24 @@ export default function Document() {
   return (
     <Html lang="de">
       <Head>
+        {/* Einfache Service Worker Deaktivierung */}
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            if ('serviceWorker' in navigator) {
+              window.addEventListener('load', function() {
+                navigator.serviceWorker.ready.then(registration => {
+                  registration.unregister();
+                  if (caches) {
+                    caches.keys().then(function(names) {
+                      for (let name of names) caches.delete(name);
+                    });
+                  }
+                }).catch(err => console.log('SW cleanup error:', err));
+              });
+            }
+          `
+        }} />
+        
         {/* Favicon & App Icons */}
         <link rel="icon" type="image/png" sizes="32x32" href="/logos/LNHunt_favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/logos/LNHunt_favicon-16x16.png" />
@@ -12,7 +30,7 @@ export default function Document() {
         <link rel="icon" type="image/png" sizes="192x192" href="/logos/LNHunt_android-chrome-192x192.png" />
         <link rel="icon" type="image/png" sizes="512x512" href="/logos/LNHunt_android-chrome-512x512.png" />
         {/* PWA Support */}
-        <link rel="manifest" href="/manifest.json" />
+        <link rel="manifest" href="manifest.json" crossOrigin="use-credentials" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black" />
         <meta name="apple-mobile-web-app-title" content="LNHunt" />
@@ -23,9 +41,20 @@ export default function Document() {
         {process.env.NODE_ENV === 'production' ? (
           <meta
             httpEquiv="Content-Security-Policy"
-            content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://api.qrserver.com; connect-src 'self' https://hwznode.rapold.io;"
+            content={`
+              default-src 'self';
+              script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://*.vercel.live https://vercel.com https://*.vercel.com https://*.vercel-dns.com https://*.vercel-scripts.com https://*.vercel.app;
+              script-src-elem 'self' 'unsafe-inline' https://vercel.live https://*.vercel.live https://vercel.com https://*.vercel.com https://*.vercel-dns.com https://*.vercel-scripts.com https://*.vercel.app;
+              style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+              font-src 'self' https://fonts.gstatic.com data:;
+              img-src 'self' data: https://api.qrserver.com;
+              connect-src 'self' https://hwznode.rapold.io https://vercel.live https://*.vercel.live https://vercel.com https://*.vercel.com https://*.vercel-dns.com https://*.vercel-scripts.com https://*.vercel.app https://fonts.googleapis.com https://fonts.gstatic.com wss://*.vercel.app;
+              frame-src 'self' https://vercel.live https://*.vercel.live https://vercel.com https://*.vercel.com https://*.vercel-dns.com https://*.vercel-scripts.com;
+              media-src 'self';
+            `.replace(/\s{2,}/g, ' ').trim()}
           />
         ) : null}
+        
         {/* Apple Splash Screen */}
         <link
           rel="apple-touch-startup-image"

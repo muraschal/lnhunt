@@ -75,7 +75,7 @@ export default function Home() {
   const [showHint, setShowHint] = useState(false)
   const [showFinalModal, setShowFinalModal] = useState(false)
   // LNURL aus den Umgebungsvariablen lesen
-  const FINAL_LNURL = process.env.NEXT_PUBLIC_LNBITS_LNURL;
+  const FINAL_LNURL = process.env.NEXT_PUBLIC_LNBITS_LNURL_WITHDRAW || process.env.NEXT_PUBLIC_LNBITS_LNURL;
   const [copiedFinalLnurl, setCopiedFinalLnurl] = useState(false);
   const [showGuidePanel, setShowGuidePanel] = useState(false)
   // Status, ob der Benutzer den LNHunt bereits abgeschlossen hat
@@ -89,13 +89,18 @@ export default function Home() {
     });
     setSolutionCodesDigital(codes);
     
-    // Zeige Anleitung automatisch an, wenn noch keine Frage gelöst wurde
-    const anyQuestionSolved = codes.some(Boolean);
-    setShowGuidePanel(!anyQuestionSolved);
+    // Zeige Anleitung automatisch an, wenn die Seite zum allerersten Mal aufgerufen wird
+    // (localStorage-Schlüssel wird gesetzt, wenn die Anleitung einmal gesehen wurde)
+    const hasSeenGuide = (typeof window !== 'undefined') ? localStorage.getItem('has_seen_guide') : false;
+    setShowGuidePanel(!hasSeenGuide);
     
-    // Prüfe, ob der Benutzer den LNHunt bereits abgeschlossen hat
-    const completed = (typeof window !== 'undefined') ? localStorage.getItem('lnhunt_completed') === 'true' : false;
-    setLnhuntCompleted(completed);
+    // Beim ersten Anzeigen der Anleitung den Schlüssel setzen
+    if (!hasSeenGuide && typeof window !== 'undefined') {
+      localStorage.setItem('has_seen_guide', 'true');
+    }
+    
+    // Status immer auf "nicht abgeschlossen" setzen, um Button stets verfügbar zu halten
+    setLnhuntCompleted(false);
   }, []);
 
   // Erste Satz im Hangman-Style bauen (Fix the money)
@@ -313,15 +318,26 @@ export default function Home() {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                       >
-                        {/* Bild als Hintergrund, wenn gelöst */}
-                        {solved && question.image && (
+                        {/* Bild oder Video als Hintergrund */}
+                        <div className="absolute inset-0 w-full h-full overflow-hidden rounded-xl z-0">
                           <img
-                            src={`/images/${question.image}`}
-                            alt="Badge"
-                            className="absolute inset-0 w-full h-full object-cover rounded-xl z-0"
+                            src={`/images/${question.id}.png`}
+                            alt="Frage Vorschau"
+                            className="w-full h-full object-cover"
                             style={{ objectPosition: 'center' }}
                           />
+                        </div>
+                        
+                        {/* Overlay für nicht gelöste Fragen - stärker undurchsichtig */}
+                        {!solved && (
+                          <div className="absolute inset-0 bg-black/70 backdrop-blur-md rounded-xl z-5" />
                         )}
+                        
+                        {/* Overlay für gelöste Fragen - leicht transparent */}
+                        {solved && (
+                          <div className="absolute inset-0 bg-black/30 rounded-xl z-5" />
+                        )}
+                        
                         {/* Overlay für ID und Icon */}
                         <div className="relative z-10 flex flex-col items-center justify-center w-full h-full">
                           <div className="text-2xl font-bold text-white mb-1 drop-shadow-lg">
@@ -333,27 +349,11 @@ export default function Home() {
                             <Lock className="w-6 h-6 text-orange-500" />
                           )}
                         </div>
-                        {/* Overlay für solved: halbtransparentes Layer für bessere Lesbarkeit */}
-                        {solved && (
-                          <div className="absolute inset-0 bg-black/30 rounded-xl z-5" />
-                        )}
                       </motion.button>
                     )
                   })}
                 </div>
                 
-                {/* Abschluss-Button, wenn alle Fragen gelöst sind - jetzt zwischen Fragen und Codes */}
-                {solutionCodesDigital.filter(Boolean).length === questions.length && !lnhuntCompleted && (
-                  <div className="mb-8 flex flex-col items-center">
-                    <button
-                      onClick={() => setShowFinalModal(true)}
-                      className="bg-orange-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-orange-700 transition text-lg"
-                    >
-                      LNHunt abschliessen & Sats geschenkt bekommen!
-                    </button>
-                  </div>
-                )}
-
                 {/* Fortschrittsanzeige und Lösungswort nur anzeigen, wenn mindestens eine Frage beantwortet wurde */}
                 {solutionCodesDigital.some(Boolean) && (
                   <div className="mb-6">
@@ -363,6 +363,41 @@ export default function Home() {
                       manualPhrase="Fix the money fix the world"
                       codesPhysical={questions.map(q => q.code_physical)}
                     />
+                    
+                    {/* Sats claimen Button - wird immer angezeigt, aber in unterschiedlichen Zuständen */}
+                    <div className="mt-8 flex justify-center">
+                      <div className={`relative ${solutionCodesDigital.filter(Boolean).length === questions.length ? '' : 'pointer-events-none'}`}>
+                        {/* Fortschrittsanzeige über dem Button */}
+                        <div className="absolute -top-6 left-0 right-0 text-center text-sm text-orange-300">
+                          {solutionCodesDigital.filter(Boolean).length < questions.length ? 
+                            `${solutionCodesDigital.filter(Boolean).length}/${questions.length} Fragen gelöst` :
+                            '🎉 Alle Fragen gelöst!'
+                          }
+                        </div>
+                        
+                        {/* Button mit bedingtem Glasmorphismus-Effekt */}
+                        <button
+                          onClick={() => solutionCodesDigital.filter(Boolean).length === questions.length && setShowFinalModal(true)}
+                          className={`
+                            bg-gradient-to-r from-orange-500 to-amber-500 text-white 
+                            px-8 py-3 rounded-xl font-bold shadow-lg transition-all duration-500
+                            ${solutionCodesDigital.filter(Boolean).length === questions.length ? 
+                              'hover:scale-105 active:scale-95' : 
+                              'opacity-60'
+                            }
+                          `}
+                        >
+                          LNHunt abschliessen
+                        </button>
+                        
+                        {/* Glasmorphismus-Overlay bei nicht vollständig gelösten Fragen */}
+                        {solutionCodesDigital.filter(Boolean).length !== questions.length && (
+                          <div className="absolute inset-0 backdrop-blur-md bg-black/30 rounded-xl z-10 flex items-center justify-center">
+                            <Lock className="w-6 h-6 text-white/70" />
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 )}
 
@@ -422,17 +457,21 @@ export default function Home() {
                     <span className="text-green-400 font-medium">Diese Frage hast du bereits richtig beantwortet</span>
                   </div>
                   
-                  {/* Bild über der Frage */}
-                  {currentQuestion.image && (
-                    <div className="flex justify-center mb-4">
-                      <img
-                        src={`/images/${currentQuestion.image}`}
-                        alt="Fragenbild"
-                        className="max-h-40 md:max-h-48 lg:max-h-64 xl:max-h-72 w-auto rounded-xl border border-white/20 shadow transform scale-110 md:scale-100 md:w-auto"
+                  {/* Video für die Frage - im solved Zustand */}
+                  {currentQuestion.id && (
+                    <div className="w-full mb-4">
+                      <video
+                        src={`/images/${currentQuestion.id}.mp4`}
+                        className="w-full rounded-xl border border-white/20 shadow"
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        preload="auto"
+                        poster={`/images/${currentQuestion.id}.png`}
                         style={{ 
-                          background: '#fff', 
-                          maxWidth: 'min(100%, 560px)',
-                          objectFit: 'contain'
+                          maxWidth: '100%',
+                          background: '#000'
                         }}
                       />
                     </div>
@@ -445,7 +484,7 @@ export default function Home() {
                     {currentQuestion.options && currentQuestion.options.map((option, idx) => (
                       <div
                         key={idx}
-                        className={`w-full py-2 px-4 rounded-lg text-white ${
+                        className={`w-full py-2 px-4 rounded-xl text-white ${
                           idx === currentQuestion.correct_index 
                             ? 'bg-green-500/80 border border-green-500' 
                             : 'bg-white/10 opacity-50'
@@ -457,9 +496,9 @@ export default function Home() {
                   </div>
                   
                   {/* Digitaler Code Anzeige */}
-                  <div className="mt-6 p-3 bg-yellow-500/20 border border-yellow-500/30 rounded-xl">
-                    <p className="text-sm text-yellow-300 mb-1">Dein gesammelter Code:</p>
-                    <p className="text-lg font-mono text-yellow-400 font-bold text-center">
+                  <div className="mt-6 p-3 bg-yellow-500/20 border border-yellow-500/30 rounded-xl flex flex-col items-center justify-center">
+                    <p className="text-sm text-yellow-300 mb-2 text-center">Dein gesammelter Code:</p>
+                    <p className="text-lg font-mono text-yellow-400 font-bold text-center px-4 py-2 bg-yellow-500/10 rounded-xl">
                       {solutionCodesDigital[questions.indexOf(currentQuestion)]}
                     </p>
                   </div>
@@ -491,28 +530,33 @@ export default function Home() {
                 className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-6 shadow-xl"
               >
                 <div className="mb-4">
-                  {/* Bild über der Frage */}
-                  {currentQuestion.image && (
-                    <div className="flex justify-center mb-4">
-                      <img
-                        src={`/images/${currentQuestion.image}`}
-                        alt="Fragenbild"
-                        className="max-h-40 md:max-h-48 lg:max-h-64 xl:max-h-72 w-auto rounded-xl border border-white/20 shadow transform scale-110 md:scale-100 md:w-auto"
+                  {/* Video für die Frage - im answer Zustand */}
+                  {currentQuestion.id && (
+                    <div className="w-full mb-4">
+                      <video
+                        src={`/images/${currentQuestion.id}.mp4`}
+                        className="w-full rounded-xl border border-white/20 shadow"
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        preload="auto"
+                        poster={`/images/${currentQuestion.id}.png`}
                         style={{ 
-                          background: '#fff', 
-                          maxWidth: 'min(100%, 560px)',
-                          objectFit: 'contain'
+                          maxWidth: '100%',
+                          background: '#000'
                         }}
                       />
                     </div>
                   )}
+                  
                   <h2 className="text-xl font-bold text-white mb-2">{currentQuestion.question}</h2>
                   <div className="space-y-2">
                     {currentQuestion.options && currentQuestion.options.map((option, idx) => (
                       <motion.button
                         key={idx}
                         onClick={() => handleAnswerClick(idx)}
-                        className={`w-full py-2 px-4 rounded-lg text-white transition font-medium
+                        className={`w-full py-2 px-4 rounded-xl text-white transition font-medium
                           ${selectedAnswer === null ? 'bg-white/10 hover:bg-orange-500/80' :
                             idx === currentQuestion.correct_index && answerFeedback === 'correct' ? 'bg-green-500/80' :
                             selectedAnswer === idx && answerFeedback === 'wrong' ? 'bg-red-500/80' :
@@ -595,7 +639,7 @@ export default function Home() {
                 setShowDebugPanel(false);
               }
             }}
-            className="bg-black/70 text-orange-400 p-2 rounded-full shadow-lg hover:bg-orange-500/80 hover:text-white transition flex items-center gap-2"
+            className="bg-black/70 text-orange-400 p-2 rounded-xl shadow-lg hover:bg-orange-500/80 hover:text-white transition flex items-center gap-2"
             aria-label="Anleitung anzeigen"
           >
             <BookOpen className="w-5 h-5" />
@@ -611,7 +655,7 @@ export default function Home() {
                 setShowDebugPanel(false);
               }
             }}
-            className="bg-black/70 text-blue-400 p-2 rounded-full shadow-lg hover:bg-orange-500/80 hover:text-white transition flex items-center gap-2"
+            className="bg-black/70 text-blue-400 p-2 rounded-xl shadow-lg hover:bg-orange-500/80 hover:text-white transition flex items-center gap-2"
             aria-label="Info anzeigen"
           >
             <Info className="w-5 h-5" />
@@ -627,7 +671,7 @@ export default function Home() {
                 setShowInfoPanel(false);
               }
             }}
-            className="bg-black/70 text-green-400 p-2 rounded-full shadow-lg hover:bg-orange-500/80 hover:text-white transition flex items-center gap-2"
+            className="bg-black/70 text-green-400 p-2 rounded-xl shadow-lg hover:bg-orange-500/80 hover:text-white transition flex items-center gap-2"
             aria-label="Debug-Log anzeigen"
           >
             <Wrench className="w-5 h-5" />
@@ -677,17 +721,6 @@ export default function Home() {
                 className="bg-red-700/80 hover:bg-red-800 text-white px-4 py-2 rounded shadow text-xs font-bold"
               >
                 Cache leeren
-              </button>
-              
-              <button
-                onClick={() => {
-                  localStorage.removeItem('lnhunt_completed');
-                  setLnhuntCompleted(false);
-                  devLog('LNHunt-Abschluss-Status zurückgesetzt');
-                }}
-                className="bg-yellow-700/80 hover:bg-yellow-800 text-white px-4 py-2 rounded shadow text-xs font-bold"
-              >
-                Abschluss zurücksetzen
               </button>
             </div>
           </div>
@@ -743,15 +776,16 @@ export default function Home() {
 
         {/* Anleitung Panel */}
         {showGuidePanel && (
-          <div className="mt-8 p-4 bg-black/80 text-orange-200 text-sm rounded-xl shadow-xl max-w-2xl mx-auto text-center">
+          <div className="mt-8 p-4 bg-black/80 text-white text-sm rounded-xl shadow-xl max-w-2xl mx-auto text-center">
             <h3 className="text-lg font-bold mb-2 text-orange-400">Kurzanleitung</h3>
             <ol className="list-decimal list-inside space-y-2 text-left mx-auto max-w-md">
-              <li>Finde den <b>physischen Code</b> in der realen Welt (z.B. QR-Code, Sticker, Hinweis).</li>
-              <li>Gib den physischen Code ein, bezahle per Lightning und warte einen Moment, bis die Zahlung bestätigt wurde. Danach kannst du die Frage beantworten. Falls die Antwort falsch ist, musst du erneut bezahlen.</li>
-              <li>Nach jeder richtigen Antwort erhältst du einen <b>digitalen Code</b> (Lösungswort). Sammle alle digitalen Codes und schließe LNHunt ab, um deine Sats-Belohnung zu erhalten!</li>
+              <li>Finde den <span className="font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-amber-500">physischen Code</span> in der realen Welt (z.B. QR-Code, Sticker, Hinweis).</li>
+              <li>Gib den physischen Code ein, bezahle per Lightning und warte einen Moment, bis die Zahlung bestätigt wurde.</li>
+              <li>Beantworte die Frage richtig und sammle den <span className="font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-amber-500">digitalen Code</span>. Bei falscher Antwort musst du erneut bezahlen.</li>
+              <li>Nach dem Lösen aller Fragen kannst du über den "LNHunt abschliessen" Button deine <b>Sats-Belohnung</b> abholen!</li>
             </ol>
-            <p className="mt-4 text-orange-300 text-sm">
-              💡 <b>Tipp:</b> Nach dem Lösen aller Fragen erscheint oben ein Button "LNHunt abschliessen & Sats geschenkt bekommen!". Scanne den QR-Code und gib deinen Namen im Kommentar-Feld der Wallet ein. Nach dem Schliessen des Fensters verschwindet der Button.
+            <p className="mt-4 text-white text-sm">
+              💡 <b>Tipp:</b> Du kannst diese Anleitung jederzeit über den Button unten wieder öffnen.
             </p>
           </div>
         )}
@@ -811,9 +845,6 @@ export default function Home() {
                 <button
                   onClick={() => {
                     setShowFinalModal(false);
-                    // Speichere im localStorage, dass der Benutzer abgeschlossen hat
-                    localStorage.setItem('lnhunt_completed', 'true');
-                    setLnhuntCompleted(true);
                   }}
                   className="mt-4 px-6 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white font-medium"
                 >

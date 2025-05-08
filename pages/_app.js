@@ -5,18 +5,15 @@ import { useEffect } from 'react';
 import ErrorBoundary from '../components/error-boundary';
 
 export default function MyApp({ Component, pageProps }) {
-  // Service Worker registrieren für PWA-Funktionalität
+  // Service Worker deaktivieren
   useEffect(() => {
-    if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
-      window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/service-worker.js').then(
-          function(registration) {
-            console.log('Service Worker erfolgreich registriert mit Scope: ', registration.scope);
-          },
-          function(err) {
-            console.log('Service Worker Registrierung fehlgeschlagen: ', err);
-          }
-        );
+    // Service Worker komplett deaktivieren
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        for(let registration of registrations) {
+          registration.unregister();
+          console.log('Service Worker deregistriert');
+        }
       });
     }
   }, []);

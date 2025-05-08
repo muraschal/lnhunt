@@ -17,11 +17,11 @@
     "id": "q2",
     "question": "Wie nennt man den Effekt, bei dem Erstempfänger von neu geschaffenem Geld Vorteile gegenüber späteren Empfängern haben?",
     "options": [
-      "Geschwindigkeitsverzerrung",
       "Kantillon-Effekt",
+      "Geschwindigkeitsverzerrung",
       "Seigniorage-Verschiebung"
     ],
-    "correct_index": 1,
+    "correct_index": 0,
     "code_digital": "the",
     "code_physical": "internet",
     "hint": "Dieser Effekt wurde erstmals im 18. Jh. von einem französischen Ökonomen beschrieben.",
@@ -32,10 +32,10 @@
     "question": "Welcher Begriff beschreibt das ökonomische Konzept des Tauschs zwischen heutigem und zukünftigem Konsum?",
     "options": [
       "Abgezinsbarer Nutzen",
-      "Zeitpräferenz",
-      "Grenzneigung zum Konsum"
+      "Grenzneigung zum Konsum",
+      "Zeitpräferenz"
     ],
-    "correct_index": 1,
+    "correct_index": 2,
     "code_digital": "money",
     "code_physical": "money",
     "hint": "HODL ist die radikalste Form davon.",
@@ -60,10 +60,10 @@
     "question": "Was geschah 1971 unter Präsident Nixon und gilt als entscheidender Bruch im Währungssystem?",
     "options": [
       "Einführung flexibler Wechselkurse",
-      "Aufhebung der Goldbindung des US-Dollars",
-      "Gründung der US-Notenbank"
+      "Gründung der US-Notenbank",
+      "Aufhebung der Goldbindung des US-Dollars"
     ],
-    "correct_index": 1,
+    "correct_index": 2,
     "code_digital": "the",
     "code_physical": "for",
     "hint": "Danach war der Dollar nicht mehr „as good as gold.",
@@ -73,11 +73,11 @@
     "id": "q6",
     "question": "Welche Protokollerweiterung machte das Lightning-Netzwerk erst möglich?",
     "options": [
-      "Segwit",
       "Taproot",
+      "Segwit",
       "Ordinals"
     ],
-    "correct_index": 0,
+    "correct_index": 1,
     "code_digital": "world",
     "code_physical": "all",
     "hint": "Ohne Fix für Transaction Malleability wäre Lightning unsicher.",

@@ -10,11 +10,15 @@ const walletId = process.env.LNBITS_WALLET_ID;
  * @param {any} data - Optionale Daten für das Logging
  */
 const devLog = (message, data) => {
+  // Im Entwicklungsmodus fast komplett deaktiviert für bessere Übersichtlichkeit
   if (process.env.NODE_ENV === 'development') {
-    if (data !== undefined) {
-      console.log(message, data);
-    } else {
-      console.log(message);
+    // 99% aller Logs unterdrücken
+    if (Math.random() > 0.99) {
+      if (data !== undefined) {
+        console.log(`[API] ${message}`, data);
+      } else {
+        console.log(`[API] ${message}`);
+      }
     }
   }
 };
@@ -31,6 +35,12 @@ const rateLimits = {
 // Validiert den Hash-Parameter
 function isValidPaymentHash(hash) {
   // Payment Hashes sollten 64 Zeichen lang sein und nur Hex-Zeichen enthalten
+  // Im Entwicklungsmodus: Akzeptiere auch den Mock-Hash
+  if (process.env.NODE_ENV === 'development' && 
+      hash === "7890abcdef1234567890abcdef1234567890abcdef1234567890abcdef123456") {
+    return true;
+  }
+  
   return typeof hash === 'string' && 
          /^[0-9a-fA-F]{64}$/.test(hash);
 }
@@ -49,6 +59,24 @@ export default async function handler(req, res) {
   // Validiere den payment hash gegen Injection-Angriffe
   if (!isValidPaymentHash(paymentHash)) {
     return res.status(400).json({ error: 'Ungültiger Payment Hash Format' });
+  }
+
+  // Im Entwicklungsmodus: Simuliere immer bezahlte Invoices
+  // Dieser Ansatz ermöglicht ein reibungsloses Erlebnis im Entwicklungsmodus ohne echte API-Aufrufe
+  if (process.env.NODE_ENV === 'development') {
+    // Immer direkt mit erfolgreicher Zahlung antworten
+    return res.status(200).json({ 
+      paid: true,
+      details: {
+        checking_id: paymentHash,
+        amount: 10,
+        fee: 0,
+        memo: "LNHunt - Dev Mode",
+        time: Math.floor(Date.now() / 1000),
+        bolt11: "lnbcrt10n...",
+      },
+      _dev_note: 'Simulierte Zahlung im Entwicklungsmodus'
+    });
   }
 
   // Rate Limiting überprüfen - sowohl pro IP als auch pro PaymentHash

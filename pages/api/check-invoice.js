@@ -24,8 +24,13 @@ export default async function handler(req, res) {
       headers: {
         'X-Api-Key': apiKey,
         'X-Wallet-Id': walletId
-      },
+      }
     });
+
+    if (!response.ok) {
+      return res.status(500).json({ error: 'Fehler beim Abruf des Invoice-Status', details: 'Response not ok' });
+    }
+
     const data = await response.json();
     console.log('Invoice status:', data);
     res.status(200).json({ paid: data.paid });
