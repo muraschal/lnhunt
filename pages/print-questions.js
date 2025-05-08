@@ -1,18 +1,9 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Head from 'next/head';
-import dynamic from 'next/dynamic';
 import questions from '../questions.json';
 
-// Umschließe den ganzen Code in einer clientseitigen Komponente
-const PDFGenerator = dynamic(() => import('../components/PDFGenerator'), { 
-  ssr: false,
-  loading: () => <p className="text-center p-4">PDF-Komponenten werden geladen...</p>
-});
-
-// Komponentenfunktion für eine einzelne Frage
+// QuestionCard Komponente für einzelne Fragen
 const QuestionCard = ({ question }) => {
-  const [imageLoaded, setImageLoaded] = useState(false);
-  
   return (
     <div 
       id={`question-${question.id}`}
@@ -58,7 +49,6 @@ const QuestionCard = ({ question }) => {
                 borderRadius: '0.25rem'
               }}
               crossOrigin="anonymous"
-              onLoad={() => setImageLoaded(true)}
             />
           </div>
         </div>
@@ -81,24 +71,13 @@ const QuestionCard = ({ question }) => {
   );
 };
 
-// Hauptkomponente mit Fallback für SSR
-const PrintQuestions = () => {
+// Hauptkomponente für die Druckseite
+export default function PrintQuestions() {
   const [isClient, setIsClient] = useState(false);
   
   useEffect(() => {
     setIsClient(true);
   }, []);
-  
-  if (!isClient) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center p-8">
-          <h1 className="text-2xl font-bold mb-4">Lade Druckansicht...</h1>
-          <p>Diese Seite wird clientseitig gerendert.</p>
-        </div>
-      </div>
-    );
-  }
   
   return (
     <div className="bg-white text-black min-h-screen p-8">
@@ -129,9 +108,35 @@ const PrintQuestions = () => {
         `}</style>
       </Head>
       
-      <PDFGenerator questions={questions} />
+      <div className="max-w-4xl mx-auto">
+        <div className="flex justify-between items-center mb-6 no-print">
+          <h1 className="text-3xl font-bold">LNHunt - Fragen zum Drucken</h1>
+          <div className="flex gap-3">
+            <button 
+              onClick={() => window.print()} 
+              className="px-6 py-3 bg-blue-500 text-white rounded-xl font-bold shadow-lg hover:bg-blue-600"
+            >
+              Drucken
+            </button>
+          </div>
+        </div>
+        
+        <div className="mb-8">
+          {questions.map((question) => (
+            <QuestionCard key={question.id} question={question} />
+          ))}
+        </div>
+        
+        <div className="my-8 p-4 bg-gray-100 rounded-lg no-print">
+          <h3 className="font-bold mb-2">Anleitung zum Drucken:</h3>
+          <ol className="list-decimal list-inside">
+            <li>Klicke auf "Drucken" oder nutze die Browser-Druckfunktion (Strg+P / Cmd+P)</li>
+            <li>Jede Frage wird auf einer eigenen Seite dargestellt</li>
+            <li>Drucke die Seiten mit den Druckeinstellungen deiner Wahl</li>
+            <li>Für optimale Ergebnisse: DIN A4, Querformat, Farbdruck</li>
+          </ol>
+        </div>
+      </div>
     </div>
   );
-};
-
-export default PrintQuestions; 
+} 
