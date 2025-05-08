@@ -17,38 +17,8 @@ const QuestionCard = ({ question }) => {
       }}
     >
       <div>
-        {/* Header mit Logo */}
-        <div className="flex flex-col items-center mb-6">
-          {/* Verbesserte Logo-Darstellung */}
-          <div className="flex items-center gap-4 mb-4">
-            {/* Vereinfachtes Logo für bessere Druckbarkeit */}
-            <div style={{
-              width: '80px',
-              height: '80px',
-              backgroundColor: '#F97316',
-              borderRadius: '12px',
-              position: 'relative',
-              boxShadow: '0 4px 8px rgba(0,0,0,0.2)'
-            }}>
-              {/* Einfaches, super-dickes Lightning-Symbol */}
-              <div style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: '60%',
-                height: '60%',
-                backgroundColor: 'white',
-                clipPath: 'polygon(45% 0%, 10% 50%, 40% 50%, 20% 100%, 85% 50%, 55% 50%)',
-              }} />
-            </div>
-            
-            {/* LNHunt Schriftzug mit solidem Orange */}
-            <h1 className="text-5xl font-bold" style={{ color: '#F97316' }}>
-              LNHunt
-            </h1>
-          </div>
-          
+        {/* Header mit Muraschal-Schriftzug */}
+        <div className="text-center mb-6">
           {/* "by Muraschal" in Schwarz für den Druck */}
           <div 
             style={{ 
@@ -57,9 +27,7 @@ const QuestionCard = ({ question }) => {
               fontWeight: 400,
               letterSpacing: "0.5px",
               fontSize: "1.75rem",
-              transform: "rotate(-3deg)",
               color: "#000000",
-              marginTop: "-5px",
               marginBottom: "10px"
             }}
           >
@@ -159,14 +127,6 @@ export default function PrintQuestions() {
             @page {
               size: A4;
               margin: 0.5cm;
-            }
-            
-            /* Zusätzliche Print-Optimierungen */
-            .print-force-color {
-              -webkit-print-color-adjust: exact !important;
-              print-color-adjust: exact !important;
-              color-adjust: exact !important;
-              background-color: #F97316 !important;
             }
             
             /* Stellen sicher, dass Hintergrundfarben gedruckt werden */
