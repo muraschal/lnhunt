@@ -1,164 +1,164 @@
-# ⚡ lnhunt
+# ⚡ LNHunt
 
-**An Interactive Bitcoin Lightning Experience for Education, Events, and Communities**
-
----
-
-## ✨ Overview
-
-**lnhunt** is a gamified learning app built on the Vercel Fullstack (Next.js + Serverless). It enables users to explore Bitcoin and Lightning through a location-based or digital scavenger hunt. Each quiz station is unlocked via a Lightning payment using LNURL-Pay.
-
-Correct answers reveal keywords. When combined, these form a predefined sentence or phrase – often drawn from Bitcoin history, but fully customizable.
+**Eine interaktive Bitcoin Lightning-Erfahrung für Bildung, Events und Communities**
 
 ---
 
-## 🎯 Learning Goals
+## ✨ Überblick
 
-- Real-world interaction with the Lightning Network (QR codes, LNURL, fees, wallets)
-- Reinforcement of key concepts (e.g. time preference, money history, protocol design)
-- Physical activation and team collaboration
-- Gamified knowledge transfer with emotional anchoring
-- **Encourages exploration and real-world interaction by requiring players to find physical codes at physical locations.**
+**LNHunt** ist eine spielifizierte Lern-App, aufgebaut auf dem Vercel Fullstack (Next.js + Serverless). Sie ermöglicht Nutzern, Bitcoin und Lightning durch eine standortbasierte oder digitale Schnitzeljagd zu erkunden. Jede Quiz-Station wird durch eine Lightning-Zahlung mittels LNURL-Pay freigeschaltet.
+
+Richtige Antworten enthüllen Schlüsselwörter. Zusammengesetzt bilden diese einen vordefinierten Satz oder eine Phrase – oft aus der Bitcoin-Geschichte entnommen, aber vollständig anpassbar.
 
 ---
 
-## 🧠 Game Mechanics
+## 🎯 Lernziele
 
-- Multiple quiz stations, each with a unique question
-- Two-step access process:
-  1. Enter the correct physical code (found in the real world)
-  2. Complete the Lightning payment to unlock the question
-- **Physical codes (code_physical) are distributed in the physical world (e.g. as QR codes, stickers, or clues at specific locations). Players must find them to unlock each question.**
-- **After answering correctly, you receive a digital code (code_digital) as a solution word for the final phrase.**
-- Configurable access modes:
-  - *Low-fee*: Multiple Choice with feedback
-  - *Premium*: Instant access to the correct answer
-- Correct answers unlock one word (or element) each
-- **Solved questions display a full-tile image badge and a checkmark.**
-- **Progress indicator and secret phrase are only shown if at least one question is solved.**
-- Goal: Collect all elements and reconstruct a final message
+- Praktische Interaktion mit dem Lightning-Netzwerk (QR-Codes, LNURL, Gebühren, Wallets)
+- Verstärkung wichtiger Konzepte (z.B. Zeitpräferenz, Geldgeschichte, Protokoll-Design)
+- Physische Aktivierung und Teamarbeit
+- Spielerischer Wissenstransfer mit emotionaler Verankerung
+- **Fördert Erkundung und reale Interaktion, indem Spieler physische Codes an realen Orten finden müssen.**
 
 ---
 
-## 🛠️ Tech Stack
+## 🧠 Spielmechanik
 
-| Layer        | Tech                       | Purpose                            |
-|-------------|----------------------------|------------------------------------|
-| Framework   | Next.js (Vercel)           | SSR, routing, API endpoints        |
-| Styling     | Tailwind CSS               | Responsive mobile-first UI         |
-| UI          | Radix UI                   | Accessible components              |
-| Animations  | Framer Motion              | Smooth transitions & effects       |
-| Hosting     | Vercel                     | Scalable deployment                |
-| Payments    | LNbits + LNURL-Pay         | Lightning-native payments          |
-| API         | Next.js API Routes         | Handles LNbits polling & logic     |
-| Data        | Local/dynamic JSON         | Quiz content & logic               |
-| State Mgmt  | LocalStorage               | Progress tracking per device       |
-| **Audio**   | MP3, HTML5 Audio           | **Success/fail sounds, Easteregg** |
+- Mehrere Quiz-Stationen, jede mit einer einzigartigen Frage
+- Zweistufiger Zugriffsprozess:
+  1. Eingabe des korrekten physischen Codes (gefunden in der realen Welt)
+  2. Abschluss der Lightning-Zahlung zur Freischaltung der Frage
+- **Physische Codes (code_physical) sind in der realen Welt verteilt (z.B. als QR-Codes, Aufkleber oder Hinweise an bestimmten Orten). Spieler müssen diese finden, um jede Frage freizuschalten.**
+- **Nach richtiger Beantwortung erhält man einen digitalen Code (code_digital) als Lösungswort für den finalen Satz.**
+- Konfigurierbare Zugriffsmodi:
+  - *Niedrige Gebühr*: Multiple-Choice mit Feedback
+  - *Premium*: Sofortiger Zugriff auf die richtige Antwort
+- Korrekte Antworten schalten jeweils ein Wort (oder Element) frei
+- **Gelöste Fragen zeigen ein Vollbild-Badge und ein Häkchen an.**
+- **Fortschrittsanzeige und Geheimphrase werden nur angezeigt, wenn mindestens eine Frage gelöst wurde.**
+- Ziel: Alle Elemente sammeln und eine finale Nachricht rekonstruieren
 
 ---
 
-## ⚙️ How It Works (Simplified)
+## 🛠️ Technologie-Stack
+
+| Ebene       | Technologie               | Zweck                                |
+|-------------|---------------------------|------------------------------------- |
+| Framework   | Next.js (Vercel)          | SSR, Routing, API-Endpunkte          |
+| Styling     | Tailwind CSS              | Responsive Mobile-First UI           |
+| UI          | Radix UI                  | Barrierefreie Komponenten            |
+| Animationen | Framer Motion             | Flüssige Übergänge & Effekte         |
+| Hosting     | Vercel                    | Skalierbare Bereitstellung           |
+| Zahlungen   | LNbits + LNURL-Pay        | Lightning-native Zahlungen           |
+| API         | Next.js API-Routen        | Handhabt LNbits-Polling & Logik      |
+| Daten       | Lokales/dynamisches JSON  | Quiz-Inhalte & Logik                 |
+| State-Mgmt  | LocalStorage              | Fortschrittsverfolgung pro Gerät     |
+| **Audio**   | MP3, HTML5 Audio          | **Erfolgs-/Fehlersounds, Easteregg** |
+
+---
+
+## ⚙️ Funktionsweise (Vereinfacht)
 
 ```mermaid
 sequenceDiagram
-    participant U as User
+    participant U as Benutzer
     participant A as App
     participant L as LNbits
     participant W as Wallet
 
-    U->>A: Opens station (e.g. /q1)
-    A->>U: Prompts for physical code
-    U->>A: Enters physical code
-    A->>U: Displays LNURL-Pay QR code (from config)
-    U->>W: Pays Lightning invoice via wallet
-    W->>L: Sends payment to LNbits
-    A-->>L: Polls LNbits if payment was received
-    L-->>A: Confirms payment
-    A->>U: Reveals the quiz question
+    U->>A: Öffnet Station (z.B. /q1)
+    A->>U: Fordert physischen Code an
+    U->>A: Gibt physischen Code ein
+    A->>U: Zeigt LNURL-Pay QR-Code (aus Konfiguration)
+    U->>W: Bezahlt Lightning-Rechnung via Wallet
+    W->>L: Sendet Zahlung an LNbits
+    A-->>L: Fragt bei LNbits ab, ob Zahlung eingegangen ist
+    L-->>A: Bestätigt Zahlung
+    A->>U: Enthüllt die Quiz-Frage
 ```
 
-Each question is locked behind both a physical code and a Lightning payment. Once both are completed, the question is revealed. Answering it correctly unlocks a "digital code" for the final message.
-**Solved questions display their image as a badge on the start screen.**
+Jede Frage ist sowohl durch einen physischen Code als auch eine Lightning-Zahlung gesichert. Sobald beide abgeschlossen sind, wird die Frage enthüllt. Die korrekte Beantwortung schaltet einen "digitalen Code" für die finale Nachricht frei.
+**Gelöste Fragen zeigen ihr Bild als Badge auf dem Startbildschirm an.**
 
 ---
 
-## 🧩 Sample Knowledge Areas
+## 🧩 Beispiele für Wissensbereiche
 
-- Bitcoin fundamentals and economic history  
-- Cantillon Effect  
-- Time Preference  
-- Protocol concepts (e.g. Static Channel Backups, Submarine Swaps)  
-- Key historic events and personalities (e.g. 1971 Nixon shock, Silk Road)
+- Bitcoin-Grundlagen und Wirtschaftsgeschichte
+- Cantillon-Effekt
+- Zeitpräferenz
+- Protokoll-Konzepte (z.B. Static Channel Backups, Submarine Swaps)
+- Wichtige historische Ereignisse und Persönlichkeiten (z.B. Nixon-Schock 1971, Silk Road)
 
-All questions and answers are fully customizable via JSON.
-**Each question can have an image ("image": "q1.png") that is shown in the question screen and as a badge.**
-**Hints are only shown in the question screen (with toggle button), not on the start page.**
-
----
-
-## ✅ Benefits
-
-- Fully whitelabel and reusable  
-- Supports educational, team-building, and onboarding use cases  
-- Runs on Bitcoin-native infrastructure (LNURL, LNbits, non-custodial)  
-- Blends movement, collaboration, and learning  
-- Modern, accessible UI with smooth animations
-- Two-factor access (knowledge + payment) for enhanced engagement
-- **All static assets (images, audio) are versioned in the public folder.**
-- **Copyright notice in the footer with the current year.**
-- **Responsive, accessible UI.**
+Alle Fragen und Antworten sind vollständig über JSON anpassbar.
+**Jede Frage kann ein Bild haben ("image": "q1.png"), das im Fragebildschirm und als Badge angezeigt wird.**
+**Hinweise werden nur im Fragebildschirm angezeigt (mit Toggle-Button), nicht auf der Startseite.**
 
 ---
 
-## 🔧 LNbits Setup (Basic)
+## ✅ Vorteile
 
-To keep things simple, use [LNbits](https://legend.lnbits.com) as your Lightning backend:
+- Vollständig als White-Label nutzbar und wiederverwendbar
+- Unterstützt Bildungs-, Teambuilding- und Onboarding-Anwendungsfälle
+- Läuft auf Bitcoin-nativer Infrastruktur (LNURL, LNbits, nicht-kustodial)
+- Verbindet Bewegung, Zusammenarbeit und Lernen
+- Moderne, barrierefreie UI mit flüssigen Animationen
+- Zweifaktor-Zugang (Wissen + Zahlung) für erhöhtes Engagement
+- **Alle statischen Assets (Bilder, Audio) werden im public-Ordner versioniert.**
+- **Copyright-Hinweis im Footer mit dem aktuellen Jahr.**
+- **Responsive, barrierefreie UI.**
 
-1. **Create a Wallet** on LNbits (no node required)
-2. Enable the **LNURLp plugin** under Extensions
-3. For each question (`/q1`, `/q2`, etc.):
-   - Create one LNURL-Pay link via the plugin
-   - Use a fixed amount (e.g. 100 sats)
-   - Set `description` to the question ID (e.g. `"q1"`)
-4. Copy the **LNURL** and insert it into your `questions.json` config:
+---
+
+## 🔧 LNbits-Einrichtung (Grundlegend)
+
+Um es einfach zu halten, verwende [LNbits](https://legend.lnbits.com) als Lightning-Backend:
+
+1. **Erstelle eine Wallet** auf LNbits (kein Node erforderlich)
+2. Aktiviere das **LNURLp-Plugin** unter Erweiterungen
+3. Für jede Frage (`/q1`, `/q2`, usw.):
+   - Erstelle einen LNURL-Pay-Link über das Plugin
+   - Verwende einen festen Betrag (z.B. 100 Sats)
+   - Setze `description` auf die Fragen-ID (z.B. `"q1"`)
+4. Kopiere die **LNURL** und füge sie in deine `questions.json`-Konfiguration ein:
 
 ```json
 {
   "id": "q1",
-  "question": "What is the block subsidy after the next halving?",
+  "question": "Wie hoch ist der Block-Subsidy nach dem nächsten Halving?",
   "options": [
-    "1.25 BTC",
-    "1.5625 BTC",
-    "1.75 BTC"
+    "1,25 BTC",
+    "1,5625 BTC",
+    "1,75 BTC"
   ],
   "correct_index": 1,
   "code_digital": "fix",
   "code_physical": "magic",
-  "hint": "The block subsidy halves every 210,000 blocks.",
+  "hint": "Der Block-Subsidy halbiert sich alle 210.000 Blöcke.",
   "image": "q1.png"
 }
 ```
 
-5. The frontend displays this LNURL as a QR code.
-6. The backend polls LNbits to check if the payment has been received.
-7. Once confirmed, the question becomes visible to the user.
-**After all questions are solved, a prominent button 'Finish LNHunt & Sats geschenkt bekommen!' appears at the top.**
-**The final LNURL is shown as a QR code and direct link. The participant's name should be entered in the comment field of the wallet. After successful withdrawal, the success URL redirects to `/thnx`.**
+5. Das Frontend zeigt diese LNURL als QR-Code an.
+6. Das Backend fragt bei LNbits ab, ob die Zahlung eingegangen ist.
+7. Nach Bestätigung wird die Frage für den Benutzer sichtbar.
+**Nachdem alle Fragen gelöst wurden, erscheint oben ein prominenter Button 'LNHunt abschließen & Sats geschenkt bekommen!'.**
+**Die finale LNURL wird als QR-Code und direkter Link angezeigt. Der Name des Teilnehmers sollte im Kommentarfeld der Wallet eingetragen werden. Nach erfolgreicher Abhebung leitet die Erfolgs-URL zu `/thnx` weiter.**
 
-No dynamic invoice creation. No node. No complexity. Just working.
+Keine dynamische Rechnungserstellung. Kein Node. Keine Komplexität. Einfach funktionierend.
 
 ---
 
-## 📦 Optional Features
+## 📦 Optionale Funktionen
 
-- Admin dashboard for question control and payment logs  
-- Team-based scoring, timers, and leaderboards  
-- Badge system and proof-of-participation export (PDF/NFT)  
-- Adaptive question paths or branching logic  
-- **Audio feedback after each answer (success/fail).**
-- **Easter egg: In the info panel, the sounds can be played via buttons.**
-- **Debug panel and info panel can be toggled via button. Info panel contains technical details and Easter egg sound buttons.**
-- **After the withdrawal transaction via LNURL, users are redirected to a /thnx page ('Thank you for participating').**
+- Admin-Dashboard für Fragenkontrolle und Zahlungsprotokolle
+- Teambasierte Punktezählung, Timer und Bestenlisten
+- Badge-System und Export von Teilnahmenachweisen (PDF/NFT)
+- Adaptive Fragenpfade oder Verzweigungslogik
+- **Audio-Feedback nach jeder Antwort (Erfolg/Fehler).**
+- **Easteregg: Im Info-Panel können die Sounds über Buttons abgespielt werden.**
+- **Debug-Panel und Info-Panel können per Button umgeschaltet werden. Das Info-Panel enthält technische Details und Easteregg-Sound-Buttons.**
+- **Nach der Withdrawal-Transaktion via LNURL werden Benutzer zu einer /thnx-Seite ('Danke für die Teilnahme') weitergeleitet.**
 
 ## 🔄 Technische Details zur Zahlungsüberwachung
 
@@ -191,14 +191,14 @@ No dynamic invoice creation. No node. No complexity. Just working.
 
 ---
 
-## 🧪 Local Setup
+## 🧪 Lokale Einrichtung
 
 ```bash
 git clone https://github.com/muraschal/lnhunt.git
 cd lnhunt
 npm install
 cp .env.example .env.local
-# Add LNbits API Key and base URL
+# Füge LNbits API-Key und Basis-URL hinzu
 npm run dev
 ```
 
@@ -206,14 +206,14 @@ npm run dev
 
 ## 🚀 Deployment
 
-1. Push the project to GitHub  
-2. Connect it to [Vercel](https://vercel.com/)  
-3. Add environment variables (API keys, base URLs) in the Vercel dashboard:
-   - `LNBITS_API_URL`: Your LNbits instance API URL
-   - `LNBITS_API_KEY`: Your LNbits API key
-   - `LNBITS_WALLET_ID`: Your LNbits wallet ID
-   - `LNBITS_LNURL`: The LNURL-withdraw link for the final reward
-4. Deploy and start playing – no backend setup required
+1. Pushe das Projekt zu GitHub
+2. Verbinde es mit [Vercel](https://vercel.com/)
+3. Füge Umgebungsvariablen (API-Keys, Basis-URLs) im Vercel-Dashboard hinzu:
+   - `LNBITS_API_URL`: Die API-URL deiner LNbits-Instanz
+   - `LNBITS_API_KEY`: Dein LNbits API-Key
+   - `LNBITS_WALLET_ID`: Deine LNbits Wallet-ID
+   - `LNBITS_LNURL`: Der LNURL-Withdraw-Link für die finale Belohnung
+4. Deploye und starte das Spiel – keine Backend-Einrichtung erforderlich
 
 ---
 
@@ -246,104 +246,104 @@ git push -u origin main
 Die Anwendung besitzt einen eingebauten Entwicklungsmodus, der aktiviert wird, wenn keine LNbits-API-Schlüssel konfiguriert sind. In diesem Modus werden Lightning-Zahlungen simuliert, sodass keine echten Sats verwendet werden müssen.
 
 ### Sicherheitshinweise
-- Speichern Sie niemals sensitive Daten wie API-Schlüssel im Git-Repository
+- Speichere niemals sensitive Daten wie API-Schlüssel im Git-Repository
 - Die `.env.local` Datei ist in `.gitignore` eingetragen und sollte NIEMALS eingecheckt werden
 - Die Anwendung implementiert Rate-Limiting für API-Anfragen zur Verhinderung von Missbrauch
 
 ### Fehlerbehandlung
 Häufige Probleme:
-- **API-Fehler**: Überprüfen Sie die API-Schlüssel und URL in Ihren Umgebungsvariablen
-- **Zahlungsfehler**: Stellen Sie sicher, dass Ihre LNbits-Instanz korrekt konfiguriert ist
-- **Entwicklungsmodus**: Für Tests ohne echte Zahlungen können Sie die API-Schlüssel leer lassen
+- **API-Fehler**: Überprüfe die API-Schlüssel und URL in deinen Umgebungsvariablen
+- **Zahlungsfehler**: Stelle sicher, dass deine LNbits-Instanz korrekt konfiguriert ist
+- **Entwicklungsmodus**: Für Tests ohne echte Zahlungen kannst du die API-Schlüssel leer lassen
 
 ### Lizenz
 Dieses Projekt steht unter der MIT-Lizenz.
 
 ---
 
-## 👥 License & Contribution
+## 👥 Lizenz & Mitwirkung
 
-Open for customization, whitelabel deployments, and community use.  
-If you adapt or build on top of lnhunt, contributions and feedback are welcome!
+Offen für Anpassung, White-Label-Deployments und Community-Nutzung.
+Wenn du LNHunt anpasst oder darauf aufbaust, sind Beiträge und Feedback willkommen!
 
 ---
 
-## �� Updates & Features (Version 2.0)
+## 🚨 Updates & Funktionen (Version 2.0)
 
-- **Completely new UI:**
-  - Question tiles now show the respective image as a full badge after solving.
-  - Progress indicator and secret phrase are only shown if at least one question is solved.
-  - The hint 'Click on a question...' is only shown if there are still open questions.
-  - **New! Code-Box mit zentrierten Elementen und gold-stilisierten Titeln**
-  - **New! Optimierte Video-Größen für Desktop und Mobile mit 720px max-width**
-  - **New! QR-Code mit Glassmorphism-Effekt nach erfolgreicher Beanspruchung**
-  - **New! Verbesserte Darstellung der Codes in der Progress-Anzeige mit Lightning-Gold-Styling**
+- **Vollständig neue UI:**
+  - Fragen-Kacheln zeigen nun das jeweilige Bild als Vollbild-Badge nach dem Lösen.
+  - Fortschrittsanzeige und Geheimphrase werden nur angezeigt, wenn mindestens eine Frage gelöst wurde.
+  - Der Hinweis 'Klicke auf eine Frage...' wird nur angezeigt, wenn noch offene Fragen vorhanden sind.
+  - **Neu! Code-Box mit zentrierten Elementen und gold-stilisierten Titeln**
+  - **Neu! Optimierte Video-Größen für Desktop und Mobile mit 720px max-width**
+  - **Neu! QR-Code mit Glassmorphism-Effekt nach erfolgreicher Beanspruchung**
+  - **Neu! Verbesserte Darstellung der Codes in der Progress-Anzeige mit Lightning-Gold-Styling**
 
 - **Dev-Mode Integration:**
-  - **New! Interaktiver Dev-Mode Toggle mit Slider für einfaches Testen**
-  - **New! Automatische Aktivierung des Dev-Modes in Entwicklungs- und Preview-Umgebungen**
-  - **New! Persistenter Dev-Mode Status mit localStorage**
-  - **New! Audio-Feedback beim Umschalten des Dev-Modes**
-  - **New! Optische Unterscheidung des aktiven/inaktiven Dev-Modes**
+  - **Neu! Interaktiver Dev-Mode Toggle mit Slider für einfaches Testen**
+  - **Neu! Automatische Aktivierung des Dev-Modes in Entwicklungs- und Preview-Umgebungen**
+  - **Neu! Persistenter Dev-Mode Status mit localStorage**
+  - **Neu! Audio-Feedback beim Umschalten des Dev-Modes**
+  - **Neu! Optische Unterscheidung des aktiven/inaktiven Dev-Modes**
 
 - **Verbesserte Benutzerfreundlichkeit:**
-  - **New! Automatisches Ausblenden der Anleitung nach der ersten Interaktion**
-  - **New! Claim-Status-Tracking mit lokalem Speicher zur Vermeidung von Mehrfach-Claims**
-  - **New! LNHunt-Abschließen-Button ändert sich nach erfolgreicher Beanspruchung**
-  - **New! LNURL String und Kopierfunktion werden nach Beanspruchung deaktiviert**
+  - **Neu! Automatisches Ausblenden der Anleitung nach der ersten Interaktion**
+  - **Neu! Claim-Status-Tracking mit lokalem Speicher zur Vermeidung von Mehrfach-Claims**
+  - **Neu! LNHunt-Abschließen-Button ändert sich nach erfolgreicher Beanspruchung**
+  - **Neu! LNURL String und Kopierfunktion werden nach Beanspruchung deaktiviert**
 
 - **Fortgeschrittene Komponenten-Kommunikation:**
-  - **New! Globaler Zustand für den Dev-Mode mit reaktiven Komponenten**
-  - **New! Verbesserte Synchronisation zwischen Komponenten**
-  - **New! Reaktives Polling für Status-Updates alle 500ms**
+  - **Neu! Globaler Zustand für den Dev-Mode mit reaktiven Komponenten**
+  - **Neu! Verbesserte Synchronisation zwischen Komponenten**
+  - **Neu! Reaktives Polling für Status-Updates alle 500ms**
 
-- **Questions & Answers:**
-  - All questions and answers are managed via the `questions.json` file.
-  - Each question can have an `image` that is shown in the question screen and as a badge.
-  - Hints are only shown in the question screen (with toggle button), not on the start page.
+- **Fragen & Antworten:**
+  - Alle Fragen und Antworten werden über die `questions.json`-Datei verwaltet.
+  - Jede Frage kann ein `image` haben, das im Fragebildschirm und als Badge angezeigt wird.
+  - Hinweise werden nur im Fragebildschirm angezeigt (mit Toggle-Button), nicht auf der Startseite.
 
-- **Lightning Integration:**
-  - Dynamic invoice creation via LNbits API.
-  - After all questions are solved, a prominent button 'LNHunt abschließen & Sats geschenkt bekommen!' appears at the top.
-  - Integration of a fixed LNURL-withdraw link for the final reward (players receive sats as a reward for completion).
-  - The LNURL-withdraw link is configured via the `LNBITS_LNURL` environment variable.
-  - Note: The participant's name is entered in the comment field of the wallet.
+- **Lightning-Integration:**
+  - Dynamische Rechnungserstellung über LNbits API.
+  - Nachdem alle Fragen gelöst wurden, erscheint oben ein prominenter Button 'LNHunt abschließen & Sats geschenkt bekommen!'.
+  - Integration eines festen LNURL-Withdraw-Links für die finale Belohnung (Spieler erhalten Sats als Belohnung für den Abschluss).
+  - Der LNURL-Withdraw-Link wird über die Umgebungsvariable `LNBITS_LNURL` konfiguriert.
+  - Hinweis: Der Name des Teilnehmers sollte im Kommentarfeld der Wallet eingetragen werden.
 
-- **Audio Feedback:**
-  - Success and fail sounds after each answer (MP3, compatible with web/mobile/desktop).
-  - Easter egg: In the info panel, the sounds can be played via buttons.
+- **Audio-Feedback:**
+  - Erfolgs- und Fehlersounds nach jeder Antwort (MP3, kompatibel mit Web/Mobile/Desktop).
+  - Easteregg: Im Info-Panel können die Sounds über Buttons abgespielt werden.
 
-- **Completion & Thank You Page:**
-  - After the withdrawal transaction via LNURL, users are redirected to a /thnx page ('Thank you for participating').
+- **Abschluss & Dankeschön-Seite:**
+  - Nach der Withdrawal-Transaktion via LNURL werden Benutzer zu einer /thnx-Seite ('Danke für die Teilnahme') weitergeleitet.
 
 - **Debug & Info:**
-  - Debug panel and info panel can be toggled via button.
-  - Info panel contains technical details and Easter egg sound buttons.
+  - Debug-Panel und Info-Panel können per Button umgeschaltet werden.
+  - Das Info-Panel enthält technische Details und Easteregg-Sound-Buttons.
 
 - **Best Practices:**
-  - Copyright notice in the footer with the current year.
-  - Responsive, accessible UI.
-  - All static assets (images, audio) are versioned in the public folder.
-  - **New! Performance-Optimierungen für Videos und Animationen**
-  - **New! Verbesserte Fade-In/Fade-Out Übergänge zwischen Screens**
+  - Copyright-Hinweis im Footer mit dem aktuellen Jahr.
+  - Responsive, barrierefreie UI.
+  - Alle statischen Assets (Bilder, Audio) werden im public-Ordner versioniert.
+  - **Neu! Performance-Optimierungen für Videos und Animationen**
+  - **Neu! Verbesserte Fade-In/Fade-Out Übergänge zwischen Screens**
 
 ---
 
-### Example for the new questions.json
+### Beispiel für die neue questions.json
 
 ```json
 {
   "id": "q1",
-  "question": "What is the block subsidy after the next halving?",
+  "question": "Wie hoch ist der Block-Subsidy nach dem nächsten Halving?",
   "options": [
-    "1.25 BTC",
-    "1.5625 BTC",
-    "1.75 BTC"
+    "1,25 BTC",
+    "1,5625 BTC",
+    "1,75 BTC"
   ],
   "correct_index": 1,
   "code_digital": "fix",
   "code_physical": "magic",
-  "hint": "The block subsidy halves every 210,000 blocks.",
+  "hint": "Der Block-Subsidy halbiert sich alle 210.000 Blöcke.",
   "image": "q1.png"
 }
 ```
@@ -352,31 +352,31 @@ If you adapt or build on top of lnhunt, contributions and feedback are welcome!
 
 ### Dev-Mode Toggle Funktion 
 
-- **New! Der Dev-Mode-Toggle erlaubt das Testen der Anwendung ohne echte Lightning-Zahlungen**
-- **New! Im aktiven Dev-Mode werden:**
+- **Neu! Der Dev-Mode-Toggle erlaubt das Testen der Anwendung ohne echte Lightning-Zahlungen**
+- **Neu! Im aktiven Dev-Mode werden:**
   - **Passwörter automatisch ausgefüllt**
   - **Mock-Rechnungen generiert** 
   - **Zahlungen automatisch simuliert**
-- **New! Der Dev-Mode ist über einen Slider-Toggle direkt in der UI zugänglich**
-- **New! Der Toggle-Zustand wird persistent gespeichert und zwischen Sitzungen beibehalten**
+- **Neu! Der Dev-Mode ist über einen Slider-Toggle direkt in der UI zugänglich**
+- **Neu! Der Toggle-Zustand wird persistent gespeichert und zwischen Sitzungen beibehalten**
 
 ---
 
-### Notes on LNURL Withdrawal Reward
+### Hinweise zur LNURL-Withdrawal-Belohnung
 
-- The final LNURL-withdraw is shown as a QR code and direct link as soon as all questions are solved.
-- The LNURL is configured in the `LNBITS_LNURL` environment variable.
-- The participant's name should be entered in the comment field of the wallet.
-- Players receive sats as a reward for completing all questions.
-- After successful withdrawal, the success URL redirects to `/thnx`.
-- **New! Verbesserter QR-Code mit weißem Hintergrund für bessere Scanbarkeit**
-- **New! Deaktivierung von QR-Code und Copy-Funktion nach erfolgreicher Beanspruchung**
-- **New! Glassmorphism-Effekt über dem QR-Code nach erfolgreicher Beanspruchung**
+- Die finale LNURL-Withdraw wird als QR-Code und direkter Link angezeigt, sobald alle Fragen gelöst wurden.
+- Die LNURL wird in der Umgebungsvariable `LNBITS_LNURL` konfiguriert.
+- Der Name des Teilnehmers sollte im Kommentarfeld der Wallet eingetragen werden.
+- Spieler erhalten Sats als Belohnung für das Lösen aller Fragen.
+- Nach erfolgreicher Abhebung leitet die Erfolgs-URL zu `/thnx` weiter.
+- **Neu! Verbesserter QR-Code mit weißem Hintergrund für bessere Scanbarkeit**
+- **Neu! Deaktivierung von QR-Code und Copy-Funktion nach erfolgreicher Beanspruchung**
+- **Neu! Glassmorphism-Effekt über dem QR-Code nach erfolgreicher Beanspruchung**
 
 ---
 
-**Tip:**
-You can freely customize questions, images, and sounds – everything is controlled via JSON and the public folder!
+**Tipp:**
+Du kannst Fragen, Bilder und Sounds frei anpassen – alles wird über JSON und den public-Ordner gesteuert!
 
 ## CI/CD-Workflow
 
