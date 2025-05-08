@@ -36,10 +36,19 @@ function vibrate(type = 'normal') {
 }
 
 /**
+ * Prüft, ob der Dev-Modus aktiviert ist
+ * Berücksichtigt sowohl die Umgebungsvariable als auch den globalen State
+ */
+const isDevModeEnabled = () => {
+  return process.env.NODE_ENV === 'development' || 
+         (typeof window !== 'undefined' && window.DEV_MODE_ENABLED === true);
+};
+
+/**
  * Nur im Dev-Modus loggen (minimale Version)
  */
 const devLog = (message) => {
-  if (process.env.NODE_ENV === 'development') {
+  if (isDevModeEnabled()) {
     console.log(`[AccessModal] ${message}`);
   }
 };
@@ -53,13 +62,30 @@ export function AccessModal({
   const [input, setInput] = useState("")
   const [error, setError] = useState("")
   const [isShaking, setIsShaking] = useState(false)
-  const [devMode] = useState(process.env.NODE_ENV === 'development')
+  const [devMode, setDevMode] = useState(false)
   const autoFillTimerRef = useRef(null)
   const submitTimerRef = useRef(null)
 
   // Extrahiere die Nummer aus dem questionNumber (z.B. "q4" -> "4")
   const questionNum = questionNumber.replace('q', '')
   
+  // Überwache den globalen DEV_MODE_ENABLED Status
+  useEffect(() => {
+    // Initial-Check
+    setDevMode(isDevModeEnabled());
+    
+    // Event-Listener für Änderungen
+    const checkDevMode = () => {
+      setDevMode(isDevModeEnabled());
+    };
+    
+    // Prüfe alle 500ms den Dev-Mode Status
+    const intervalId = setInterval(checkDevMode, 500);
+    
+    // Cleanup
+    return () => clearInterval(intervalId);
+  }, []);
+
   /**
    * Bereinigt die Eingabe:
    * 1. Entfernt alle HTML/Script-Tags
@@ -81,12 +107,13 @@ export function AccessModal({
 
   // Auto-Ausfüllfunktion für den Entwicklungsmodus
   useEffect(() => {
+    // Säubere vorhandene Timer
+    if (autoFillTimerRef.current) clearTimeout(autoFillTimerRef.current);
+    if (submitTimerRef.current) clearTimeout(submitTimerRef.current);
+    
+    // Nur ausführen, wenn Dev-Mode aktiv ist
     if (devMode) {
       devLog(`Entwicklungsmodus: Auto-Ausfüllen für Frage ${questionNum} wird in 1.5 Sekunden starten.`);
-      
-      // Sicherstellen, dass eventuell vorhandene Timer gelöscht werden
-      if (autoFillTimerRef.current) clearTimeout(autoFillTimerRef.current);
-      if (submitTimerRef.current) clearTimeout(submitTimerRef.current);
       
       // Timer für Auto-Ausfüllen starten
       autoFillTimerRef.current = setTimeout(() => {
@@ -109,13 +136,13 @@ export function AccessModal({
           }
         }, 75); // 75ms pro Zeichen
       }, 1500); // 1,5 Sekunden Verzögerung vor Start
-      
-      // Aufräumen beim Unmounten
-      return () => {
-        if (autoFillTimerRef.current) clearTimeout(autoFillTimerRef.current);
-        if (submitTimerRef.current) clearTimeout(submitTimerRef.current);
-      };
     }
+    
+    // Aufräumen beim Unmounten oder wenn sich devMode ändert
+    return () => {
+      if (autoFillTimerRef.current) clearTimeout(autoFillTimerRef.current);
+      if (submitTimerRef.current) clearTimeout(submitTimerRef.current);
+    };
   }, [devMode, codePhysical, questionNum, onPasswordSubmit]);
 
   const handleSubmit = (e) => {

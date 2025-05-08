@@ -31,13 +31,22 @@ const getLNbitsConfig = () => {
 const { url: LNbits_API_URL, apiKey: LNbits_API_KEY, walletId: LNbits_WALLET_ID, isDev } = getLNbitsConfig();
 
 /**
+ * Prüft, ob der Dev-Modus aktiviert ist
+ * Berücksichtigt sowohl die Umgebungsvariable als auch den globalen State
+ */
+const isDevModeEnabled = () => {
+  return process.env.NODE_ENV === 'development' || 
+         (typeof window !== 'undefined' && window.DEV_MODE_ENABLED === true);
+};
+
+/**
  * Nur im Dev-Modus loggen
  * @param {string} message - Die Lognachricht
  * @param {any} data - Optionale Daten für das Logging
  */
 const devLog = (message, data) => {
   // Fast alle Logs deaktivieren, außer bei wichtigen Ereignissen
-  if (process.env.NODE_ENV === 'development') {
+  if (isDevModeEnabled()) {
     // STRIKTE Whitelist wichtiger Nachrichten, die immer geloggt werden sollen
     const criticalEvents = [
       "DEV-MODUS: Erstelle simulierte Invoice",
@@ -138,7 +147,7 @@ export function QRCodeModal({
   const [pollingMessage, setPollingMessage] = useState("");
   
   // Flag für den Entwicklungsmodus
-  const [devMode] = useState(process.env.NODE_ENV === 'development');
+  const [devMode, setDevMode] = useState(false);
   
   // Timer-ID für den Entwicklungsmodus
   const devModeTimerRef = useRef(null);
@@ -146,20 +155,38 @@ export function QRCodeModal({
   // Extrahiere die Nummer aus der questionId (z.B. "q4" -> "4")
   const questionNum = questionId.replace('q', '')
   
+  // Überwache den globalen DEV_MODE_ENABLED Status
+  useEffect(() => {
+    // Initial-Check
+    setDevMode(isDevModeEnabled());
+    
+    // Event-Listener für Änderungen
+    const checkDevMode = () => {
+      setDevMode(isDevModeEnabled());
+    };
+    
+    // Prüfe alle 500ms den Dev-Mode Status
+    const intervalId = setInterval(checkDevMode, 500);
+    
+    // Cleanup
+    return () => clearInterval(intervalId);
+  }, []);
+  
   /**
    * Dev-Mode: Simuliere eine erfolgreiche Zahlung nach einigen Sekunden
    * Vermeidet unnötige API-Aufrufe im Entwicklungsmodus
    */
   useEffect(() => {
+    // Cleanup zuerst
+    if (devModeTimerRef.current) {
+      clearTimeout(devModeTimerRef.current);
+      devModeTimerRef.current = null;
+    }
+    
     // Nur im Entwicklungsmodus und wenn die erforderlichen Konfigurationen fehlen
-    if (devMode && (!LNbits_API_KEY || !LNbits_WALLET_ID) && paymentStatus === "processing" && !paymentDetected) {
+    if (devMode && paymentStatus === "processing" && !paymentDetected) {
       setPollingMessage("DEV-MODUS: Simuliere Zahlung...");
       devLog("DEV-MODUS: Simuliere Zahlungsprozess ohne API-Aufrufe");
-      
-      // Sicherstellen, dass alte Timer gesäubert werden
-      if (devModeTimerRef.current) {
-        clearTimeout(devModeTimerRef.current);
-      }
       
       // Simuliere eine erfolgreiche Zahlung unmittelbar (keine Verzögerung im Dev-Modus)
       devModeTimerRef.current = setTimeout(() => {
@@ -175,15 +202,15 @@ export function QRCodeModal({
           onPaymentComplete();
         }, 1500); // Auf 1,5 Sekunden erhöht
       }, 1500); // Auf 1,5 Sekunden erhöht
-      
-      // Cleanup, wenn die Komponente unmountet
-      return () => {
-        if (devModeTimerRef.current) {
-          clearTimeout(devModeTimerRef.current);
-        }
-      };
     }
-  }, [devMode, LNbits_API_KEY, LNbits_WALLET_ID, paymentStatus, paymentDetected, onPaymentComplete]);
+    
+    // Cleanup, wenn die Komponente unmountet oder sich devMode ändert
+    return () => {
+      if (devModeTimerRef.current) {
+        clearTimeout(devModeTimerRef.current);
+      }
+    };
+  }, [devMode, paymentStatus, paymentDetected, onPaymentComplete]);
 
   /**
    * Effect: Invoice erstellen
@@ -377,13 +404,14 @@ export function QRCodeModal({
     console.log("[QR-CODE] Polling Effect aktiviert:", {
       paymentHash,
       paymentStatus,
-      paymentDetected
+      paymentDetected,
+      devMode
     });
     
     // ANTI-LOOP SCHUTZ: Ref-Wert für aktives Polling wurde nun nach oben verschoben
 
     // Im Entwicklungsmodus kein echtes Polling, sondern direkte Simulation
-    if (isDev || devMode) {
+    if (devMode) {
       // Frühzeitige Beendigung, wenn noch kein payment_hash existiert
       if (!paymentHash) return;
       
