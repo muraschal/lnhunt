@@ -9,15 +9,16 @@ import { CheckCircle, Lock, HelpCircle, Zap, Wrench, Info, XCircle, Play, Check,
 import { ProgressIndicator } from '../components/progress-indicator'
 
 /**
- * Funktion zum Überprüfen, ob aktuelle Umgebung Preview ist
- * @returns {boolean} - true, wenn die Umgebung eine Preview-Umgebung ist
+ * Funktion zum Überprüfen, ob aktuelle Umgebung Entwicklung oder Preview ist
+ * @returns {boolean} - true, wenn die Umgebung eine Development- oder Preview-Umgebung ist
  */
-const isPreviewEnvironment = () => {
+const isDevOrPreviewEnvironment = () => {
   if (typeof window === 'undefined') return false;
   
-  // Überprüfen, ob die URL auf vercel.app endet (typisch für Preview)
   const hostname = window.location.hostname;
-  return hostname.includes('vercel.app') || 
+  return hostname === 'localhost' || 
+         hostname === '127.0.0.1' ||
+         hostname.includes('vercel.app') || 
          hostname.includes('preview') || 
          hostname.includes('pr-');
 };
@@ -120,13 +121,17 @@ export default function Home() {
     // Status immer auf "nicht abgeschlossen" setzen, um Button stets verfügbar zu halten
     setLnhuntCompleted(false);
     
-    // Dev-Mode-Status aus localStorage holen, oder auf true setzen wenn in Preview-Umgebung
+    // Dev-Mode-Status aus localStorage holen, oder auf true setzen wenn in Development/Preview-Umgebung
     if (typeof window !== 'undefined') {
       const savedDevMode = localStorage.getItem('dev_mode_enabled');
-      // In Preview-Umgebung standardmäßig aktivieren, sonst den gespeicherten Wert verwenden
-      const shouldEnableDevMode = isPreviewEnvironment() ? 
-        (savedDevMode !== 'false') : // In Preview: Aktiviert, es sei denn, explizit deaktiviert
-        (savedDevMode === 'true');   // Anderswo: Deaktiviert, es sei denn, explizit aktiviert
+      
+      // Der Dev-Mode soll standardmäßig aktiviert sein auf:
+      // 1. localhost/Development
+      // 2. Preview-Umgebungen (vercel.app)
+      // 3. Wenn der Benutzer ihn explizit aktiviert hat
+      const shouldEnableDevMode = isDevOrPreviewEnvironment() ? 
+        (savedDevMode !== 'false') : // In Dev/Preview: Aktiviert, es sei denn, explizit deaktiviert
+        (savedDevMode === 'true');   // In Produktion: Deaktiviert, es sei denn, explizit aktiviert
       
       setDevModeEnabled(shouldEnableDevMode);
       // Globale Variable für devLog
@@ -303,6 +308,29 @@ export default function Home() {
       }, 3000) // Längere Anzeigezeit (3 Sekunden statt 1.5 Sekunden)
     }
   }
+
+  // Funktion zum Umschalten des Dev-Modus mit Feedback-Sound
+  const toggleDevMode = () => {
+    // Umschalten des Dev-Modus mit Sound-Feedback
+    const newState = !devModeEnabled;
+    setDevModeEnabled(newState);
+    
+    // Spiele einen Sound ab, je nach neuem Status
+    if (newState) {
+      // Dev-Modus aktiviert: Success-Sound abspielen
+      const audio = new Audio('/audio/success2.mp3');
+      audio.volume = 0.7; // Etwas leiser als normale Sounds
+      audio.play();
+    } else {
+      // Dev-Modus deaktiviert: Kurzes Klick-Geräusch (optional)
+      const audio = new Audio('/audio/success.mp3');
+      audio.volume = 0.3; // Deutlich leiser
+      audio.play();
+    }
+    
+    // Optional: Feedback-Vibration
+    vibrate('normal');
+  };
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white p-8">
@@ -749,19 +777,38 @@ export default function Home() {
             <Wrench className="w-5 h-5" />
             <span className="text-sm">{showDebugPanel ? 'Debug ausblenden' : 'Debug anzeigen'}</span>
           </button>
-          {/* Dev-Mode Toggle Button */}
-          <button
-            onClick={() => setDevModeEnabled(prev => !prev)}
-            className={`bg-black/70 p-2 rounded-xl shadow-lg transition flex items-center gap-2 ${
-              devModeEnabled 
-                ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white' 
-                : 'text-gray-400'
-            }`}
-            aria-label="Dev-Mode umschalten"
-          >
-            <Code className="w-5 h-5" />
-            <span className="text-sm">Dev-Mode{devModeEnabled ? ' (aktiv)' : ''}</span>
-          </button>
+        </div>
+
+        {/* Dev-Mode Toggle mit Slider */}
+        <div className="mt-4 flex justify-center">
+          <div className="bg-black/70 p-2 pl-3 pr-4 rounded-xl shadow-lg flex items-center gap-3">
+            <span className={`text-sm ${devModeEnabled ? 'text-orange-400 font-medium' : 'text-gray-400'}`}>
+              <Code className="w-4 h-4 inline-block mr-1" />
+              Dev-Mode
+            </span>
+            
+            {/* Custom Toggle Slider */}
+            <button 
+              onClick={toggleDevMode}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                devModeEnabled 
+                  ? 'bg-gradient-to-r from-orange-500 to-amber-500 focus:ring-orange-500' 
+                  : 'bg-gray-600 focus:ring-gray-500'
+              }`}
+              role="switch"
+              aria-checked={devModeEnabled}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-lg transition-transform ${
+                  devModeEnabled ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
+            
+            <span className={`text-xs ${devModeEnabled ? 'text-orange-300' : 'text-gray-500'}`}>
+              {devModeEnabled ? 'Aktiv' : 'Inaktiv'}
+            </span>
+          </div>
         </div>
 
         {/* Debug Panel */}
