@@ -169,8 +169,8 @@ export function QRCodeModal({
         setTimeout(() => {
           devLog("DEV-MODUS: Leite weiter zu Frage");
           onPaymentComplete();
-        }, 100); // Minimale Verzögerung für UI-Updates
-      }, 200); // Sehr kurze Verzögerung
+        }, 1500); // Auf 1,5 Sekunden erhöht
+      }, 1500); // Auf 1,5 Sekunden erhöht
       
       // Cleanup, wenn die Komponente unmountet
       return () => {
@@ -211,7 +211,9 @@ export function QRCodeModal({
           setPaymentHash(mockInvoice.payment_hash);
           
           // Status auf "processing" setzen, um den Entwicklungsmodus-Timer zu starten
-          setPaymentStatus("processing");
+          setTimeout(() => {
+            setPaymentStatus("processing");
+          }, 3000); // Verzögerung hinzugefügt
           
           // Debug-Log - nur im Entwicklungsmodus
           if (onDebugLog && !isDev && !devMode) onDebugLog({
@@ -234,19 +236,15 @@ export function QRCodeModal({
 
         // Teste die Verbindung, bevor wir den eigentlichen Aufruf machen
         try {
-          // LNbits API-Aufruf zur Erstellung einer Invoice
-          const res = await fetch(`${LNbits_API_URL}/payments`, {
+          // Ersetze den direkten LNbits-API-Aufruf durch einen Aufruf an den eigenen Server-Endpunkt
+          const res = await fetch('/api/create-invoice', {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "X-Api-Key": LNbits_API_KEY,
-              "X-Wallet-Id": LNbits_WALLET_ID,
             },
             body: JSON.stringify({
-              out: false,
-              amount: satCost,
-              unit: "sat",
-              memo: `LNHunt - Frage ${questionNum} freischalten`
+              questionId,
+              amount: satCost
             }),
           });
           
@@ -269,6 +267,12 @@ export function QRCodeModal({
             bolt11: data.bolt11 || '',
             lastPaymentStatus: null,
             pollingError: null
+          });
+          
+          // Log für QR-Code-Problem
+          console.log("[QR-CODE] Invoice erfolgreich erstellt:", {
+            paymentRequest: data.payment_request || data.bolt11,
+            paymentHash: data.payment_hash
           });
         } catch (apiError) {
           console.error("Fehler beim API-Aufruf:", apiError);
@@ -345,6 +349,13 @@ export function QRCodeModal({
    * Vermeidung von Race-Conditions ist entscheidend für die zuverlässige Weiterleitung
    */
   useEffect(() => {
+    // Log für QR-Code-Problem
+    console.log("[QR-CODE] Polling Effect aktiviert:", {
+      paymentHash,
+      paymentStatus,
+      paymentDetected
+    });
+
     // Im Entwicklungsmodus kein echtes Polling, sondern direkte Simulation
     if (isDev || devMode) {
       // Frühzeitige Beendigung, wenn noch kein payment_hash existiert
@@ -379,7 +390,11 @@ export function QRCodeModal({
     
     // Flag zum Abbrechen des Pollings beim Unmounten der Komponente
     let cancelled = false;
-    setPaymentStatus("processing");
+    
+    // Nur den Status auf "processing" setzen, wenn wir eine echte Invoice haben
+    if (paymentRequest && paymentHash) {
+      setPaymentStatus("processing");
+    }
     
     // Polling mit längeren Intervallen für bessere Performance und Server-Schonung
     let pollingDelay = 8000; // 8 Sekunden initiale Verzögerung (erhöht von 5s)
@@ -494,8 +509,9 @@ export function QRCodeModal({
       }
     };
     
+    // Polling-Timeout erhöhen auf 15 Sekunden (war 8 Sekunden)
     // Polling starten mit einer initialeren Verzögerung
-    pollTimerId = setTimeout(poll, 8000); // Auf 8 Sekunden erhöht (von 1 Sekunde)
+    pollTimerId = setTimeout(poll, 15000); // Auf 15 Sekunden erhöht (von 8 Sekunden)
     
     // Cleanup-Funktion: Wird beim Unmounten aufgerufen
     // WICHTIG: Verhindert weitere API-Aufrufe, wenn die Komponente nicht mehr angezeigt wird
@@ -571,6 +587,7 @@ export function QRCodeModal({
       </div>
 
       <div className="relative mx-auto w-64 h-64 mb-4 flex items-center justify-center">
+        {/* QR-Code immer anzeigen, solange ein paymentRequest existiert - unabhängig vom Status */}
         {paymentRequest && (
           <img
             src={
@@ -590,7 +607,7 @@ export function QRCodeModal({
             style={{ userSelect: 'none' }}
           />
         )}
-        {/* Erfolgsanzeige: Wird angezeigt, wenn die Zahlung eingegangen ist */}
+        {/* Overlay nur anzeigen, wenn die Zahlung eingegangen ist */}
         {paymentStatus === "complete" && (
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
             <CheckCircle className="w-16 h-16 text-green-500 mb-4" />
@@ -606,7 +623,7 @@ export function QRCodeModal({
         )}
       </div>
 
-      {/* Invoice-Details und Aktionsbuttons */}
+      {/* Invoice-Details und Aktionsbuttons - immer anzeigen, solange ein paymentRequest existiert */}
       {paymentRequest && (
         <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-xl p-3 mb-4">
           <div className="flex justify-between items-center mb-1">
