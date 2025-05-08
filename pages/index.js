@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import questions from '../questions.json'
 import { QRCodeModal } from '../components/qr-code-modal'
 import { AccessModal } from '../components/access-modal'
-import { CheckCircle, Lock, HelpCircle, Zap, Wrench, Info, XCircle, Play, Check, Copy, BookOpen } from "lucide-react"
+import { CheckCircle, Lock, HelpCircle, Zap, Wrench, Info, XCircle, Play, Check, Copy, BookOpen, RefreshCw } from "lucide-react"
 import { ProgressIndicator } from '../components/progress-indicator'
 
 /**
@@ -80,6 +80,8 @@ export default function Home() {
   const [showGuidePanel, setShowGuidePanel] = useState(false)
   // Status, ob der Benutzer den LNHunt bereits abgeschlossen hat
   const [lnhuntCompleted, setLnhuntCompleted] = useState(false)
+  // Neuer State für Claim-Tracking
+  const [claimStatus, setClaimStatus] = useState('idle'); // 'idle', 'processing', 'claimed', 'failed'
 
   useEffect(() => {
     // Hole für jede Frage den gespeicherten digitalen Code aus localStorage
@@ -102,6 +104,35 @@ export default function Home() {
     // Status immer auf "nicht abgeschlossen" setzen, um Button stets verfügbar zu halten
     setLnhuntCompleted(false);
   }, []);
+
+  // Überprüfe beim Laden der Komponente, ob bereits geclaimt wurde
+  useEffect(() => {
+    const hasAlreadyClaimed = localStorage.getItem('final_claimed') === 'true';
+    if (hasAlreadyClaimed) {
+      setClaimStatus('claimed');
+    }
+  }, []);
+
+  // Funktion zum Behandeln des Claims
+  const handleClaim = () => {
+    // Setze Status auf "wird verarbeitet"
+    setClaimStatus('processing');
+    
+    // Nach erfolgreichem Claim (z.B. Klick auf den Wallet-Link)
+    // Setze ein Timeout, um einen groben Schätzwert für die Verarbeitung zu geben
+    setTimeout(() => {
+      // Speichere in localStorage, dass der Claim ausgeführt wurde
+      localStorage.setItem('final_claimed', 'true');
+      // Aktualisiere den UI-Status
+      setClaimStatus('claimed');
+    }, 1000);
+  };
+  
+  // Funktion zum Zurücksetzen des Claim-Status (für Tests)
+  const resetClaim = () => {
+    localStorage.removeItem('final_claimed');
+    setClaimStatus('idle');
+  };
 
   // Erste Satz im Hangman-Style bauen (Fix the money)
   const firstSentence = questions
@@ -827,19 +858,53 @@ export default function Home() {
                     >
                       {copiedFinalLnurl ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                     </motion.button>
-                    <a
-                      href={`lightning:${FINAL_LNURL}`}
-                      className="inline-flex items-center px-2 py-1 bg-orange-500/90 hover:bg-orange-500 text-white text-xs rounded transition ml-1"
-                      style={{ textDecoration: 'none' }}
-                    >
-                      <span className="mr-1">Mit Wallet öffnen</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                      </svg>
-                    </a>
+                    {claimStatus === 'idle' && (
+                      <a
+                        href={`lightning:${FINAL_LNURL}`}
+                        className="inline-flex items-center px-2 py-1 bg-orange-500/90 hover:bg-orange-500 text-white text-xs rounded transition ml-1"
+                        style={{ textDecoration: 'none' }}
+                        onClick={handleClaim}  // Tracking hinzufügen
+                      >
+                        <span className="mr-1">Mit Wallet öffnen</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                      </a>
+                    )}
+                    {claimStatus === 'processing' && (
+                      <div className="inline-flex items-center px-2 py-1 bg-gray-500/50 text-gray-200 text-xs rounded ml-1">
+                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span>Verarbeitung...</span>
+                      </div>
+                    )}
+                    {claimStatus === 'claimed' && (
+                      <div className="inline-flex items-center px-2 py-1 bg-green-500/50 text-white text-xs rounded ml-1">
+                        <CheckCircle className="w-4 h-4 mr-1" />
+                        <span>Beansprucht</span>
+                      </div>
+                    )}
+                    {claimStatus === 'failed' && (
+                      <button
+                        onClick={() => setClaimStatus('idle')}
+                        className="inline-flex items-center px-2 py-1 bg-red-500/80 hover:bg-red-500 text-white text-xs rounded ml-1"
+                      >
+                        <RefreshCw className="w-3 h-3 mr-1" />
+                        <span>Erneut versuchen</span>
+                      </button>
+                    )}
                   </div>
                 </div>
                 <p className="text-xs text-gray-300 font-mono break-all">{FINAL_LNURL}</p>
+                
+                {/* Status-Nachricht basierend auf dem Claim-Status */}
+                {claimStatus === 'claimed' && (
+                  <div className="mt-3 p-2 bg-green-900/20 rounded border border-green-500/20 text-center">
+                    <p className="text-green-400 text-xs">Sats erfolgreich beansprucht! Vielen Dank fürs Mitmachen.</p>
+                  </div>
+                )}
               </div>
               <div className="text-center">
                 <button
@@ -850,6 +915,16 @@ export default function Home() {
                 >
                   Schliessen
                 </button>
+                
+                {/* Nur für Entwicklung/Debugging: Button zum Zurücksetzen des Claim-Status */}
+                {process.env.NODE_ENV === 'development' && (
+                  <button
+                    onClick={resetClaim}
+                    className="ml-2 px-3 py-1 bg-gray-700/50 hover:bg-gray-700/80 text-gray-300 text-xs rounded"
+                  >
+                    Reset Claim (Dev)
+                  </button>
+                )}
               </div>
             </motion.div>
           </div>
