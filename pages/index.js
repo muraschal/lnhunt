@@ -209,6 +209,13 @@ export default function Home() {
     // Normale Vibration bei Auswahl einer Frage
     vibrate('normal');
     
+    // Anleitung ausblenden, sobald eine Frage ausgewählt wird
+    setShowGuidePanel(false);
+    // Speichere in localStorage, dass die Anleitung gesehen wurde
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('has_seen_guide', 'true');
+    }
+    
     setCurrentQuestion(question)
     
     // Prüfen, ob die Frage bereits beantwortet wurde
