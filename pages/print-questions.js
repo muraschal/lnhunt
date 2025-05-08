@@ -17,67 +17,59 @@ const QuestionCard = ({ question }) => {
       }}
     >
       <div>
-        {/* Header mit Logo und Nummer */}
-        <div className="flex flex-col items-center mb-4">
-          {/* Logo mit LNHunt + Muraschal Schriftzug */}
-          <div className="mb-3 flex flex-col items-center">
-            {/* Verbesserte Logo-Darstellung */}
-            <div className="flex items-center gap-4 mb-4">
-              {/* Lightning Icon mit Farben optimiert für Druck */}
-              <div className="bg-orange-500 p-4 rounded-lg print-force-color" style={{ 
-                boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-                minWidth: '64px',
-                minHeight: '64px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                {/* Sehr einfaches Lightning-Icon als Dreieck mit solider weißer Füllung */}
-                <svg 
-                  width="48" 
-                  height="48" 
-                  viewBox="0 0 24 24" 
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <polygon 
-                    fill="white" 
-                    points="13,2 2,14 7,14 7,22 18,10 13,10" 
-                  />
-                </svg>
-              </div>
-              
-              {/* LNHunt Schriftzug mit solidem Orange statt Gradient */}
-              <h1 className="text-5xl font-bold" style={{ color: '#F97316' }}>
-                LNHunt
-              </h1>
+        {/* Header mit Logo */}
+        <div className="flex flex-col items-center mb-6">
+          {/* Verbesserte Logo-Darstellung */}
+          <div className="flex items-center gap-4 mb-4">
+            {/* Vereinfachtes Logo für bessere Druckbarkeit */}
+            <div style={{
+              width: '80px',
+              height: '80px',
+              backgroundColor: '#F97316',
+              borderRadius: '12px',
+              position: 'relative',
+              boxShadow: '0 4px 8px rgba(0,0,0,0.2)'
+            }}>
+              {/* Einfaches, super-dickes Lightning-Symbol */}
+              <div style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: '60%',
+                height: '60%',
+                backgroundColor: 'white',
+                clipPath: 'polygon(45% 0%, 10% 50%, 40% 50%, 20% 100%, 85% 50%, 55% 50%)',
+              }} />
             </div>
             
-            {/* "by Muraschal" in Schwarz für den Druck */}
-            <div 
-              style={{ 
-                fontFamily: "'Parisienne', cursive, Arial, sans-serif", 
-                textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
-                fontWeight: 400,
-                letterSpacing: "0.5px",
-                fontSize: "1.75rem",
-                transform: "rotate(-3deg)",
-                color: "#000000",
-                marginTop: "-5px",
-                marginBottom: "10px"
-              }}
-            >
-              by Muraschal
-            </div>
+            {/* LNHunt Schriftzug mit solidem Orange */}
+            <h1 className="text-5xl font-bold" style={{ color: '#F97316' }}>
+              LNHunt
+            </h1>
           </div>
           
-          <div className="flex items-center bg-orange-500 text-white px-6 py-3 rounded-full font-bold text-xl mb-6">
-            Frage Nr.{question.id.replace('q', '')}
+          {/* "by Muraschal" in Schwarz für den Druck */}
+          <div 
+            style={{ 
+              fontFamily: "'Parisienne', cursive, Arial, sans-serif", 
+              textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
+              fontWeight: 400,
+              letterSpacing: "0.5px",
+              fontSize: "1.75rem",
+              transform: "rotate(-3deg)",
+              color: "#000000",
+              marginTop: "-5px",
+              marginBottom: "10px"
+            }}
+          >
+            by Muraschal
           </div>
         </div>
         
-        {/* Frage-Titel */}
+        {/* Frage-Titel mit integrierter Nummer */}
         <h2 className="text-3xl font-bold mb-6 text-center border-b-2 border-gray-200 pb-4">
-          {question.question}
+          Frage Nr.{question.id.replace('q', '')} - {question.question}
         </h2>
         
         {/* Bild - jetzt mit Vollbreite */}
@@ -177,17 +169,11 @@ export default function PrintQuestions() {
               background-color: #F97316 !important;
             }
             
-            svg {
-              color-adjust: exact !important;
+            /* Stellen sicher, dass Hintergrundfarben gedruckt werden */
+            * {
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
-            }
-            
-            svg path {
               color-adjust: exact !important;
-              -webkit-print-color-adjust: exact !important;
-              print-color-adjust: exact !important;
-              fill: white !important;
             }
           }
           
