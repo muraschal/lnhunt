@@ -121,17 +121,20 @@ export default function Home() {
     // Status immer auf "nicht abgeschlossen" setzen, um Button stets verfügbar zu halten
     setLnhuntCompleted(false);
     
-    // Dev-Mode-Status aus localStorage holen, oder auf true setzen wenn in Development/Preview-Umgebung
+    // Dev-Mode-Status aus localStorage holen, oder Standardwert setzen
     if (typeof window !== 'undefined') {
       const savedDevMode = localStorage.getItem('dev_mode_enabled');
+      let shouldEnableDevMode;
       
-      // Der Dev-Mode soll standardmäßig aktiviert sein auf:
-      // 1. localhost/Development
-      // 2. Preview-Umgebungen (vercel.app)
-      // 3. Wenn der Benutzer ihn explizit aktiviert hat
-      const shouldEnableDevMode = isDevOrPreviewEnvironment() ? 
-        (savedDevMode !== 'false') : // In Dev/Preview: Aktiviert, es sei denn, explizit deaktiviert
-        (savedDevMode === 'true');   // In Produktion: Deaktiviert, es sei denn, explizit aktiviert
+      // Erste Initialisierung: Wenn der Wert noch nie gespeichert wurde
+      if (savedDevMode === null) {
+        // Bei erster Verwendung: Standard ist "aktiviert" für Dev/Preview-Umgebungen
+        shouldEnableDevMode = isDevOrPreviewEnvironment();
+        localStorage.setItem('dev_mode_enabled', shouldEnableDevMode ? 'true' : 'false');
+      } else {
+        // Bei wiederkehrendem Besuch: Immer den gespeicherten Wert verwenden
+        shouldEnableDevMode = savedDevMode === 'true';
+      }
       
       setDevModeEnabled(shouldEnableDevMode);
       // Globale Variable für devLog
