@@ -10,7 +10,7 @@ const QuestionCard = ({ question }) => {
       className="bg-white border-2 border-gray-300 rounded-xl p-4 mb-12 page-break-after"
       style={{
         pageBreakAfter: 'always',
-        minHeight: '975px', // Anpassen für A4-Größe mit Rändern
+        minHeight: '950px', // Etwas reduzierte Mindestseitenhöhe
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between'
@@ -18,7 +18,7 @@ const QuestionCard = ({ question }) => {
     >
       <div>
         {/* Header mit LNHunt und Muraschal-Schriftzug */}
-        <div className="text-center mb-6">
+        <div className="text-center mb-5">
           {/* LNHunt-Schriftzug */}
           <h1 className="text-5xl font-bold mb-1" style={{ color: '#F97316' }}>
             LNHunt
@@ -33,7 +33,7 @@ const QuestionCard = ({ question }) => {
               letterSpacing: "0.5px",
               fontSize: "1.75rem",
               color: "#000000",
-              marginBottom: "10px"
+              marginBottom: "8px"
             }}
           >
             by Muraschal
@@ -41,19 +41,19 @@ const QuestionCard = ({ question }) => {
         </div>
         
         {/* Frage-Titel mit integrierter Nummer */}
-        <h2 className="text-3xl font-bold mb-6 text-center border-b-2 border-gray-200 pb-4">
+        <h2 className="text-2xl font-bold mb-5 text-center border-b-2 border-gray-200 pb-3">
           Frage Nr.{question.id.replace('q', '')} - {question.question}
         </h2>
         
-        {/* Bild - jetzt mit Vollbreite */}
-        <div className="mb-8 flex justify-center">
+        {/* Bild - jetzt mit Vollbreite aber etwas kleiner */}
+        <div className="mb-6 flex justify-center">
           <div className="p-2 border border-gray-300 rounded-lg shadow-md bg-white w-full">
             <img 
               src={`/images/${question.id}.png`} 
               alt={`Bild für Frage ${question.id}`}
               style={{ 
                 width: '100%',
-                height: '450px', // Etwas kleinere Höhe, um Platz für größeren Text zu schaffen
+                height: '380px', // Kleinere Höhe für besseres Layout im PDF
                 objectFit: 'contain',
                 borderRadius: '0.25rem'
               }}
@@ -63,16 +63,16 @@ const QuestionCard = ({ question }) => {
         </div>
         
         {/* Antwortoptionen - ohne Markierung der richtigen Antwort */}
-        <div className="mt-6 mb-6">
-          <h3 className="text-xl font-bold mb-4 border-l-4 border-orange-500 pl-3">Antwortoptionen:</h3>
-          <div className="space-y-3">
+        <div className="mt-4 mb-4">
+          <h3 className="text-xl font-bold mb-3 border-l-4 border-orange-500 pl-3">Antwortoptionen:</h3>
+          <div className="space-y-2">
             {question.options && question.options.map((option, idx) => (
               <div 
                 key={idx}
-                className="border border-gray-300 rounded-lg p-4 bg-white text-black"
+                className="border border-gray-300 rounded-lg p-3 bg-white text-black"
               >
                 <div className="flex items-center">
-                  <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-4 font-bold text-lg">
+                  <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center mr-3 font-bold text-lg">
                     {idx + 1}
                   </div>
                   <span className="text-xl">{option}</span>
@@ -88,11 +88,11 @@ const QuestionCard = ({ question }) => {
         <div className="font-bold text-lg uppercase text-gray-600 mb-2 text-center">
           Code Physical
         </div>
-        <div className="text-6xl font-bold text-center p-6 border-4 border-gray-800 rounded-lg bg-gray-100 shadow-inner">
+        <div className="text-6xl font-bold text-center p-5 border-4 border-gray-800 rounded-lg bg-gray-100 shadow-inner">
           <span className="text-orange-500" style={{ letterSpacing: '0.1em' }}>{question.code_physical}</span>
         </div>
         
-        <div className="text-center mt-4 text-gray-500 text-sm">
+        <div className="text-center mt-3 text-gray-500 text-sm">
           LNHunt © {new Date().getFullYear()} by Marcel Rapold
         </div>
       </div>
