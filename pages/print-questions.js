@@ -104,6 +104,11 @@ const QuestionCard = ({ question }) => {
 export default function PrintQuestions() {
   const [isClient, setIsClient] = useState(false);
   
+  // Funktion zum Drucken
+  const handlePrint = () => {
+    window.print();
+  };
+  
   useEffect(() => {
     setIsClient(true);
   }, []);
@@ -112,7 +117,7 @@ export default function PrintQuestions() {
     <div className="bg-white text-black min-h-screen p-8">
       <Head>
         <title>LNHunt - Fragen zum Drucken</title>
-        <style jsx global>{`
+        <style dangerouslySetInnerHTML={{ __html: `
           @media print {
             body {
               background: white;
@@ -120,8 +125,15 @@ export default function PrintQuestions() {
               padding: 0;
             }
             
-            .no-print {
+            .print-hide {
               display: none !important;
+              visibility: hidden !important;
+              height: 0 !important;
+              width: 0 !important;
+              overflow: hidden !important;
+              position: absolute !important;
+              top: -9999px !important;
+              left: -9999px !important;
             }
             
             .page-break-after {
@@ -140,11 +152,6 @@ export default function PrintQuestions() {
               print-color-adjust: exact !important;
               color-adjust: exact !important;
             }
-            
-            /* Explizit die UI-Elemente zum Drucken ausblenden */
-            #print-ui {
-              display: none !important;
-            }
           }
           
           @font-face {
@@ -154,16 +161,16 @@ export default function PrintQuestions() {
             src: url('https://fonts.gstatic.com/s/parisienne/v13/E21i_d3kivvAkxhLEVZpQyhwDw.woff2') format('woff2');
             font-display: swap;
           }
-        `}</style>
+        `}} />
       </Head>
       
       <div className="max-w-4xl mx-auto">
-        {/* UI-Elemente mit einer ID, die im Print-CSS explizit ausgeblendet wird */}
-        <div id="print-ui" className="flex justify-between items-center mb-6 no-print">
+        {/* UI-Elemente mit verstärkten Ausblendungstechniken */}
+        <div className="print-hide" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
           <h1 className="text-3xl font-bold">LNHunt - Fragen zum Drucken</h1>
-          <div className="flex gap-3">
+          <div>
             <button 
-              onClick={() => window.print()} 
+              onClick={handlePrint} 
               className="px-6 py-3 bg-blue-500 text-white rounded-xl font-bold shadow-lg hover:bg-blue-600"
             >
               Drucken
@@ -177,10 +184,10 @@ export default function PrintQuestions() {
           ))}
         </div>
         
-        {/* Auch die Druckanleitung mit einer ID versehen */}
-        <div id="print-ui" className="my-8 p-4 bg-gray-100 rounded-lg no-print">
+        {/* Auch die Druckanleitung verstecken */}
+        <div className="print-hide" style={{ margin: '2rem 0', padding: '1rem', backgroundColor: '#f3f4f6', borderRadius: '0.75rem' }}>
           <h3 className="font-bold mb-2">Anleitung zum Drucken:</h3>
-          <ol className="list-decimal list-inside">
+          <ol style={{ listStyleType: 'decimal', paddingLeft: '1.5rem' }}>
             <li>Klicke auf "Drucken" oder nutze die Browser-Druckfunktion (Strg+P / Cmd+P)</li>
             <li>Jede Frage wird auf einer eigenen Seite dargestellt</li>
             <li>Drucke die Seiten mit den Druckeinstellungen deiner Wahl</li>
