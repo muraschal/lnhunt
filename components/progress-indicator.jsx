@@ -57,7 +57,11 @@ export function ProgressIndicator({
             {phraseFromCodes.map((word, index) => (
               <span
                 key={index}
-                className={`px-2 py-1 rounded text-white font-medium ${index < codesDigital.length ? 'bg-white/5' : 'bg-white/5 border border-dashed border-white/10 text-gray-500'}`}
+                className={`px-2 py-1 rounded font-medium ${
+                  index < codesDigital.length 
+                    ? 'bg-white/5 text-orange-400' 
+                    : 'bg-white/5 border border-dashed border-white/10 text-gray-500'
+                }`}
               >
                 {word}
               </span>
@@ -77,7 +81,7 @@ export function ProgressIndicator({
                 className={`px-2 py-1 rounded font-mono ${
                   word.includes("_")
                     ? "bg-white/5 text-gray-500 border border-dashed border-white/10"
-                    : "bg-green-500/20 text-green-400 border border-green-500/30"
+                    : "bg-orange-500/20 text-orange-400 border border-orange-500/30"
                 }`}
                 initial={!word.includes("_") ? { scale: 0.8 } : { scale: 1 }}
                 animate={!word.includes("_") ? { scale: 1 } : { scale: 1 }}

@@ -5,8 +5,22 @@ import { motion, AnimatePresence } from 'framer-motion'
 import questions from '../questions.json'
 import { QRCodeModal } from '../components/qr-code-modal'
 import { AccessModal } from '../components/access-modal'
-import { CheckCircle, Lock, HelpCircle, Zap, Wrench, Info, XCircle, Play, Check, Copy, BookOpen, RefreshCw } from "lucide-react"
+import { CheckCircle, Lock, HelpCircle, Zap, Wrench, Info, XCircle, Play, Check, Copy, BookOpen, RefreshCw, Code } from "lucide-react"
 import { ProgressIndicator } from '../components/progress-indicator'
+
+/**
+ * Funktion zum Überprüfen, ob aktuelle Umgebung Preview ist
+ * @returns {boolean} - true, wenn die Umgebung eine Preview-Umgebung ist
+ */
+const isPreviewEnvironment = () => {
+  if (typeof window === 'undefined') return false;
+  
+  // Überprüfen, ob die URL auf vercel.app endet (typisch für Preview)
+  const hostname = window.location.hostname;
+  return hostname.includes('vercel.app') || 
+         hostname.includes('preview') || 
+         hostname.includes('pr-');
+};
 
 /**
  * Nur im Dev-Modus loggen
@@ -14,7 +28,7 @@ import { ProgressIndicator } from '../components/progress-indicator'
  * @param {any} data - Optionale Daten für das Logging
  */
 const devLog = (message, data) => {
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === 'development' || (typeof window !== 'undefined' && window.DEV_MODE_ENABLED)) {
     if (data) {
       console.log(message, data);
     } else {
@@ -82,6 +96,8 @@ export default function Home() {
   const [lnhuntCompleted, setLnhuntCompleted] = useState(false)
   // Neuer State für Claim-Tracking
   const [claimStatus, setClaimStatus] = useState('idle'); // 'idle', 'processing', 'claimed', 'failed'
+  // Dev-Mode Toggle
+  const [devModeEnabled, setDevModeEnabled] = useState(false);
 
   useEffect(() => {
     // Hole für jede Frage den gespeicherten digitalen Code aus localStorage
@@ -103,7 +119,28 @@ export default function Home() {
     
     // Status immer auf "nicht abgeschlossen" setzen, um Button stets verfügbar zu halten
     setLnhuntCompleted(false);
+    
+    // Dev-Mode-Status aus localStorage holen, oder auf true setzen wenn in Preview-Umgebung
+    if (typeof window !== 'undefined') {
+      const savedDevMode = localStorage.getItem('dev_mode_enabled');
+      // In Preview-Umgebung standardmäßig aktivieren, sonst den gespeicherten Wert verwenden
+      const shouldEnableDevMode = isPreviewEnvironment() ? 
+        (savedDevMode !== 'false') : // In Preview: Aktiviert, es sei denn, explizit deaktiviert
+        (savedDevMode === 'true');   // Anderswo: Deaktiviert, es sei denn, explizit aktiviert
+      
+      setDevModeEnabled(shouldEnableDevMode);
+      // Globale Variable für devLog
+      window.DEV_MODE_ENABLED = shouldEnableDevMode;
+    }
   }, []);
+  
+  // Effect zum Aktualisieren der globalen DEV_MODE_ENABLED Variable
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.DEV_MODE_ENABLED = devModeEnabled;
+      localStorage.setItem('dev_mode_enabled', devModeEnabled ? 'true' : 'false');
+    }
+  }, [devModeEnabled]);
 
   // Überprüfe beim Laden der Komponente, ob bereits geclaimt wurde
   useEffect(() => {
@@ -663,7 +700,7 @@ export default function Home() {
         </div>
 
         {/* Debug, Info & Anleitung Buttons */}
-        <div className="mt-8 flex justify-center gap-4">
+        <div className="mt-8 flex justify-center gap-4 flex-wrap">
           <button
             onClick={() => {
               if (showGuidePanel) {
@@ -711,6 +748,19 @@ export default function Home() {
           >
             <Wrench className="w-5 h-5" />
             <span className="text-sm">{showDebugPanel ? 'Debug ausblenden' : 'Debug anzeigen'}</span>
+          </button>
+          {/* Dev-Mode Toggle Button */}
+          <button
+            onClick={() => setDevModeEnabled(prev => !prev)}
+            className={`bg-black/70 p-2 rounded-xl shadow-lg transition flex items-center gap-2 ${
+              devModeEnabled 
+                ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white' 
+                : 'text-gray-400'
+            }`}
+            aria-label="Dev-Mode umschalten"
+          >
+            <Code className="w-5 h-5" />
+            <span className="text-sm">Dev-Mode{devModeEnabled ? ' (aktiv)' : ''}</span>
           </button>
         </div>
 
