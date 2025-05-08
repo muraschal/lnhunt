@@ -10,7 +10,7 @@ const QuestionCard = ({ question }) => {
       className="bg-white border-2 border-gray-300 rounded-xl p-4 mb-12 page-break-after"
       style={{
         pageBreakAfter: 'always',
-        minHeight: '975px',
+        minHeight: '975px', // Anpassen für A4-Größe mit Rändern
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between'
@@ -20,32 +20,32 @@ const QuestionCard = ({ question }) => {
         {/* Header mit Logo und Nummer */}
         <div className="flex flex-col items-center mb-4">
           {/* Logo mit LNHunt + Muraschal Schriftzug */}
-          <div className="mb-2 flex flex-col items-center">
-            <div className="flex items-center mb-1">
-              <div className="bg-gradient-to-br from-orange-500 to-amber-500 p-2 rounded-xl mr-2">
+          <div className="mb-3 flex flex-col items-center">
+            {/* Verbesserte Logo-Darstellung */}
+            <div className="flex items-center gap-2 mb-1">
+              {/* Lightning Icon mit Farben optimiert für Druck */}
+              <div className="bg-orange-500 p-2 rounded-lg" style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
                 <svg 
                   xmlns="http://www.w3.org/2000/svg" 
-                  width="24" 
-                  height="24" 
+                  width="32" 
+                  height="32" 
                   viewBox="0 0 24 24" 
                   fill="none" 
-                  stroke="currentColor" 
-                  strokeWidth="2" 
+                  stroke="white" 
+                  strokeWidth="2.5" 
                   strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  className="text-white"
+                  strokeLinejoin="round"
                 >
                   <path d="M13 3L1 15l6 6 12-12-6-6M5 13l6 6M18 12l4-4M8.83 7.17l8 8"/>
                 </svg>
               </div>
-              <div className="flex flex-col">
-                <h1 className="text-2xl font-bold">
-                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-amber-500">
-                    LNHunt
-                  </span>
-                </h1>
-              </div>
+              
+              {/* LNHunt Schriftzug mit solidem Orange statt Gradient */}
+              <h1 className="text-3xl font-bold" style={{ color: '#F97316' }}>
+                LNHunt
+              </h1>
             </div>
+            
             {/* "by Muraschal" in Schwarz für den Druck */}
             <div 
               style={{ 
@@ -53,7 +53,7 @@ const QuestionCard = ({ question }) => {
                 textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
                 fontWeight: 400,
                 letterSpacing: "0.5px",
-                fontSize: "1rem",
+                fontSize: "1.25rem",
                 transform: "rotate(-3deg)",
                 color: "#000000",
                 marginTop: "-5px"
@@ -62,7 +62,8 @@ const QuestionCard = ({ question }) => {
               by Muraschal
             </div>
           </div>
-          <div className="flex items-center bg-orange-500 text-white px-4 py-1 rounded-full font-bold">
+          
+          <div className="flex items-center bg-orange-500 text-white px-4 py-2 rounded-full font-bold">
             Frage Nr.{question.id.replace('q', '')}
           </div>
         </div>
@@ -80,7 +81,7 @@ const QuestionCard = ({ question }) => {
               alt={`Bild für Frage ${question.id}`}
               style={{ 
                 width: '100%',
-                height: '520px',
+                height: '520px', // Feste Höhe für konsistentes Layout
                 objectFit: 'contain',
                 borderRadius: '0.25rem'
               }}
@@ -159,6 +160,13 @@ export default function PrintQuestions() {
             @page {
               size: A4;
               margin: 0.5cm;
+            }
+            
+            /* Zusätzliche Print-Optimierungen */
+            svg {
+              color-adjust: exact;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
             }
           }
           
