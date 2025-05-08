@@ -571,12 +571,17 @@ export function QRCodeModal({
         <h2 className="text-xl font-bold text-white">Frage Nr.{questionNum} freischalten</h2>
         <p className="text-gray-300 text-sm mt-1">Scanne den QR-Code, um {satCost} sats zu bezahlen</p>
         
-        {/* Polling-Status anzeigen */}
-        {pollingMessage && paymentStatus === "processing" && (
-          <p className="text-sm text-blue-300 mt-2 italic">
-            {pollingMessage}
-          </p>
-        )}
+        {/* Status-Anzeige und Logs */}
+        <div className="mt-2">
+          {paymentRequest && (
+            <p className="text-xs text-green-300">Invoice generiert! QR-Code sollte sichtbar sein.</p>
+          )}
+          {pollingMessage && paymentStatus === "processing" && (
+            <p className="text-sm text-blue-300 mt-1 italic">
+              {pollingMessage}
+            </p>
+          )}
+        </div>
         
         {/* Fehlermeldung anzeigen, wenn vorhanden */}
         {errorMessage && (
@@ -586,44 +591,44 @@ export function QRCodeModal({
         )}
       </div>
 
-      <div className="relative mx-auto w-64 h-64 mb-4 flex items-center justify-center">
-        {/* QR-Code immer anzeigen, solange ein paymentRequest existiert - unabhängig vom Status */}
-        {paymentRequest && (
+      {/* QR-Code immer anzeigen, wenn paymentRequest existiert */}
+      {paymentRequest ? (
+        <div className="relative mx-auto w-64 h-64 mb-4 flex items-center justify-center bg-black/20 rounded-lg">
+          {console.log("[QR-CODE] Rendering QR-Code:", paymentRequest)}
           <img
-            src={
-              paymentRequest.startsWith('lnbc') 
-                ? `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(paymentRequest)}&size=180x180` 
-                : `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 180 180"><rect width="180" height="180" fill="black" /><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Arial" font-size="12">QR Code nicht verfügbar</text></svg>`
-            }
+            src={`https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(paymentRequest)}&size=200x200`}
             alt="Lightning QR"
-            className="w-full h-full"
+            className="w-full h-full object-contain p-3"
             onError={(e) => {
-              // Fallback für Fehler bei der QR-Code-Generierung mit einem Inline-SVG
-              console.error('Fehler beim Laden des QR-Codes, verwende Inline-SVG');
+              console.error('[QR-CODE] Fehler beim Laden des QR-Codes:', e);
               e.target.src = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 180 180"><rect width="180" height="180" fill="black" /><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Arial" font-size="12">QR Code nicht verfügbar</text></svg>`;
             }}
-            // Screenshot-Schutz und Copy-Schutz für Zahlungsinfos
-            onContextMenu={(e) => e.preventDefault()}
+            onLoad={() => console.log("[QR-CODE] QR-Code erfolgreich geladen")}
             style={{ userSelect: 'none' }}
           />
-        )}
-        {/* Overlay nur anzeigen, wenn die Zahlung eingegangen ist */}
-        {paymentStatus === "complete" && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-            <CheckCircle className="w-16 h-16 text-green-500 mb-4" />
-            <p className="text-white font-medium">Zahlung erhalten!</p>
-          </div>
-        )}
-        {/* Fehleranzeige: Wird angezeigt, wenn ein Fehler bei der Invoice-Erstellung auftritt */}
-        {paymentStatus === "error" && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-            <p className="text-red-400 font-bold">Fehler beim Erzeugen der Rechnung!</p>
-            <p className="text-xs text-gray-400 mt-2">Bitte versuche es später erneut.</p>
-          </div>
-        )}
-      </div>
+          
+          {/* Overlays */}
+          {paymentStatus === "complete" && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 rounded-lg">
+              <CheckCircle className="w-16 h-16 text-green-500 mb-4" />
+              <p className="text-white font-medium">Zahlung erhalten!</p>
+            </div>
+          )}
+          
+          {paymentStatus === "error" && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 rounded-lg">
+              <p className="text-red-400 font-bold">Fehler beim Erzeugen der Rechnung!</p>
+              <p className="text-xs text-gray-400 mt-2">Bitte versuche es später erneut.</p>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="mx-auto w-64 h-64 mb-4 flex items-center justify-center bg-gray-800/20 rounded-lg">
+          <div className="text-gray-400 text-sm">Warte auf Invoice...</div>
+        </div>
+      )}
 
-      {/* Invoice-Details und Aktionsbuttons - immer anzeigen, solange ein paymentRequest existiert */}
+      {/* Invoice-Details und Aktionsbuttons - auch immer anzeigen */}
       {paymentRequest && (
         <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-xl p-3 mb-4">
           <div className="flex justify-between items-center mb-1">
@@ -641,8 +646,6 @@ export function QRCodeModal({
                 href={`lightning:${paymentRequest}`}
                 className="inline-flex items-center px-2 py-1 bg-orange-500/90 hover:bg-orange-500 text-white text-xs rounded transition ml-1"
                 style={{ textDecoration: 'none' }}
-                // Sicherstellen, dass die URL wirklich eine Lightning-Adresse ist
-                {...(paymentRequest.startsWith('lnbc') ? {} : { onClick: (e) => e.preventDefault() })}
               >
                 <span className="mr-1">Mit Wallet zahlen</span>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
