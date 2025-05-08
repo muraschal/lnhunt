@@ -1,57 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import Head from 'next/head';
+import dynamic from 'next/dynamic';
 import questions from '../questions.json';
 
-// PDF-Export Funktion mit dynamischen Imports
-const exportToPDF = async () => {
-  try {
-    // Dynamischer Import der benötigten Bibliotheken
-    const html2canvasModule = await import('html2canvas');
-    const html2canvas = html2canvasModule.default;
-    
-    const jsPDFModule = await import('jspdf');
-    const jsPDF = jsPDFModule.jsPDF;
-    
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    
-    // Für jede Frage
-    for (let i = 0; i < questions.length; i++) {
-      const question = questions[i];
-      
-      // Hole das Element und erstelle ein Canvas
-      const element = document.getElementById(`question-${question.id}`);
-      if (!element) continue;
-      
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: '#FFFFFF'
-      });
-      
-      const imgData = canvas.toDataURL('image/png');
-      
-      // Berechne die Höhe und Breite für das PDF
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const imgWidth = pageWidth - 40; // Rand links und rechts
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      
-      // Neue Seite, wenn nötig
-      if (i > 0) {
-        pdf.addPage();
-      }
-      
-      // Füge das Bild zum PDF hinzu
-      pdf.addImage(imgData, 'PNG', 20, 20, imgWidth, imgHeight);
-    }
-    
-    // Speichere das PDF
-    pdf.save('lnhunt-fragen.pdf');
-  } catch (error) {
-    console.error('Fehler beim PDF-Export:', error);
-    alert('Beim PDF-Export ist ein Fehler aufgetreten. Bitte versuche es erneut oder nutze die Druckfunktion des Browsers.');
-  }
-};
+// Umschließe den ganzen Code in einer clientseitigen Komponente
+const PDFGenerator = dynamic(() => import('../components/PDFGenerator'), { 
+  ssr: false,
+  loading: () => <p className="text-center p-4">PDF-Komponenten werden geladen...</p>
+});
 
 // Komponentenfunktion für eine einzelne Frage
 const QuestionCard = ({ question }) => {
@@ -125,20 +81,29 @@ const QuestionCard = ({ question }) => {
   );
 };
 
-// Hauptkomponente
-export default function PrintQuestions() {
+// Hauptkomponente mit Fallback für SSR
+const PrintQuestions = () => {
   const [isClient, setIsClient] = useState(false);
   
-  // Setze isClient auf true, sobald die Komponente im Browser gerendert wird
   useEffect(() => {
     setIsClient(true);
   }, []);
+  
+  if (!isClient) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center p-8">
+          <h1 className="text-2xl font-bold mb-4">Lade Druckansicht...</h1>
+          <p>Diese Seite wird clientseitig gerendert.</p>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className="bg-white text-black min-h-screen p-8">
       <Head>
         <title>LNHunt - Fragen zum Drucken</title>
-        {/* Print-spezifisches CSS */}
         <style jsx global>{`
           @media print {
             body {
@@ -164,41 +129,9 @@ export default function PrintQuestions() {
         `}</style>
       </Head>
       
-      <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-6 no-print">
-          <h1 className="text-3xl font-bold">LNHunt - Fragen zum Drucken</h1>
-          <div className="flex gap-3">
-            <button 
-              onClick={exportToPDF} 
-              className="px-6 py-3 bg-orange-500 text-white rounded-xl font-bold shadow-lg hover:bg-orange-600"
-            >
-              Als PDF exportieren
-            </button>
-            <button 
-              onClick={() => window.print()} 
-              className="px-6 py-3 bg-blue-500 text-white rounded-xl font-bold shadow-lg hover:bg-blue-600"
-            >
-              Direkt drucken
-            </button>
-          </div>
-        </div>
-        
-        <div className="mb-8">
-          {isClient && questions.map((question) => (
-            <QuestionCard key={question.id} question={question} />
-          ))}
-        </div>
-        
-        <div className="my-8 p-4 bg-gray-100 rounded-lg no-print">
-          <h3 className="font-bold mb-2">Anleitung zum Drucken:</h3>
-          <ol className="list-decimal list-inside">
-            <li>Klicke auf "Als PDF exportieren" oder "Direkt drucken"</li>
-            <li>Jede Frage wird auf einer eigenen Seite dargestellt</li>
-            <li>Drucke die PDF mit den Druckeinstellungen deiner Wahl</li>
-            <li>Für optimale Ergebnisse: DIN A4, Querformat, Farbdruck</li>
-          </ol>
-        </div>
-      </div>
+      <PDFGenerator questions={questions} />
     </div>
   );
-} 
+};
+
+export default PrintQuestions; 

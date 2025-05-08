@@ -13,6 +13,15 @@ const nextConfig = {
     // useDeploymentId: true,
     // useDeploymentIdServerActions: true,
   },
+  // Webpack-Konfiguration für clientseitige Module
+  webpack: (config, { isServer }) => {
+    // PDF-Module nur clientseitig verarbeiten
+    if (!isServer) {
+      config.externals = [...config.externals, 'canvas', 'jsdom'];
+    }
+    
+    return config;
+  },
   // Sicherheits-HTTP-Header
   async headers() {
     return [
