@@ -22,26 +22,32 @@ const QuestionCard = ({ question }) => {
           {/* Logo mit LNHunt + Muraschal Schriftzug */}
           <div className="mb-3 flex flex-col items-center">
             {/* Verbesserte Logo-Darstellung */}
-            <div className="flex items-center gap-2 mb-1">
+            <div className="flex items-center gap-4 mb-4">
               {/* Lightning Icon mit Farben optimiert für Druck */}
-              <div className="bg-orange-500 p-2 rounded-lg" style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+              <div className="bg-orange-500 p-4 rounded-lg print-force-color" style={{ 
+                boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                minWidth: '64px',
+                minHeight: '64px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                {/* Sehr einfaches Lightning-Icon als Dreieck mit solider weißer Füllung */}
                 <svg 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  width="32" 
-                  height="32" 
+                  width="48" 
+                  height="48" 
                   viewBox="0 0 24 24" 
-                  fill="none" 
-                  stroke="white" 
-                  strokeWidth="2.5" 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  <path d="M13 3L1 15l6 6 12-12-6-6M5 13l6 6M18 12l4-4M8.83 7.17l8 8"/>
+                  <polygon 
+                    fill="white" 
+                    points="13,2 2,14 7,14 7,22 18,10 13,10" 
+                  />
                 </svg>
               </div>
               
               {/* LNHunt Schriftzug mit solidem Orange statt Gradient */}
-              <h1 className="text-3xl font-bold" style={{ color: '#F97316' }}>
+              <h1 className="text-5xl font-bold" style={{ color: '#F97316' }}>
                 LNHunt
               </h1>
             </div>
@@ -53,35 +59,36 @@ const QuestionCard = ({ question }) => {
                 textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
                 fontWeight: 400,
                 letterSpacing: "0.5px",
-                fontSize: "1.25rem",
+                fontSize: "1.75rem",
                 transform: "rotate(-3deg)",
                 color: "#000000",
-                marginTop: "-5px"
+                marginTop: "-5px",
+                marginBottom: "10px"
               }}
             >
               by Muraschal
             </div>
           </div>
           
-          <div className="flex items-center bg-orange-500 text-white px-4 py-2 rounded-full font-bold">
+          <div className="flex items-center bg-orange-500 text-white px-6 py-3 rounded-full font-bold text-xl mb-6">
             Frage Nr.{question.id.replace('q', '')}
           </div>
         </div>
         
         {/* Frage-Titel */}
-        <h2 className="text-xl font-bold mb-4 text-center border-b-2 border-gray-200 pb-2">
+        <h2 className="text-3xl font-bold mb-6 text-center border-b-2 border-gray-200 pb-4">
           {question.question}
         </h2>
         
         {/* Bild - jetzt mit Vollbreite */}
-        <div className="mb-6 flex justify-center">
+        <div className="mb-8 flex justify-center">
           <div className="p-2 border border-gray-300 rounded-lg shadow-md bg-white w-full">
             <img 
               src={`/images/${question.id}.png`} 
               alt={`Bild für Frage ${question.id}`}
               style={{ 
                 width: '100%',
-                height: '520px', // Feste Höhe für konsistentes Layout
+                height: '450px', // Etwas kleinere Höhe, um Platz für größeren Text zu schaffen
                 objectFit: 'contain',
                 borderRadius: '0.25rem'
               }}
@@ -91,19 +98,19 @@ const QuestionCard = ({ question }) => {
         </div>
         
         {/* Antwortoptionen - ohne Markierung der richtigen Antwort */}
-        <div className="mt-4 mb-4">
-          <h3 className="text-base font-bold mb-2 border-l-4 border-orange-500 pl-2">Antwortoptionen:</h3>
-          <div className="space-y-1">
+        <div className="mt-6 mb-6">
+          <h3 className="text-xl font-bold mb-4 border-l-4 border-orange-500 pl-3">Antwortoptionen:</h3>
+          <div className="space-y-3">
             {question.options && question.options.map((option, idx) => (
               <div 
                 key={idx}
-                className="border border-gray-300 rounded-lg p-2 bg-white text-black"
+                className="border border-gray-300 rounded-lg p-4 bg-white text-black"
               >
                 <div className="flex items-center">
-                  <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center mr-3 font-bold text-sm">
+                  <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-4 font-bold text-lg">
                     {idx + 1}
                   </div>
-                  <span>{option}</span>
+                  <span className="text-xl">{option}</span>
                 </div>
               </div>
             ))}
@@ -113,14 +120,14 @@ const QuestionCard = ({ question }) => {
       
       {/* Code Physical */}
       <div className="mt-auto">
-        <div className="font-bold text-sm uppercase text-gray-500 mb-1 text-center">
+        <div className="font-bold text-lg uppercase text-gray-600 mb-2 text-center">
           Code Physical
         </div>
-        <div className="text-4xl font-bold text-center p-4 border-2 border-gray-800 rounded-lg bg-gray-100 shadow-inner">
+        <div className="text-6xl font-bold text-center p-6 border-4 border-gray-800 rounded-lg bg-gray-100 shadow-inner">
           <span className="text-orange-500" style={{ letterSpacing: '0.1em' }}>{question.code_physical}</span>
         </div>
         
-        <div className="text-center mt-4 text-gray-500 text-xs">
+        <div className="text-center mt-4 text-gray-500 text-sm">
           LNHunt © {new Date().getFullYear()} by Marcel Rapold
         </div>
       </div>
@@ -163,10 +170,24 @@ export default function PrintQuestions() {
             }
             
             /* Zusätzliche Print-Optimierungen */
+            .print-force-color {
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+              color-adjust: exact !important;
+              background-color: #F97316 !important;
+            }
+            
             svg {
-              color-adjust: exact;
-              -webkit-print-color-adjust: exact;
-              print-color-adjust: exact;
+              color-adjust: exact !important;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            
+            svg path {
+              color-adjust: exact !important;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+              fill: white !important;
             }
           }
           
