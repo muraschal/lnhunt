@@ -268,12 +268,34 @@ If you adapt or build on top of lnhunt, contributions and feedback are welcome!
 
 ---
 
-## 🚨 Updates & Features
+## �� Updates & Features (Version 2.0)
 
 - **Completely new UI:**
   - Question tiles now show the respective image as a full badge after solving.
   - Progress indicator and secret phrase are only shown if at least one question is solved.
   - The hint 'Click on a question...' is only shown if there are still open questions.
+  - **New! Code-Box mit zentrierten Elementen und gold-stilisierten Titeln**
+  - **New! Optimierte Video-Größen für Desktop und Mobile mit 720px max-width**
+  - **New! QR-Code mit Glassmorphism-Effekt nach erfolgreicher Beanspruchung**
+  - **New! Verbesserte Darstellung der Codes in der Progress-Anzeige mit Lightning-Gold-Styling**
+
+- **Dev-Mode Integration:**
+  - **New! Interaktiver Dev-Mode Toggle mit Slider für einfaches Testen**
+  - **New! Automatische Aktivierung des Dev-Modes in Entwicklungs- und Preview-Umgebungen**
+  - **New! Persistenter Dev-Mode Status mit localStorage**
+  - **New! Audio-Feedback beim Umschalten des Dev-Modes**
+  - **New! Optische Unterscheidung des aktiven/inaktiven Dev-Modes**
+
+- **Verbesserte Benutzerfreundlichkeit:**
+  - **New! Automatisches Ausblenden der Anleitung nach der ersten Interaktion**
+  - **New! Claim-Status-Tracking mit lokalem Speicher zur Vermeidung von Mehrfach-Claims**
+  - **New! LNHunt-Abschließen-Button ändert sich nach erfolgreicher Beanspruchung**
+  - **New! LNURL String und Kopierfunktion werden nach Beanspruchung deaktiviert**
+
+- **Fortgeschrittene Komponenten-Kommunikation:**
+  - **New! Globaler Zustand für den Dev-Mode mit reaktiven Komponenten**
+  - **New! Verbesserte Synchronisation zwischen Komponenten**
+  - **New! Reaktives Polling für Status-Updates alle 500ms**
 
 - **Questions & Answers:**
   - All questions and answers are managed via the `questions.json` file.
@@ -302,6 +324,8 @@ If you adapt or build on top of lnhunt, contributions and feedback are welcome!
   - Copyright notice in the footer with the current year.
   - Responsive, accessible UI.
   - All static assets (images, audio) are versioned in the public folder.
+  - **New! Performance-Optimierungen für Videos und Animationen**
+  - **New! Verbesserte Fade-In/Fade-Out Übergänge zwischen Screens**
 
 ---
 
@@ -326,6 +350,18 @@ If you adapt or build on top of lnhunt, contributions and feedback are welcome!
 
 ---
 
+### Dev-Mode Toggle Funktion 
+
+- **New! Der Dev-Mode-Toggle erlaubt das Testen der Anwendung ohne echte Lightning-Zahlungen**
+- **New! Im aktiven Dev-Mode werden:**
+  - **Passwörter automatisch ausgefüllt**
+  - **Mock-Rechnungen generiert** 
+  - **Zahlungen automatisch simuliert**
+- **New! Der Dev-Mode ist über einen Slider-Toggle direkt in der UI zugänglich**
+- **New! Der Toggle-Zustand wird persistent gespeichert und zwischen Sitzungen beibehalten**
+
+---
+
 ### Notes on LNURL Withdrawal Reward
 
 - The final LNURL-withdraw is shown as a QR code and direct link as soon as all questions are solved.
@@ -333,6 +369,9 @@ If you adapt or build on top of lnhunt, contributions and feedback are welcome!
 - The participant's name should be entered in the comment field of the wallet.
 - Players receive sats as a reward for completing all questions.
 - After successful withdrawal, the success URL redirects to `/thnx`.
+- **New! Verbesserter QR-Code mit weißem Hintergrund für bessere Scanbarkeit**
+- **New! Deaktivierung von QR-Code und Copy-Funktion nach erfolgreicher Beanspruchung**
+- **New! Glassmorphism-Effekt über dem QR-Code nach erfolgreicher Beanspruchung**
 
 ---
 
@@ -345,3 +384,31 @@ Dieses Projekt verwendet einen automatisierten CI/CD-Workflow mit GitHub und Ver
 
 - **Produktion:** https://lnhunt.rapold.io
 - **Feature-Previews:** https://pr-[nummer].lnhunt.rapold.io
+
+---
+
+## Changelog Version 2.0
+
+### UI-Verbesserungen
+- Zentrale Ausrichtung aller Code-Box-Elemente
+- Gold-Stile für Titel und Code-Elemente
+- Optimierte Video-Größen (720px max-width, 60vh max-height)
+- QR-Code mit weißem Hintergrund und Padding
+- Verbessertes LNURL-Claim-Feedback mit Glassmorphism
+
+### Dev-Mode
+- Interaktiver Toggle mit Slider und Sound-Feedback
+- Globaler Dev-Mode-Status mit reaktivem State-Management
+- Automatische Initialisierung basierend auf Umgebung (localhost/preview)
+- Persistenter Status mit localStorage
+
+### UX-Optimierungen
+- Automatisches Ausblenden der Anleitung nach erster Interaktion
+- Verbessertes Claim-Status-Tracking (idle, processing, claimed, failed)
+- Änderung des LNHunt-Abschließen-Buttons nach Beanspruchung
+- Deaktivierung von QR-Code und Copy-Funktion nach Beanspruchung
+
+### Komponentenkommunikation
+- Verbesserter Datenfluss zwischen Komponenten
+- Reaktives Polling für Status-Updates
+- Globaler Entwicklungsmodus-State für konsistentes Verhalten
