@@ -7,10 +7,10 @@ const QuestionCard = ({ question }) => {
   return (
     <div 
       id={`question-${question.id}`}
-      className="bg-white border-2 border-gray-300 rounded-xl p-6 mb-12 page-break-after"
+      className="bg-white border-2 border-gray-300 rounded-xl p-4 mb-12 page-break-after"
       style={{
         pageBreakAfter: 'always',
-        minHeight: '800px',
+        minHeight: '975px',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between'
@@ -18,15 +18,15 @@ const QuestionCard = ({ question }) => {
     >
       <div>
         {/* Header mit Logo und Nummer */}
-        <div className="flex flex-col items-center mb-8">
+        <div className="flex flex-col items-center mb-4">
           {/* Logo mit LNHunt + Muraschal Schriftzug */}
-          <div className="mb-4 flex flex-col items-center">
-            <div className="flex items-center mb-2">
+          <div className="mb-2 flex flex-col items-center">
+            <div className="flex items-center mb-1">
               <div className="bg-gradient-to-br from-orange-500 to-amber-500 p-2 rounded-xl mr-2">
                 <svg 
                   xmlns="http://www.w3.org/2000/svg" 
-                  width="30" 
-                  height="30" 
+                  width="24" 
+                  height="24" 
                   viewBox="0 0 24 24" 
                   fill="none" 
                   stroke="currentColor" 
@@ -39,7 +39,7 @@ const QuestionCard = ({ question }) => {
                 </svg>
               </div>
               <div className="flex flex-col">
-                <h1 className="text-3xl font-bold">
+                <h1 className="text-2xl font-bold">
                   <span className="bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-amber-500">
                     LNHunt
                   </span>
@@ -53,7 +53,7 @@ const QuestionCard = ({ question }) => {
                 textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
                 fontWeight: 400,
                 letterSpacing: "0.5px",
-                fontSize: "1.25rem",
+                fontSize: "1rem",
                 transform: "rotate(-3deg)",
                 color: "#000000",
                 marginTop: "-5px"
@@ -62,25 +62,25 @@ const QuestionCard = ({ question }) => {
               by Muraschal
             </div>
           </div>
-          <div className="flex items-center bg-orange-500 text-white px-4 py-2 rounded-full font-bold">
+          <div className="flex items-center bg-orange-500 text-white px-4 py-1 rounded-full font-bold">
             Frage Nr.{question.id.replace('q', '')}
           </div>
         </div>
         
         {/* Frage-Titel */}
-        <h2 className="text-2xl font-bold mb-8 text-center border-b-2 border-gray-200 pb-4">
+        <h2 className="text-xl font-bold mb-4 text-center border-b-2 border-gray-200 pb-2">
           {question.question}
         </h2>
         
-        {/* Bild */}
-        <div className="mb-10 flex justify-center">
-          <div className="p-2 border border-gray-300 rounded-lg shadow-md bg-white" style={{ maxWidth: '80%' }}>
+        {/* Bild - jetzt mit Vollbreite */}
+        <div className="mb-6 flex justify-center">
+          <div className="p-2 border border-gray-300 rounded-lg shadow-md bg-white w-full">
             <img 
               src={`/images/${question.id}.png`} 
               alt={`Bild für Frage ${question.id}`}
               style={{ 
-                maxHeight: '300px', 
-                maxWidth: '100%',
+                width: '100%',
+                height: '520px',
                 objectFit: 'contain',
                 borderRadius: '0.25rem'
               }}
@@ -90,16 +90,16 @@ const QuestionCard = ({ question }) => {
         </div>
         
         {/* Antwortoptionen - ohne Markierung der richtigen Antwort */}
-        <div className="mt-8 mb-8">
-          <h3 className="text-lg font-bold mb-3 border-l-4 border-orange-500 pl-2">Antwortoptionen:</h3>
-          <div className="space-y-2">
+        <div className="mt-4 mb-4">
+          <h3 className="text-base font-bold mb-2 border-l-4 border-orange-500 pl-2">Antwortoptionen:</h3>
+          <div className="space-y-1">
             {question.options && question.options.map((option, idx) => (
               <div 
                 key={idx}
-                className="border border-gray-300 rounded-lg p-3 bg-white text-black"
+                className="border border-gray-300 rounded-lg p-2 bg-white text-black"
               >
                 <div className="flex items-center">
-                  <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center mr-3 font-bold">
+                  <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center mr-3 font-bold text-sm">
                     {idx + 1}
                   </div>
                   <span>{option}</span>
@@ -112,10 +112,10 @@ const QuestionCard = ({ question }) => {
       
       {/* Code Physical */}
       <div className="mt-auto">
-        <div className="font-bold text-sm uppercase text-gray-500 mb-2 text-center">
+        <div className="font-bold text-sm uppercase text-gray-500 mb-1 text-center">
           Code Physical
         </div>
-        <div className="text-4xl font-bold text-center p-6 border-2 border-gray-800 rounded-lg bg-gray-100 shadow-inner">
+        <div className="text-4xl font-bold text-center p-4 border-2 border-gray-800 rounded-lg bg-gray-100 shadow-inner">
           <span className="text-orange-500" style={{ letterSpacing: '0.1em' }}>{question.code_physical}</span>
         </div>
         
@@ -158,7 +158,7 @@ export default function PrintQuestions() {
             
             @page {
               size: A4;
-              margin: 1cm;
+              margin: 0.5cm;
             }
           }
           
