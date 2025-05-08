@@ -3,12 +3,9 @@ import axios from 'axios';
 // Reduziertes Logging im Entwicklungsmodus
 const isDev = process.env.NODE_ENV === 'development';
 
-// Nur initiale Logs außerhalb von Entwicklungsumgebungen
-if (!isDev) {
-  console.log("[API] create-invoice handler reached");
-  console.log("[API] LNBITS_API_URL:", process.env.LNBITS_API_URL);
-  console.log("[API] LNBITS_API_KEY:", process.env.LNBITS_API_KEY);
-  console.log("[API] LNBITS_WALLET_ID:", process.env.LNBITS_WALLET_ID);
+// Nur in der Entwicklungsumgebung debug-loggen
+if (isDev) {
+  console.log("[DEV] create-invoice handler bereit für Entwicklungsmodus");
 }
 
 const apiUrl = process.env.LNBITS_API_URL;
@@ -16,8 +13,9 @@ const apiKey = process.env.LNBITS_API_KEY;
 const walletId = process.env.LNBITS_WALLET_ID;
 
 export default async function handler(req, res) {
-  if (!isDev) {
-    console.log("[API] create-invoice called", { method: req.method, body: req.body });
+  // Reduziertes Logging
+  if (isDev) {
+    console.log("[DEV] create-invoice called", { method: req.method });
   }
   
   if (req.method !== 'POST') return res.status(405).end();
@@ -32,7 +30,7 @@ export default async function handler(req, res) {
   }
 
   if (!apiUrl || !apiKey || !walletId) {
-    console.error("[API] Fehlende LNbits-Konfiguration", { apiUrl, apiKey, walletId });
+    console.error("[API] Fehlende LNbits-Konfiguration");
     return res.status(500).json({ error: 'LNbits-Konfiguration unvollständig' });
   }
   if (!questionId) {
@@ -41,7 +39,11 @@ export default async function handler(req, res) {
   }
 
   try {
-    console.log('[API] Invoice request', { apiUrl, amount, questionId, walletId });
+    // Sicherere Logging ohne sensitive Daten
+    if (isDev) {
+      console.log('[DEV] Invoice request für Frage', { questionId, amount });
+    }
+    
     const resp = await axios.post(
       `${apiUrl}/payments`,
       {
@@ -57,7 +59,12 @@ export default async function handler(req, res) {
         } 
       }
     );
-    console.log('[API] LNbits-Response:', resp.data);
+    
+    // Erfolgslog ohne sensible Daten
+    if (isDev) {
+      console.log('[DEV] LNbits Invoice erfolgreich erstellt');
+    }
+    
     res.status(200).json({ 
       payment_request: resp.data.payment_request || resp.data.bolt11, 
       payment_hash: resp.data.payment_hash 
