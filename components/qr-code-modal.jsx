@@ -187,6 +187,24 @@ export function QRCodeModal({
    * Setzt alle States zurück und erstellt eine neue Invoice
    */
   useEffect(() => {
+    // ANTI-LOOP SCHUTZ: Einen Ref-Wert verwenden, um sicherzustellen, dass dieser Effect nur einmal läuft
+    const invoiceCreationRef = useRef(false);
+    
+    // Wenn bereits eine Invoice-Erstellung durchgeführt wurde, abbrechen
+    if (invoiceCreationRef.current) {
+      console.log("[QR-CODE] Invoice-Erstellung bereits durchgeführt, überspringe");
+      return;
+    }
+    
+    // Markieren, dass dieser Effect einmal ausgeführt wurde
+    invoiceCreationRef.current = true;
+    
+    // Wenn bereits eine Invoice oder ein Payment-Hash existiert, nicht erneut erstellen
+    if (paymentRequest || paymentHash) {
+      console.log("[QR-CODE] Invoice existiert bereits, keine neue Erstellung nötig");
+      return;
+    }
+    
     // States zurücksetzen für sauberen Neuanfang
     setPaymentStatus("pending")
     setPaymentRequest("")
@@ -339,7 +357,10 @@ export function QRCodeModal({
     }
     
     createInvoice();
-  }, [questionId, satCost, devMode, LNbits_API_KEY, LNbits_WALLET_ID, LNbits_API_URL, isDev, onDebugLog]);
+    
+    // Leere Abhängigkeitsliste, damit dieser Effect nur EINMAL beim Mounten ausgeführt wird
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // <-- Streng kontrollierte Abhängigkeitsliste, darf nicht verändert werden!
 
   /**
    * Effect: Zahlungsstatus-Polling
@@ -355,11 +376,23 @@ export function QRCodeModal({
       paymentStatus,
       paymentDetected
     });
+    
+    // ANTI-LOOP SCHUTZ: Ref-Wert für aktives Polling
+    const isPollingActiveRef = useRef(false);
 
     // Im Entwicklungsmodus kein echtes Polling, sondern direkte Simulation
     if (isDev || devMode) {
       // Frühzeitige Beendigung, wenn noch kein payment_hash existiert
       if (!paymentHash) return;
+      
+      // Wenn bereits ein Polling läuft, nicht erneut starten
+      if (isPollingActiveRef.current) {
+        console.log("[QR-CODE] Polling im Dev-Modus läuft bereits, überspringe");
+        return;
+      }
+      
+      // Markieren, dass Polling gestartet wurde
+      isPollingActiveRef.current = true;
       
       setPaymentStatus("processing");
       setPollingMessage("DEV-MODUS: Simuliere Zahlung...");
@@ -374,19 +407,32 @@ export function QRCodeModal({
         // Verzögerung für UI-Effekte und zur Vermeidung von Race Conditions
         setTimeout(() => {
           onPaymentComplete();
-        }, 100); // Minimale Verzögerung
-      }, 200); // Sehr kurze Verzögerung
+        }, 1500); // Auf 1,5 Sekunden erhöht
+      }, 1500); // Auf 1,5 Sekunden erhöht
       
       // Cleanup-Funktion
       return () => {
         clearTimeout(devTimer);
+        isPollingActiveRef.current = false;
       };
     }
     
     // Ab hier nur Produktionscode
     
     // Frühzeitige Beendigung, wenn noch kein payment_hash existiert
-    if (!paymentHash) return;
+    if (!paymentHash) {
+      console.log("[QR-CODE] Kein payment_hash, Polling nicht gestartet");
+      return;
+    }
+    
+    // Wenn bereits ein Polling läuft, nicht erneut starten
+    if (isPollingActiveRef.current) {
+      console.log("[QR-CODE] Polling läuft bereits, überspringe");
+      return;
+    }
+    
+    // Markieren, dass Polling gestartet wurde
+    isPollingActiveRef.current = true;
     
     // Flag zum Abbrechen des Pollings beim Unmounten der Komponente
     let cancelled = false;
@@ -397,7 +443,7 @@ export function QRCodeModal({
     }
     
     // Polling mit längeren Intervallen für bessere Performance und Server-Schonung
-    let pollingDelay = 8000; // 8 Sekunden initiale Verzögerung (erhöht von 5s)
+    let pollingDelay = 15000; // 15 Sekunden initiale Verzögerung
     const maxDelay = 30000; // 30 Sekunden maximal
     
     // Timer-ID für Polling, um sicherzustellen, dass nur eine Instanz aktiv ist
@@ -409,14 +455,23 @@ export function QRCodeModal({
     // Nach kurzer Zeit aktualisierten Status anzeigen
     setTimeout(() => {
       if (!cancelled) {
-        setPollingMessage(`Warte auf Zahlung... Überprüfung in 8 Sekunden.`);
+        setPollingMessage(`Warte auf Zahlung... Überprüfung in ${Math.round(pollingDelay/1000)} Sekunden.`);
       }
     }, 1500);
     
     const poll = async () => {
       if (cancelled) return;
       
+      // Flag für laufenden API-Aufruf
+      let apiCallInProgress = false;
+      
       try {
+        if (apiCallInProgress) {
+          console.log("[QR-CODE] API-Aufruf läuft bereits, überspringe");
+          return;
+        }
+        
+        apiCallInProgress = true;
         setPollingMessage("Überprüfe Zahlung...");
         
         // API-Aufruf zur Prüfung des Zahlungsstatus (über einen Proxy auf dem Server)
@@ -486,7 +541,7 @@ export function QRCodeModal({
           setPollingMessage(`Warte auf Zahlung... Nächste Überprüfung in ${waitSeconds} Sekunden.`);
           devLog(`Zahlung noch nicht erkannt. Nächster Check in ${waitSeconds} Sekunden.`);
           
-          pollTimerId = setTimeout(poll, pollingDelay);
+          if (!cancelled) pollTimerId = setTimeout(poll, pollingDelay);
         }
       } catch (err) {
         // Allgemeine Fehlerbehandlung und Logging
@@ -518,6 +573,7 @@ export function QRCodeModal({
     return () => { 
       devLog('Cleanup: Polling wird beendet');
       cancelled = true;
+      isPollingActiveRef.current = false;
       if (pollTimerId) {
         clearTimeout(pollTimerId);
       }
