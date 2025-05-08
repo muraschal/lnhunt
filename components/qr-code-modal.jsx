@@ -130,6 +130,10 @@ export function QRCodeModal({
   // Insbesondere bei Race-Conditions oder schnellen Polling-Zyklen kritisch
   const [paymentDetected, setPaymentDetected] = useState(false)
   
+  // ANTI-LOOP SCHUTZ: Ref-Werte für die Vermeidung von mehrfachen Aufrufen
+  const invoiceCreationRef = useRef(false);
+  const isPollingActiveRef = useRef(false);
+  
   // Polling Information für UI-Updates
   const [pollingMessage, setPollingMessage] = useState("");
   
@@ -188,7 +192,6 @@ export function QRCodeModal({
    */
   useEffect(() => {
     // ANTI-LOOP SCHUTZ: Einen Ref-Wert verwenden, um sicherzustellen, dass dieser Effect nur einmal läuft
-    const invoiceCreationRef = useRef(false);
     
     // Wenn bereits eine Invoice-Erstellung durchgeführt wurde, abbrechen
     if (invoiceCreationRef.current) {
@@ -377,8 +380,7 @@ export function QRCodeModal({
       paymentDetected
     });
     
-    // ANTI-LOOP SCHUTZ: Ref-Wert für aktives Polling
-    const isPollingActiveRef = useRef(false);
+    // ANTI-LOOP SCHUTZ: Ref-Wert für aktives Polling wurde nun nach oben verschoben
 
     // Im Entwicklungsmodus kein echtes Polling, sondern direkte Simulation
     if (isDev || devMode) {
