@@ -801,9 +801,9 @@ export default function Home() {
         </div>
 
         {/* Dev-Mode Toggle mit Slider */}
-        {!isProductionEnvironment() && (
+        {isDevOrPreviewEnvironment() && (
           <div className="mt-4 flex justify-center">
-            <div className="bg-black/70 p-2 pl-3 pr-4 rounded-xl shadow-lg flex items-center gap-3">
+            <div className="flex items-center gap-2 bg-black/50 p-2 rounded-xl">
               <span className={`text-sm ${devModeEnabled ? 'text-orange-400 font-medium' : 'text-gray-400'}`}>
                 <Code className="w-4 h-4 inline-block mr-1" />
                 Dev-Mode
