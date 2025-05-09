@@ -1032,7 +1032,17 @@ export default function Home() {
                     )}
                   </div>
                 </div>
-                <p className={`text-xs ${claimStatus === 'claimed' ? 'text-gray-500' : 'text-gray-300'} font-mono break-all`}>{FINAL_LNURL}</p>
+                {/* LNURL-Container mit bedingtem Glasmorphismus-Effekt */}
+                <div className="relative">
+                  <p className={`text-xs ${claimStatus === 'claimed' ? 'text-gray-500' : 'text-gray-300'} font-mono break-all`}>{FINAL_LNURL}</p>
+                  
+                  {/* Glasmorphismus-Overlay beim Claimed-Status */}
+                  {claimStatus === 'claimed' && (
+                    <div className="absolute inset-0 backdrop-blur-md bg-black/40 rounded-md z-5 flex items-center justify-center">
+                      <CheckCircle className="w-10 h-10 text-green-500 opacity-50" />
+                    </div>
+                  )}
+                </div>
                 
                 {/* Status-Nachricht basierend auf dem Claim-Status */}
                 {claimStatus === 'claimed' && (
